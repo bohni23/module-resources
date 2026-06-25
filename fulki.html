@@ -20,15 +20,25 @@
       --accent-d: #D17078;
       color-scheme: light dark;
     }
+    body.dark {
+      --bg:#2A0F1E; --surface:#3D1529; --border:#5C2040; --border-2:#7A2E55;
+      --text:#F5D8EC; --text-2:#D898C0; --text-3:#A86090; --text-4:#6A3050;
+      --accent:#F89831; --accent-d:#D17078;
+    }
+    body.dark #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
+    body.dark .log-btn, body.dark .vet-type-btn { filter: brightness(0.72) saturate(0.55); }
+    body.dark .stats-stat-card, body.dark .stats-peaks-card,
+    body.dark .weight-chart-wrap, body.dark .corr-card { background: #2A0A1C; }
     @media (prefers-color-scheme: dark) {
-      :root {
+      body:not(.light) {
         --bg:#2A0F1E; --surface:#3D1529; --border:#5C2040; --border-2:#7A2E55;
         --text:#F5D8EC; --text-2:#D898C0; --text-3:#A86090; --text-4:#6A3050;
         --accent:#F89831; --accent-d:#D17078;
       }
-      #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
-      .log-btn, .vet-type-btn { filter: brightness(0.88); }
-      .stats-stat-card, .stats-peaks-card, .weight-chart-wrap, .corr-card { background: #2A0A1C; }
+      body:not(.light) #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
+      body:not(.light) .log-btn, body:not(.light) .vet-type-btn { filter: brightness(0.72) saturate(0.55); }
+      body:not(.light) .stats-stat-card, body:not(.light) .stats-peaks-card,
+      body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #2A0A1C; }
     }
 
     /* ── Accessibility mode ── */
@@ -42,6 +52,17 @@
       border-color: rgba(255,255,255,0.9);
       box-shadow: 0 0 0 3px rgba(176,79,108,0.35);
     }
+    #dark-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 10px; color: #fff;
+      font-family: inherit; font-size: 14px;
+      padding: 6px 10px; cursor: pointer;
+      min-height: 36px; min-width: 36px;
+      transition: background 0.25s, border-color 0.25s;
+      line-height: 1;
+    }
+    #dark-btn:active { opacity: 0.75; }
 
     body.a11y                  { font-size: 20px; }
     body.a11y #header-title    { font-size: 34px; }
@@ -612,7 +633,10 @@
           <div id="header-title">Fulki Log 🐾</div>
           <div id="header-subtitle">Daily puppy tracker</div>
         </div>
-        <button class="edit-name-btn" data-action="toggle-a11y" id="a11y-btn" title="Accessibility mode">A</button>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button id="dark-btn" data-action="toggle-dark" title="Toggle dark / light mode">🌙</button>
+          <button class="edit-name-btn" data-action="toggle-a11y" id="a11y-btn" title="Accessibility mode">A</button>
+        </div>
       </div>
       <div id="date-nav">
         <button class="date-nav-btn" data-action="date-prev">◀</button>
@@ -1092,7 +1116,17 @@ function getLearningStage() {
   return               { label:'Expert — fully calibrated',      icon:'🎓', blend:0.98 };
 }
 
+function isDarkMode() {
+  return document.body.classList.contains('dark') ||
+    (!document.body.classList.contains('light') &&
+     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+}
 function urgency(mins) {
+  if (isDarkMode()) {
+    if (mins <= 5)  return { bg:'#3A0E18', text:'#F0B8C0', bar:'#C06070', border:'#6A2030' };
+    if (mins <= 20) return { bg:'#2A1A06', text:'#F0D898', bar:'#B89030', border:'#6A4810' };
+    return               { bg:'#0C1E14', text:'#A0C8A8', bar:'#408858', border:'#1A4028' };
+  }
   if (mins <= 5)  return { bg:'#FEE2E2', text:'#B91C1C', bar:'#EF4444', border:'#FCA5A5' };
   if (mins <= 20) return { bg:'#FEF9C3', text:'#854D0E', bar:'#EAB308', border:'#FDE047' };
   return               { bg:'#DCFCE7', text:'#166534', bar:'#22C55E', border:'#86EFAC' };
@@ -2016,6 +2050,14 @@ document.addEventListener('click', e => {
     try { localStorage.setItem('fulki_a11y', on ? '1' : '0'); } catch(e){}
   }
 
+  if (action === 'toggle-dark') {
+    const goingDark = !document.body.classList.contains('dark');
+    document.body.classList.toggle('dark', goingDark);
+    document.body.classList.toggle('light', !goingDark);
+    document.getElementById('dark-btn').textContent = goingDark ? '☀️' : '🌙';
+    try { localStorage.setItem('fulki_dark', goingDark ? '1' : '0'); } catch(e){}
+  }
+
   if (action === 'delete-vet') {
     if (confirm('Delete this record?')) {
       deleteVetNote(el.dataset.id);
@@ -2087,6 +2129,18 @@ if (localStorage.getItem('fulki_a11y') === '1') {
   document.body.classList.add('a11y');
   document.getElementById('a11y-btn')?.classList.add('on');
 }
+(function() {
+  const saved = localStorage.getItem('fulki_dark');
+  const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === '1' || (saved === null && sysDark);
+  if (isDark) {
+    document.body.classList.add('dark');
+    const btn = document.getElementById('dark-btn');
+    if (btn) btn.textContent = '☀️';
+  } else {
+    document.body.classList.add('light');
+  }
+}());
 render();
 
 // ── PWA Service Worker ──
