@@ -32,13 +32,33 @@
     }
 
     /* ── Accessibility mode ── */
-    body.a11y { font-size: 18px; }
-    body.a11y .log-btn        { padding: 20px 6px 16px; font-size: 16px; }
-    body.a11y .log-btn .btn-emoji { font-size: 34px; }
-    body.a11y .timeline-entry { padding: 14px 16px; min-height: 52px; }
-    body.a11y .tab-btn        { font-size: 12px; padding: 10px 4px 8px; }
-    body.a11y .summary-pill   { font-size: 14px; padding: 7px 14px; }
-    body.a11y #header-title   { font-size: 32px; }
+    #a11y-btn { transition: background 0.2s, color 0.2s; }
+    #a11y-btn.on { background: #B04F6C; color: #fff; }
+
+    body.a11y                  { font-size: 20px; }
+    body.a11y #header-title    { font-size: 34px; }
+    body.a11y #header-subtitle { font-size: 13px; }
+    body.a11y .section-label   { font-size: 13px; }
+    body.a11y .log-btn         { padding: 22px 6px 18px; }
+    body.a11y .btn-emoji       { font-size: 36px; }
+    body.a11y .btn-label       { font-size: 14px; }
+    body.a11y .timeline-entry  { padding: 16px; min-height: 56px; }
+    body.a11y .tl-label        { font-size: 16px; }
+    body.a11y .tl-time         { font-size: 14px; }
+    body.a11y .summary-pill    { font-size: 15px; padding: 8px 16px; }
+    body.a11y .pred-time       { font-size: 20px; }
+    body.a11y .pred-lbl        { font-size: 13px; }
+    body.a11y .pred-emoji      { font-size: 28px; }
+    body.a11y .nav-btn .nav-icon  { font-size: 22px; }
+    body.a11y .nav-btn .nav-label { font-size: 13px; }
+    body.a11y .vet-note-type   { font-size: 16px; }
+    body.a11y .vet-note-detail { font-size: 15px; }
+    body.a11y .stats-pill      { font-size: 15px; padding: 7px 14px; }
+    body.a11y .stats-stat-val  { font-size: 22px; }
+    body.a11y .stats-stat-lbl  { font-size: 13px; }
+    body.a11y .vet-type-btn    { font-size: 14px; padding: 14px 8px; }
+    body.a11y .vet-type-icon   { font-size: 24px; }
+    body.a11y .tl-delete       { font-size: 24px; min-width: 44px; min-height: 52px; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -564,7 +584,7 @@
           <div id="header-title">Fulki Log 🐾</div>
           <div id="header-subtitle">Daily puppy tracker</div>
         </div>
-        <button class="edit-name-btn" data-action="toggle-a11y" id="a11y-btn" title="Accessibility mode">👁 A</button>
+        <button class="edit-name-btn" data-action="toggle-a11y" id="a11y-btn" title="Accessibility mode">A</button>
       </div>
       <div id="date-nav">
         <button class="date-nav-btn" data-action="date-prev">◀</button>
@@ -1377,7 +1397,7 @@ function renderStatsTab() {
     const ctHtml = count > 0 ? `<div class="chart-ct" style="color:${cat.color}">${count}</div>` : '';
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-bar" style="height:${pct}%;background:${count>0?cat.color:'transparent'}"></div>
+        <div class="chart-bar" style="height:${pct}%;background:${count>0?`linear-gradient(to top,${cat.color}50,${cat.color})`:'transparent'}"></div>
       </div>
       <div class="chart-hr-lbl">${hrLabel(h)}</div>
       ${ctHtml}
@@ -1831,6 +1851,7 @@ document.addEventListener('click', e => {
 
   if (action === 'toggle-a11y') {
     const on = document.body.classList.toggle('a11y');
+    document.getElementById('a11y-btn').classList.toggle('on', on);
     try { localStorage.setItem('fulki_a11y', on ? '1' : '0'); } catch(e){}
   }
 
@@ -1901,7 +1922,10 @@ setInterval(() => {
 }, 30000);
 
 // ── Initial render ──
-if (localStorage.getItem('fulki_a11y') === '1') document.body.classList.add('a11y');
+if (localStorage.getItem('fulki_a11y') === '1') {
+  document.body.classList.add('a11y');
+  document.getElementById('a11y-btn')?.classList.add('on');
+}
 render();
 
 // ── PWA Service Worker ──
