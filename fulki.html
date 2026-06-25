@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Fulki Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream:       #FDF8EE;
+      --cream-dark:  #F0E8D4;
+      --accent:      #F5C842;
+      --accent-dark: #E5B030;
+      --amber:       #F5A623;
+      --red:         #D0021B;
+      --green:       #4CAF50;
+      --brown:       #3D2B1F;
+      --brown-light: #8B6B52;
+      --shadow:      rgba(61,43,31,0.12);
+      --white:       #FFFFFF;
+      --nap-blue:    #4254B0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Cochin', 'Cormorant Garamond', Palatino, 'Palatino Linotype', serif;
+      background: var(--cream-dark);
+      min-height: 100vh;
+      color: var(--brown);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app-wrapper {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background: var(--cream-dark);
+    }
+
+    #card {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Header ── */
+    #header-bar {
+      background: var(--brown);
+      color: var(--cream);
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    #header-left { display: flex; align-items: center; gap: 8px; }
+
+    #puppy-name-display {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    #puppy-name-input {
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: 700;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 6px;
+      color: var(--cream);
+      padding: 2px 8px;
+      width: 150px;
+      outline: none;
+    }
+
+    .edit-name-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      padding: 4px;
+      opacity: 0.65;
+      min-height: 36px;
+      min-width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #header-date { font-size: 13px; opacity: 0.72; font-style: italic; }
+
+    /* ── Summary strip ── */
+    #summary-strip {
+      background: var(--brown);
+      padding: 0 14px 13px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .summary-pill {
+      background: rgba(255,255,255,0.13);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .summary-pill .count {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* ── Scrollable content ── */
+    #tab-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 70px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 10px;
+    }
+
+    /* ── Prediction section ── */
+    #prediction-section { padding: 14px 14px 8px; }
+
+    .predictions-row {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .predictions-row::-webkit-scrollbar { display: none; }
+
+    .pred-card {
+      flex: 0 0 132px;
+      background: var(--white);
+      border-radius: 14px;
+      padding: 12px 11px 10px;
+      box-shadow: 0 2px 8px var(--shadow);
+      border-left: 4px solid var(--green);
+      transition: border-color 0.5s;
+    }
+    .pred-card.amber { border-left-color: var(--amber); }
+    .pred-card.red   { border-left-color: var(--red); }
+    .pred-card.pulse { animation: pulse 1.6s ease-in-out infinite; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 2px 8px var(--shadow); }
+      50%       { transform: scale(1.04); box-shadow: 0 4px 16px rgba(208,2,27,0.2); }
+    }
+
+    .pred-emoji  { font-size: 22px; }
+    .pred-label  { font-size: 11px; color: var(--brown-light); margin-top: 2px; }
+    .pred-time   { font-size: 17px; font-weight: 700; margin: 5px 0 3px; color: var(--brown); line-height: 1.15; }
+    .pred-time.amber { color: var(--amber); }
+    .pred-time.red   { color: var(--red); }
+
+    .conf-bar-bg { background: var(--cream-dark); border-radius: 4px; height: 4px; margin-top: 6px; overflow: hidden; }
+    .conf-bar    { height: 4px; border-radius: 4px; transition: width 0.5s; }
+    .conf-label  { font-size: 10px; color: var(--brown-light); margin-top: 3px; }
+
+    /* ── Log buttons ── */
+    #log-section { padding: 6px 14px 14px; }
+
+    #log-buttons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .log-btn {
+      background: var(--white);
+      border: 2px solid var(--cream-dark);
+      border-radius: 14px;
+      padding: 14px 8px;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--brown);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 82px;
+      transition: transform 0.12s, background 0.12s, border-color 0.12s;
+      box-shadow: 0 1px 5px var(--shadow);
+      user-select: none;
+    }
+    .log-btn:active {
+      transform: scale(0.95);
+      background: var(--accent);
+      border-color: var(--accent-dark);
+    }
+    .log-btn .btn-emoji { font-size: 27px; }
+    .log-btn .btn-label { font-size: 13px; font-weight: 600; letter-spacing: 0.2px; }
+
+    .log-btn.nap-active {
+      background: #EEF2FF;
+      border-color: #7B8FD8;
+    }
+    .log-btn.nap-active .btn-label {
+      color: var(--nap-blue);
+      font-size: 11.5px;
+    }
+
+    #walkies-btn {
+      grid-column: 1 / -1;
+      background: var(--accent);
+      border-color: var(--accent-dark);
+      flex-direction: row;
+      justify-content: center;
+      gap: 9px;
+      min-height: 54px;
+    }
+    #walkies-btn:active { background: var(--accent-dark); }
+    #walkies-btn .btn-label { font-size: 15px; }
+
+    /* ── Timeline ── */
+    #timeline-section { padding: 2px 14px 12px; }
+
+    .timeline-entry {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--white);
+      border-radius: 11px;
+      margin-bottom: 7px;
+      box-shadow: 0 1px 4px var(--shadow);
+      gap: 10px;
+    }
+
+    .tl-emoji { font-size: 21px; flex-shrink: 0; }
+
+    .tl-body { flex: 1; min-width: 0; }
+
+    .tl-label { font-size: 14px; font-weight: 600; }
+
+    .tl-time {
+      font-size: 12px;
+      color: var(--brown-light);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tl-time-value {
+      cursor: pointer;
+      border-bottom: 1px dashed var(--brown-light);
+    }
+
+    .tl-time-input {
+      font-family: inherit;
+      font-size: 12px;
+      border: 1px solid var(--accent);
+      border-radius: 5px;
+      padding: 1px 5px;
+      color: var(--brown);
+      background: var(--cream);
+      width: 88px;
+      outline: none;
+    }
+
+    .tl-duration {
+      font-size: 11px;
+      color: var(--brown-light);
+      background: var(--cream-dark);
+      border-radius: 8px;
+      padding: 1px 7px;
+    }
+
+    .tl-delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      color: #CCC;
+      min-height: 44px;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .tl-delete:active { color: var(--red); }
+
+    /* ── Stats ── */
+    #stats-tab { padding: 14px 14px; }
+
+    .stats-category {
+      background: var(--white);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 5px var(--shadow);
+      overflow: hidden;
+    }
+
+    .stats-cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .stats-cat-left { display: flex; align-items: center; gap: 10px; }
+    .stats-cat-emoji { font-size: 22px; }
+    .stats-cat-name  { font-size: 15px; font-weight: 600; }
+    .stats-peaks     { font-size: 12px; color: var(--brown-light); margin-top: 2px; }
+
+    .stats-expand-btn {
+      background: var(--cream-dark);
+      border: none;
+      border-radius: 8px;
+      padding: 5px 11px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--brown-light);
+      font-family: inherit;
+      font-weight: 600;
+      min-height: 32px;
+    }
+
+    .stats-chart { display: none; padding: 0 14px 14px; }
+    .stats-chart.expanded { display: block; }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      height: 80px;
+      gap: 2px;
+    }
+
+    .chart-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar {
+      width: 100%;
+      background: var(--cream-dark);
+      border-radius: 2px 2px 0 0;
+      min-height: 2px;
+      transition: background 0.3s, height 0.4s;
+    }
+    .chart-bar.peak { background: var(--accent); }
+
+    .chart-bar-label {
+      font-size: 7.5px;
+      color: var(--brown-light);
+      margin-top: 3px;
+      text-align: center;
+      line-height: 1;
+    }
+
+    /* ── Vet tab ── */
+    #vet-tab { padding: 14px; }
+
+    .vet-form {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 5px var(--shadow);
+    }
+
+    .vet-form-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+
+    .vet-field { margin-bottom: 10px; }
+
+    .vet-field label {
+      display: block;
+      font-size: 11px;
+      color: var(--brown-light);
+      margin-bottom: 4px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .vet-field select,
+    .vet-field input,
+    .vet-field textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 9px;
+      padding: 9px 11px;
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 44px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .vet-field select:focus,
+    .vet-field input:focus,
+    .vet-field textarea:focus { border-color: var(--accent); }
+    .vet-field textarea { min-height: 64px; resize: vertical; }
+
+    .vet-save-btn {
+      width: 100%;
+      background: var(--brown);
+      color: var(--cream);
+      border: none;
+      border-radius: 11px;
+      padding: 13px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 48px;
+      transition: opacity 0.15s;
+    }
+    .vet-save-btn:active { opacity: 0.82; }
+
+    .vet-note-entry {
+      background: var(--white);
+      border-radius: 11px;
+      padding: 12px 14px;
+      margin-bottom: 7px;
+      box-shadow: 0 1px 4px var(--shadow);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .vet-note-icon   { font-size: 22px; flex-shrink: 0; }
+    .vet-note-body   { flex: 1; }
+    .vet-note-value  { font-size: 15px; font-weight: 600; }
+    .vet-note-date   { font-size: 12px; color: var(--brown-light); margin-top: 1px; }
+    .vet-note-notes  { font-size: 12.5px; color: var(--brown-light); margin-top: 3px; font-style: italic; }
+
+    .vet-note-delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #CCC;
+      min-height: 44px;
+      min-width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Bottom nav ── */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 420px;
+      background: var(--white);
+      border-top: 1px solid var(--cream-dark);
+      display: flex;
+      z-index: 100;
+      box-shadow: 0 -2px 12px var(--shadow);
+    }
+
+    .nav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--brown-light);
+      padding: 9px 4px 7px;
+      min-height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: color 0.15s;
+    }
+    .nav-btn .nav-icon { font-size: 22px; transition: transform 0.15s; }
+    .nav-btn.active    { color: var(--brown); font-weight: 700; }
+    .nav-btn.active .nav-icon { transform: scale(1.12); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--brown-light);
+      font-size: 14px;
+      font-style: italic;
+    }
+    .empty-state .big { font-size: 38px; margin-bottom: 8px; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--brown);
+      color: var(--cream);
+      padding: 9px 20px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      z-index: 200;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div id="app-wrapper">
+  <div id="card">
+
+    <div id="header-bar">
+      <div id="header-left">
+        <span id="puppy-name-display">Fulki</span>
+        <button class="edit-name-btn" data-action="edit-name" title="Edit name">✏️</button>
+      </div>
+      <span id="header-date"></span>
+    </div>
+
+    <div id="summary-strip"></div>
+
+    <div id="tab-content">
+      <div id="home-tab" class="tab-panel active">
+        <div id="prediction-section"></div>
+        <div id="log-section">
+          <div class="section-label">Log an Event</div>
+          <div id="log-buttons-grid"></div>
+        </div>
+        <div id="timeline-section">
+          <div class="section-label">Today's Timeline</div>
+          <div id="timeline"></div>
+        </div>
+      </div>
+
+      <div id="stats-tab" class="tab-panel"></div>
+      <div id="vet-tab" class="tab-panel"></div>
+    </div>
+
+    <nav id="bottom-nav">
+      <button class="nav-btn active" data-action="tab-home">
+        <span class="nav-icon">🏠</span>Home
+      </button>
+      <button class="nav-btn" data-action="tab-stats">
+        <span class="nav-icon">📊</span>Stats
+      </button>
+      <button class="nav-btn" data-action="tab-vet">
+        <span class="nav-icon">🩺</span>Vet
+      </button>
+    </nav>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase 9 compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ============================================================
+// A — CONFIGURATION
+// Set USE_MOCK = false after pasting your Firebase config below
+// ============================================================
+const USE_MOCK = true;
+
+// ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+// ─────────────────────────────────────────────────────────────
+
+// ── Mock data (only active when USE_MOCK = true) ──
+const _now = Date.now();
+const _h   = 3600000;
+const MOCK = {
+  settings: { puppyName: 'Fulki' },
+  logs: [
+    { id:'m1',  type:'pee',     timestamp: new Date(_now - 0.4*_h) },
+    { id:'m2',  type:'food',    timestamp: new Date(_now - 1.0*_h) },
+    { id:'m3',  type:'water',   timestamp: new Date(_now - 1.5*_h) },
+    { id:'m4',  type:'poop',    timestamp: new Date(_now - 2.0*_h) },
+    { id:'m5',  type:'nap',     timestamp: new Date(_now - 4.2*_h), napEnd: new Date(_now - 3.1*_h), duration: 66 },
+    { id:'m6',  type:'pee',     timestamp: new Date(_now - 4.3*_h) },
+    { id:'m7',  type:'zoomies', timestamp: new Date(_now - 5.0*_h) },
+    { id:'m8',  type:'pee',     timestamp: new Date(_now - 6.0*_h) },
+    { id:'m9',  type:'food',    timestamp: new Date(_now - 7.2*_h) },
+    { id:'m10', type:'poop',    timestamp: new Date(_now - 8.0*_h) },
+    { id:'m11', type:'nap',     timestamp: new Date(_now - 10.0*_h), napEnd: new Date(_now - 9.0*_h), duration: 60 },
+    { id:'m12', type:'pee',     timestamp: new Date(_now - 10.3*_h) },
+    { id:'m13', type:'water',   timestamp: new Date(_now - 11.0*_h) },
+    { id:'m14', type:'pee',     timestamp: new Date(_now - 12.0*_h) },
+    // Older logs powering stats
+    { id:'m15', type:'pee',     timestamp: new Date(_now - 24*_h - 0.5*_h) },
+    { id:'m16', type:'pee',     timestamp: new Date(_now - 24*_h - 4.0*_h) },
+    { id:'m17', type:'pee',     timestamp: new Date(_now - 24*_h - 8.0*_h) },
+    { id:'m18', type:'poop',    timestamp: new Date(_now - 24*_h - 1.0*_h) },
+    { id:'m19', type:'poop',    timestamp: new Date(_now - 24*_h - 7.0*_h) },
+    { id:'m20', type:'food',    timestamp: new Date(_now - 24*_h - 1.0*_h) },
+    { id:'m21', type:'food',    timestamp: new Date(_now - 24*_h - 7.0*_h) },
+    { id:'m22', type:'zoomies', timestamp: new Date(_now - 24*_h - 5.0*_h) },
+    { id:'m23', type:'water',   timestamp: new Date(_now - 24*_h - 2.0*_h) },
+    { id:'m24', type:'nap',     timestamp: new Date(_now - 48*_h - 4.0*_h), napEnd: new Date(_now - 48*_h - 3.0*_h), duration: 60 },
+  ],
+  vetNotes: [
+    { id:'v1', category:'weight',       date: new Date(_now - 7*24*_h),  value:'8.2 kg',              notes:'Vet check — healthy!' },
+    { id:'v2', category:'vaccination',  date: new Date(_now - 14*24*_h), value:'Parvovirus booster',  notes:'' },
+  ]
+};
+
+// ============================================================
+// B — STATE
+// ============================================================
+const state = {
+  tab:             'home',
+  logs:            [],
+  settings:        { puppyName: 'Fulki' },
+  vetNotes:        [],
+  napInProgress:   null,
+  predictions:     {},
+  expandedCharts:  new Set(),
+};
+
+// ============================================================
+// C — FIREBASE INIT & LISTENERS
+// ============================================================
+let db = null;
+
+if (!USE_MOCK) {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  db.enablePersistence().catch(() => {});
+
+  const toDate = ts => ts?.toDate ? ts.toDate() : ts;
+
+  db.collection('logs').orderBy('timestamp','desc').onSnapshot(snap => {
+    state.logs = snap.docs.map(d => ({
+      id:        d.id,
+      type:      d.data().type,
+      timestamp: toDate(d.data().timestamp),
+      napEnd:    toDate(d.data().napEnd) || null,
+      duration:  d.data().duration || null,
+    }));
+    recoverNapState();
+    computePredictions();
+    render();
+  });
+
+  db.collection('settings').doc('main').onSnapshot(snap => {
+    if (snap.exists) state.settings = snap.data();
+    renderHeader();
+  });
+
+  db.collection('vetNotes').orderBy('date','desc').onSnapshot(snap => {
+    state.vetNotes = snap.docs.map(d => ({
+      id:       d.id,
+      category: d.data().category,
+      date:     toDate(d.data().date),
+      value:    d.data().value,
+      notes:    d.data().notes || '',
+    }));
+    if (state.tab === 'vet') renderVetTab();
+  });
+} else {
+  state.logs     = [...MOCK.logs].sort((a,b) => b.timestamp - a.timestamp);
+  state.settings = { ...MOCK.settings };
+  state.vetNotes = [...MOCK.vetNotes];
+  recoverNapState();
+  computePredictions();
+}
+
+// ============================================================
+// D — WRITE HELPERS
+// ============================================================
+function addLog(type, timestamp, extra={}) {
+  const entry = { type, timestamp: timestamp || new Date(), ...extra };
+  if (USE_MOCK) {
+    const id = 'mock_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    state.logs.unshift({ id, ...entry });
+    computePredictions();
+    render();
+    return;
+  }
+  const fs = firebase.firestore;
+  const data = { ...entry, timestamp: fs.Timestamp.fromDate(entry.timestamp) };
+  if (entry.napEnd) data.napEnd = fs.Timestamp.fromDate(entry.napEnd);
+  db.collection('logs').add(data);
+}
+
+function deleteLog(id) {
+  if (USE_MOCK) {
+    state.logs = state.logs.filter(l => l.id !== id);
+    if (state.napInProgress?.docId === id) state.napInProgress = null;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(id).delete();
+}
+
+function updateLogTime(id, newDate) {
+  if (USE_MOCK) {
+    const log = state.logs.find(l => l.id === id);
+    if (log) log.timestamp = newDate;
+    state.logs.sort((a,b) => b.timestamp - a.timestamp);
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(id).update({ timestamp: firebase.firestore.Timestamp.fromDate(newDate) });
+}
+
+function savePuppyName(name) {
+  state.settings.puppyName = name;
+  if (USE_MOCK) { renderHeader(); return; }
+  db.collection('settings').doc('main').set({ puppyName: name }, { merge: true });
+}
+
+function startNap() {
+  const ts = new Date();
+  if (USE_MOCK) {
+    const id = 'nap_' + Date.now();
+    state.logs.unshift({ id, type:'nap', timestamp: ts, napEnd: null, duration: null });
+    state.napInProgress = { docId: id, startTime: ts };
+    render();
+    return;
+  }
+  db.collection('logs').add({
+    type: 'nap',
+    timestamp: firebase.firestore.Timestamp.fromDate(ts),
+    napEnd: null,
+    duration: null,
+  }).then(ref => {
+    state.napInProgress = { docId: ref.id, startTime: ts };
+  });
+}
+
+function endNap() {
+  const end      = new Date();
+  const duration = Math.round((end - state.napInProgress.startTime) / 60000);
+  if (USE_MOCK) {
+    const log = state.logs.find(l => l.id === state.napInProgress.docId);
+    if (log) { log.napEnd = end; log.duration = duration; }
+    state.napInProgress = null;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(state.napInProgress.docId).update({
+    napEnd:   firebase.firestore.Timestamp.fromDate(end),
+    duration,
+  });
+  state.napInProgress = null;
+}
+
+function saveVetNote(data) {
+  const entry = { ...data, date: new Date() };
+  if (USE_MOCK) {
+    state.vetNotes.unshift({ id: 'vet_' + Date.now(), ...entry });
+    renderVetTab();
+    return;
+  }
+  db.collection('vetNotes').add({ ...entry, date: firebase.firestore.Timestamp.fromDate(entry.date) });
+}
+
+function deleteVetNote(id) {
+  if (USE_MOCK) {
+    state.vetNotes = state.vetNotes.filter(v => v.id !== id);
+    renderVetTab();
+    return;
+  }
+  db.collection('vetNotes').doc(id).delete();
+}
+
+// ============================================================
+// E — PREDICTION ENGINE
+// ============================================================
+const PREDICT_CATS = ['pee','poop','zoomies'];
+const DECAY = 0.05;
+const WINDOW = 50;
+
+function computePredictions() {
+  state.predictions = {};
+  const allAsc = [...state.logs].sort((a,b) => a.timestamp - b.timestamp);
+  const lastNapEnd = allAsc.slice().reverse().find(l => l.type === 'nap' && l.napEnd)?.napEnd || null;
+
+  PREDICT_CATS.forEach(cat => {
+    const events = allAsc.filter(l => l.type === cat).slice(-WINDOW);
+    const count  = events.length;
+    const conf   = Math.min(count / 20, 1);
+
+    if (count < 2) {
+      state.predictions[cat] = { conf, minutesUntil: null, source: 'log more to predict' };
+      return;
+    }
+
+    const intervals = [];
+    for (let i = 1; i < events.length; i++)
+      intervals.push(events[i].timestamp - events[i-1].timestamp);
+
+    const weights = intervals.map((_,i) => Math.exp(-DECAY * (intervals.length - 1 - i)));
+    const wSum    = weights.reduce((a,b) => a+b, 0);
+    const wMean   = intervals.reduce((acc, iv, i) => acc + iv * weights[i], 0) / wSum;
+
+    let nextMs = events[events.length - 1].timestamp.getTime() + wMean;
+    let source = `${count} logs`;
+
+    // Post-nap trigger override for pee / poop
+    if ((cat === 'pee' || cat === 'poop') && lastNapEnd) {
+      const delays = [];
+      allAsc.forEach(l => {
+        if (l.type === 'nap' && l.napEnd) {
+          const first = allAsc.find(x =>
+            x.type === cat &&
+            x.timestamp > l.napEnd &&
+            (x.timestamp - l.napEnd) < 30 * 60000
+          );
+          if (first) delays.push(first.timestamp - l.napEnd);
+        }
+      });
+      if (delays.length >= 2) {
+        const meanDelay = delays.reduce((a,b) => a+b, 0) / delays.length;
+        const triggerMs = lastNapEnd.getTime() + meanDelay;
+        if (triggerMs > Date.now() || (Date.now() - triggerMs) < 5 * 60000) {
+          nextMs = triggerMs;
+          source = 'after nap';
+        }
+      }
+    }
+
+    state.predictions[cat] = { conf, minutesUntil: (nextMs - Date.now()) / 60000, source };
+  });
+}
+
+function recoverNapState() {
+  const active = state.logs.find(l => l.type === 'nap' && !l.napEnd);
+  state.napInProgress = active
+    ? { docId: active.id, startTime: active.timestamp }
+    : null;
+}
+
+// ============================================================
+// F — RENDER FUNCTIONS
+// ============================================================
+const CATS = [
+  { key:'food',    emoji:'🍗', label:'Food'    },
+  { key:'water',   emoji:'💧', label:'Water'   },
+  { key:'nap',     emoji:'😴', label:'Nap'     },
+  { key:'pee',     emoji:'🌱', label:'Pee'     },
+  { key:'poop',    emoji:'💩', label:'Poop'    },
+  { key:'zoomies', emoji:'🏎️', label:'Zoomies' },
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
+
+function render() {
+  renderHeader();
+  renderSummaryStrip();
+  renderPredictions();
+  renderLogButtons();
+  renderTimeline();
+  if (state.tab === 'stats') renderStatsTab();
+  if (state.tab === 'vet')   renderVetTab();
+}
+
+function renderHeader() {
+  const el = document.getElementById('puppy-name-display');
+  if (el) el.textContent = state.settings.puppyName || 'Fulki';
+  document.getElementById('header-date').textContent =
+    new Date().toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function renderSummaryStrip() {
+  const midnight = new Date(); midnight.setHours(0,0,0,0);
+  const today = state.logs.filter(l => l.timestamp >= midnight);
+  document.getElementById('summary-strip').innerHTML = CATS.map(c => {
+    const n = today.filter(l => l.type === c.key).length;
+    return `<div class="summary-pill">${c.emoji} <span class="count">${n}</span></div>`;
+  }).join('');
+}
+
+function renderPredictions() {
+  const section = document.getElementById('prediction-section');
+  section.innerHTML =
+    `<div class="section-label">Next Predicted</div><div class="predictions-row">` +
+    PREDICT_CATS.map(cat => {
+      const p = state.predictions[cat] || {};
+      const c = CAT[cat];
+      let timeText = 'Learning…';
+      let cls = '';
+
+      if (p.minutesUntil !== null && p.conf >= 0.2) {
+        const m = Math.round(p.minutesUntil);
+        const abs = Math.abs(m);
+        const fmt = abs >= 60 ? `${Math.floor(abs/60)}h ${abs%60}m` : `${abs}m`;
+        timeText = m > 0 ? `In ~${fmt}` : `Overdue ${fmt}`;
+        cls = m > 10 ? '' : m > 5 ? 'amber' : 'red';
+      }
+
+      const pct   = Math.round((p.conf || 0) * 100);
+      const barBg = cls === 'red' ? '#D0021B' : cls === 'amber' ? '#F5A623' : '#4CAF50';
+      const pulse = cls === 'red' ? 'pulse' : '';
+
+      return `<div class="pred-card ${cls} ${pulse}">
+        <div class="pred-emoji">${c.emoji}</div>
+        <div class="pred-label">${c.label}</div>
+        <div class="pred-time ${cls}">${timeText}</div>
+        <div class="conf-bar-bg">
+          <div class="conf-bar" style="width:${pct}%;background:${barBg}"></div>
+        </div>
+        <div class="conf-label">${p.source || '—'} · ${pct}%</div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function renderLogButtons() {
+  const elapsed = state.napInProgress
+    ? Math.round((Date.now() - state.napInProgress.startTime) / 60000)
+    : 0;
+
+  document.getElementById('log-buttons-grid').innerHTML =
+    CATS.map(c => {
+      const isActive = c.key === 'nap' && state.napInProgress;
+      const label    = isActive ? `End Nap (${elapsed}m)` : c.label;
+      return `<button class="log-btn${isActive ? ' nap-active' : ''}" data-action="log" data-type="${c.key}">
+        <span class="btn-emoji">${c.emoji}</span>
+        <span class="btn-label">${label}</span>
+      </button>`;
+    }).join('') +
+    `<button id="walkies-btn" class="log-btn" data-action="walkies">
+      <span class="btn-emoji">🐕</span>
+      <span class="btn-label">Walkies (Pee + Poop)</span>
+    </button>`;
+}
+
+function renderTimeline() {
+  const midnight = new Date(); midnight.setHours(0,0,0,0);
+  const today = state.logs.filter(l => l.timestamp >= midnight);
+  const el    = document.getElementById('timeline');
+
+  if (!today.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="big">🌅</div>Nothing logged yet today — tap a button above!</div>`;
+    return;
+  }
+
+  el.innerHTML = today.map(log => {
+    const c    = CAT[log.type] || { emoji:'•', label: log.type };
+    const ts   = log.timestamp;
+    const tStr = ts.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    let extra  = '';
+    if (log.type === 'nap') {
+      if (log.napEnd) {
+        const endStr = log.napEnd.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+        extra = `<span class="tl-duration">${log.duration}m &nbsp;${tStr}–${endStr}</span>`;
+      } else {
+        extra = `<span class="tl-duration" style="color:var(--nap-blue)">In progress…</span>`;
+      }
+    }
+    return `<div class="timeline-entry" data-id="${log.id}">
+      <span class="tl-emoji">${c.emoji}</span>
+      <div class="tl-body">
+        <div class="tl-label">${c.label}</div>
+        <div class="tl-time">
+          <span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>
+          ${extra}
+        </div>
+      </div>
+      <button class="tl-delete" data-action="delete" data-id="${log.id}" aria-label="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderStatsTab() {
+  const tab = document.getElementById('stats-tab');
+  tab.innerHTML = `<div class="section-label" style="margin-bottom:14px">Activity Patterns</div>` +
+    CATS.map(c => {
+      const events  = state.logs.filter(l => l.type === c.key);
+      const buckets = new Array(24).fill(0);
+      events.forEach(l => { if (l.timestamp) buckets[l.timestamp.getHours()]++; });
+      const max     = Math.max(...buckets, 1);
+      const ranked  = buckets.map((v,h) => ({v,h})).sort((a,b) => b.v - a.v);
+      const topHrs  = ranked.slice(0,3).filter(x => x.v > 0);
+      const topSet  = new Set(topHrs.map(x => x.h));
+      const peakTxt = topHrs.length
+        ? 'Peak: ' + topHrs.map(x => fmtHour(x.h)).join(', ')
+        : 'No data yet';
+      const expanded = state.expandedCharts.has(c.key);
+
+      const bars = buckets.map((v,h) => {
+        const pct   = Math.round((v / max) * 100);
+        const isPk  = topSet.has(h);
+        const lbl   = h % 4 === 0 ? `${h}` : '';
+        return `<div class="chart-bar-wrap">
+          <div class="chart-bar${isPk ? ' peak' : ''}" style="height:${pct}%"></div>
+          <div class="chart-bar-label">${lbl}</div>
+        </div>`;
+      }).join('');
+
+      return `<div class="stats-category">
+        <div class="stats-cat-header" data-action="toggle-chart" data-cat="${c.key}">
+          <div class="stats-cat-left">
+            <span class="stats-cat-emoji">${c.emoji}</span>
+            <div>
+              <div class="stats-cat-name">${c.label}</div>
+              <div class="stats-peaks">${peakTxt}</div>
+            </div>
+          </div>
+          <button class="stats-expand-btn">${expanded ? 'Hide ▲' : 'Expand ▼'}</button>
+        </div>
+        <div class="stats-chart${expanded ? ' expanded' : ''}">
+          <div class="chart-bars">${bars}</div>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function fmtHour(h) {
+  if (h === 0)  return '12am';
+  if (h < 12)   return `${h}am`;
+  if (h === 12) return '12pm';
+  return `${h-12}pm`;
+}
+
+function renderVetTab() {
+  const VET_ICON  = { weight:'⚖️', flea:'🪲', vaccination:'💉', other:'📋' };
+  const VET_LABEL = { weight:'Weight', flea:'Flea Treatment', vaccination:'Vaccination', other:'Other' };
+  const tab = document.getElementById('vet-tab');
+
+  tab.innerHTML = `
+    <div class="vet-form">
+      <div class="vet-form-title">Add a Record</div>
+      <div class="vet-field">
+        <label>Type</label>
+        <select id="vet-cat">
+          <option value="weight">Weight</option>
+          <option value="flea">Flea Treatment</option>
+          <option value="vaccination">Vaccination</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="vet-field">
+        <label>Value</label>
+        <input type="text" id="vet-value" placeholder="e.g. 8.2 kg / Frontline / Parvo booster">
+      </div>
+      <div class="vet-field">
+        <label>Notes (optional)</label>
+        <textarea id="vet-notes" placeholder="Any additional details…"></textarea>
+      </div>
+      <button class="vet-save-btn" data-action="save-vet">Save Record</button>
+    </div>
+
+    <div class="section-label">History</div>
+    ${state.vetNotes.length === 0
+      ? `<div class="empty-state"><div class="big">📋</div>No vet records yet.</div>`
+      : state.vetNotes.map(n => `
+          <div class="vet-note-entry">
+            <span class="vet-note-icon">${VET_ICON[n.category] || '📋'}</span>
+            <div class="vet-note-body">
+              <div class="vet-note-value">${VET_LABEL[n.category] || n.category}: ${n.value}</div>
+              <div class="vet-note-date">${n.date.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+              ${n.notes ? `<div class="vet-note-notes">${n.notes}</div>` : ''}
+            </div>
+            <button class="vet-note-delete" data-action="delete-vet" data-id="${n.id}">✕</button>
+          </div>`).join('')
+    }`;
+}
+
+// ============================================================
+// G — EVENT DELEGATION
+// ============================================================
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+
+  if (action === 'log') {
+    const type = el.dataset.type;
+    if (type === 'nap') {
+      if (state.napInProgress) {
+        endNap();
+        showToast('😴 Nap ended');
+      } else {
+        startNap();
+        showToast('😴 Nap started');
+      }
+    } else {
+      addLog(type);
+      showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
+    }
+  }
+
+  if (action === 'walkies') {
+    addLog('pee');
+    addLog('poop');
+    showToast('🐕 Walkies — Pee + Poop logged');
+  }
+
+  if (action === 'delete') {
+    const id  = el.dataset.id;
+    const log = state.logs.find(l => l.id === id);
+    const lbl = log
+      ? `${CAT[log.type]?.label} at ${log.timestamp.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`
+      : 'this entry';
+    if (confirm(`Delete ${lbl}?`)) {
+      deleteLog(id);
+      showToast('Deleted');
+    }
+  }
+
+  if (action === 'edit-name') {
+    const display = document.getElementById('puppy-name-display');
+    if (!display) return;
+    const cur   = state.settings.puppyName;
+    const input = Object.assign(document.createElement('input'), {
+      id:    'puppy-name-input',
+      value: cur,
+    });
+    display.replaceWith(input);
+    input.focus(); input.select();
+    const done = () => {
+      const name = input.value.trim() || cur;
+      savePuppyName(name);
+      input.replaceWith(Object.assign(document.createElement('span'), {
+        id:          'puppy-name-display',
+        textContent: name,
+      }));
+    };
+    input.addEventListener('blur', done);
+    input.addEventListener('keydown', ev => { if (ev.key === 'Enter') input.blur(); });
+  }
+
+  if (action === 'tab-home')  switchTab('home');
+  if (action === 'tab-stats') switchTab('stats');
+  if (action === 'tab-vet')   switchTab('vet');
+
+  if (action === 'toggle-chart') {
+    const cat = el.dataset.cat;
+    state.expandedCharts.has(cat)
+      ? state.expandedCharts.delete(cat)
+      : state.expandedCharts.add(cat);
+    renderStatsTab();
+  }
+
+  if (action === 'edit-time') {
+    const id    = el.dataset.id;
+    const orig  = new Date(parseInt(el.dataset.ts));
+    const hh    = String(orig.getHours()).padStart(2,'0');
+    const mm    = String(orig.getMinutes()).padStart(2,'0');
+    const input = Object.assign(document.createElement('input'), {
+      type:      'time',
+      className: 'tl-time-input',
+      value:     `${hh}:${mm}`,
+    });
+    el.replaceWith(input);
+    input.focus();
+    const save = () => {
+      if (!input.value) return;
+      const [nh, nm] = input.value.split(':').map(Number);
+      const nd = new Date(orig);
+      nd.setHours(nh, nm, 0, 0);
+      updateLogTime(id, nd);
+    };
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', ev => { if (ev.key === 'Enter') input.blur(); });
+  }
+
+  if (action === 'save-vet') {
+    const cat   = document.getElementById('vet-cat').value;
+    const value = document.getElementById('vet-value').value.trim();
+    const notes = document.getElementById('vet-notes').value.trim();
+    if (!value) { alert('Please enter a value.'); return; }
+    saveVetNote({ category: cat, value, notes });
+    document.getElementById('vet-value').value = '';
+    document.getElementById('vet-notes').value = '';
+    showToast('Record saved');
+  }
+
+  if (action === 'delete-vet') {
+    if (confirm('Delete this record?')) {
+      deleteVetNote(el.dataset.id);
+      showToast('Deleted');
+    }
+  }
+});
+
+// ============================================================
+// H — UTILITIES
+// ============================================================
+function switchTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`${tab}-tab`).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-action="tab-${tab}"]`).classList.add('active');
+  if (tab === 'stats') renderStatsTab();
+  if (tab === 'vet')   renderVetTab();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// Refresh predictions + nap elapsed timer every 30 s
+setInterval(() => {
+  computePredictions();
+  renderPredictions();
+  if (state.napInProgress) renderLogButtons();
+}, 30000);
+
+// ── Initial render ──
+render();
+</script>
+</body>
+</html>
