@@ -88,6 +88,7 @@
     body.a11y .pred-emoji      { font-size: 48px; }
     body.a11y .predictions-row { grid-template-columns: repeat(2, 1fr) !important; }
     body.a11y #log-buttons-grid { gap: 6px; }
+    body.a11y #walkies-btn      { font-size: 26px; padding: 18px 16px; }
     body.a11y .gr-fact-card    { padding: 20px; }
     body.a11y .gr-fact-label   { font-size: 22px !important; }
     body.a11y .gr-fact-text    { font-size: 28px !important; line-height: 1.5; }
@@ -873,12 +874,10 @@
       <button class="water-size-btn" data-action="nap-type" data-type="nap">
         <span class="water-size-emoji">💤</span>
         <span class="water-size-lbl">Nap</span>
-        <span class="water-size-ml">Daytime</span>
       </button>
       <button class="water-size-btn" data-action="nap-type" data-type="sleep">
         <span class="water-size-emoji">🌙</span>
         <span class="water-size-lbl">Sleep</span>
-        <span class="water-size-ml">Overnight</span>
       </button>
     </div>
     <button class="water-size-cancel" data-action="nap-type-cancel">Cancel</button>
@@ -1612,12 +1611,29 @@ function renderPredictions() {
       isUrgent = m <= 5;
     }
 
+    // While napping: override card to show expected wake time
+    let displayEmoji = c.emoji;
+    let displayLabel = c.label;
+    if (cat === 'nap' && state.napInProgress) {
+      const pastNaps = state.logs.filter(l => l.type === 'nap' && l.duration);
+      const avgDur = pastNaps.length
+        ? pastNaps.reduce((a, b) => a + b.duration, 0) / pastNaps.length
+        : 90;
+      const wakeMs  = new Date(state.napInProgress.startTime).getTime() + avgDur * 60000;
+      clockText     = new Date(wakeMs).toLocaleTimeString('en-GB', { hour:'numeric', minute:'2-digit', hour12:true }).toUpperCase();
+      countdownText = '';
+      displayEmoji  = '☀️';
+      displayLabel  = 'Expected wake';
+      urg = { bg:'#FFF8E8', text:'#7A5800', bar:'#E8C040', border:'#F0D888' };
+      isUrgent = false;
+    }
+
     return `<div class="pred-card${isUrgent ? ' urgent' : ''}"
       style="background:${urg.bg};border-color:${urg.border}">
-      <div class="pred-emoji">${c.emoji}</div>
+      <div class="pred-emoji">${displayEmoji}</div>
       <div class="pred-time" style="color:${urg.text}">${clockText || timeText}</div>
       ${countdownText ? `<div style="font-size:10px;opacity:0.7;color:${urg.text};margin-top:1px">${countdownText}</div>` : ''}
-      <div class="pred-lbl" style="color:${urg.text}">${c.label}</div>
+      <div class="pred-lbl" style="color:${urg.text}">${displayLabel}</div>
       <div class="conf-bar-wrap">
         <div class="conf-bar-bg">
           <div class="conf-bar" style="width:${pct}%;background:${urg.bar}"></div>
@@ -2252,13 +2268,13 @@ function renderStatsTab() {
 
   // Line chart category definitions (also used by tooltip handler below)
   const LINE_CATS = [
-    { key:'food',    color:'#8C3A00', label:'Food'        },
-    { key:'water',   color:'#0A4080', label:'Water'       },
-    { key:'nap',     color:'#380858', label:'Nap'         },
-    { key:'pee',     color:'#0A420A', label:'Pee'         },
-    { key:'poop',    color:'#600A28', label:'Poop'        },
-    { key:'zoomies', color:'#6A0E18', label:'Active Play' },
-    { key:'sleep',   color:'#1A1058', label:'Sleep'       },
+    { key:'food',    color:'#FF9966', label:'Food'        },
+    { key:'water',   color:'#55AADD', label:'Water'       },
+    { key:'nap',     color:'#BB88EE', label:'Nap'         },
+    { key:'pee',     color:'#55BB77', label:'Pee'         },
+    { key:'poop',    color:'#CC9966', label:'Poop'        },
+    { key:'zoomies', color:'#FF7799', label:'Active Play' },
+    { key:'sleep',   color:'#88AACC', label:'Sleep'       },
   ];
 
   // Build the hourly line chart (all categories, avg events per hour)
@@ -2271,7 +2287,7 @@ function renderStatsTab() {
       data[lc.key] = data[lc.key].map(n => n / numDays);
     });
     const globalMax = Math.max(...LINE_CATS.flatMap(lc => data[lc.key]), 0.01);
-    const W = 330, H = 150, padL = 26, padB = 22, padT = 8, padR = 8;
+    const W = 330, H = 185, padL = 26, padB = 22, padT = 8, padR = 8;
     const cW = W - padL - padR, cH = H - padT - padB;
     const px = h => padL + (h / 23) * cW;
     const py = v => padT + (1 - v / globalMax) * cH;
@@ -2280,8 +2296,8 @@ function renderStatsTab() {
     const gridLines = [0.25, 0.5, 0.75, 1].map(frac => {
       const yg = py(globalMax * frac);
       const yVal = (globalMax * frac).toFixed(1);
-      return `<line x1="${padL}" y1="${yg}" x2="${W - padR}" y2="${yg}" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
-              <text x="${padL - 3}" y="${yg + 2.5}" font-size="6" text-anchor="end" fill="var(--text-3)" font-family="sans-serif">${yVal}</text>`;
+      return `<line x1="${padL}" y1="${yg}" x2="${W - padR}" y2="${yg}" stroke="var(--border)" stroke-width="0.6" stroke-dasharray="4,4"/>
+              <text x="${padL - 3}" y="${yg + 2.5}" font-size="7.5" text-anchor="end" fill="var(--text-3)" font-family="sans-serif">${yVal}</text>`;
     }).join('');
 
     // X-axis labels every 3h
@@ -2293,7 +2309,7 @@ function renderStatsTab() {
     let defsHtml = '<defs>';
     LINE_CATS.forEach(lc => {
       defsHtml += `<linearGradient id="lg-${lc.key}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="${lc.color}" stop-opacity="0.22"/>
+        <stop offset="0%" stop-color="${lc.color}" stop-opacity="0.32"/>
         <stop offset="100%" stop-color="${lc.color}" stop-opacity="0"/>
       </linearGradient>`;
     });
@@ -2309,13 +2325,13 @@ function renderStatsTab() {
       // Area fill
       linesHtml += `<polygon points="${areaPoints}" fill="url(#lg-${lc.key})"/>`;
       // Glow line
-      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.1"/>`;
+      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`;
       // Main line
-      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
       // Circle markers
       vals.forEach((v,h) => {
         const x = px(h).toFixed(1), y = py(v).toFixed(1);
-        linesHtml += `<circle cx="${x}" cy="${y}" r="3.5" fill="${lc.color}" stroke="#fff" stroke-width="1.2" data-cat="${lc.key}" data-hr="${h}" data-avg="${v.toFixed(2)}" style="cursor:pointer"/>`;
+        linesHtml += `<circle cx="${x}" cy="${y}" r="4.5" fill="${lc.color}" stroke="#fff" stroke-width="2" data-cat="${lc.key}" data-hr="${h}" data-avg="${v.toFixed(2)}" style="cursor:pointer"/>`;
       });
     });
 
@@ -2370,7 +2386,7 @@ function renderStatsTab() {
       <div class="weight-chart-title">📈 Average activity by hour of day</div>
       <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
         ${defsHtml}
-        <rect x="${padL}" y="${padT}" width="${cW}" height="${cH}" fill="var(--surface)" rx="4" opacity="0.6"/>
+        <rect x="${padL}" y="${padT}" width="${cW}" height="${cH}" fill="var(--surface)" rx="4" stroke="var(--border)" stroke-width="0.5"/>
         ${gridLines}
         ${xLabels}
         ${linesHtml}
