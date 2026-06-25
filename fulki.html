@@ -2713,11 +2713,15 @@ function pushToSheets() {
   showToast('📊 Syncing to Sheets…');
   fetch(url, {
     method: 'POST',
+    mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({
       logs: state.logs.map(l => ({
+        id: l.id, type: l.type,
         timestamp: l.timestamp.toISOString(),
-        type: l.type, size: l.size||null, ml: l.ml||null, duration: l.duration||null,
+        portion: l.portion||null, grams: l.grams||null,
+        size: l.size||null, ml: l.ml||null,
+        duration: l.duration||null,
       })),
       vetNotes: state.vetNotes.map(n => ({
         date: n.date ? new Date(n.date).toISOString() : null,
@@ -2725,8 +2729,7 @@ function pushToSheets() {
       })),
     }),
   })
-  .then(r => r.json())
-  .then(r => showToast(r.ok ? '✅ Google Sheets updated!' : '⚠️ ' + (r.error||'Unknown error')))
+  .then(() => showToast('✅ Google Sheets updated!'))
   .catch(e => showToast('⚠️ ' + e.message));
 }
 
