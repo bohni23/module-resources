@@ -1437,8 +1437,8 @@ function renderFoodPoopHeatmap() {
   const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
   if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🥩 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
 
-  const bucketLabels = ['<30m','30–60m','1–2h','2–4h','4h+'];
-  const bucketMaxMs  = [30, 60, 120, 240, Infinity].map(m => m * 60000);
+  const bucketLabels = ['<3h','3–6h','6–9h','9–12h','12h+'];
+  const bucketMaxMs  = [3, 6, 9, 12, Infinity].map(h => h === Infinity ? Infinity : h * 3600000);
 
   const days = [];
   for (let i = 13; i >= 0; i--) {
