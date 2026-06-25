@@ -29,7 +29,7 @@
     body.dark .log-btn { filter: none; background: #363d70 !important; }
     body.dark .btn-label { color: #ffffff !important; }
     body.dark .vet-type-btn { filter: none; background: #1e2445 !important; }
-    body.dark .pred-card { background: var(--surface) !important; border-color: var(--border-2) !important; }
+    body.dark .pred-card { background: var(--surface) !important; }
     body.dark .stats-stat-card, body.dark .stats-peaks-card,
     body.dark .weight-chart-wrap, body.dark .corr-card { background: #1e2445; }
     @media (prefers-color-scheme: dark) {
@@ -42,7 +42,7 @@
       body:not(.light) .log-btn { filter: none; background: #363d70 !important; }
       body:not(.light) .btn-label { color: #ffffff !important; }
       body:not(.light) .vet-type-btn { filter: none; background: #1e2445 !important; }
-      body:not(.light) .pred-card { background: var(--surface) !important; border-color: var(--border-2) !important; }
+      body:not(.light) .pred-card { background: var(--surface) !important; }
       body:not(.light) .stats-stat-card, body:not(.light) .stats-peaks-card,
       body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #1e2445; }
     }
@@ -841,6 +841,8 @@ const state = {
   catNotes:         {},   // { pee: [{id, text, date}], … }
   activeCatNote:    null, // cat key currently being edited
   waterSizePending: false,
+  vetFilter:        { type: 'all', search: '' },
+  sheetsUrl:        '',
 };
 
 function isSameDay(a, b) {
@@ -850,7 +852,7 @@ function startOfDay(d) { const r=new Date(d); r.setHours(0,0,0,0); return r; }
 function endOfDay(d)   { const r=new Date(d); r.setHours(23,59,59,999); return r; }
 
 // Prediction constants needed before Firebase init calls computePredictions()
-const PREDICT_CATS = ['pee','poop','zoomies'];
+const PREDICT_CATS = ['pee','poop','nap'];
 const DECAY  = 0.05;
 const WINDOW = 50;
 
@@ -1175,7 +1177,8 @@ function getLearningStage() {
   if (days < 7)  return { label:'Patterns starting to emerge',   icon:'📈', blend:0.55 };
   if (days < 14) return { label:'Growing more confident',        icon:'🎯', blend:0.75 };
   if (days < 30) return { label:'Reliable predictions',          icon:'⭐', blend:0.90 };
-  return               { label:'Expert — fully calibrated',      icon:'🎓', blend:0.98 };
+  if (days < 60) return { label:'Fully calibrated',             icon:'🎓', blend:0.98 };
+  return               { label:'Expert — fully calibrated',     icon:'🏆', blend:1.0  };
 }
 
 function isDarkMode() {
@@ -1185,9 +1188,9 @@ function isDarkMode() {
 }
 function urgency(mins) {
   if (isDarkMode()) {
-    if (mins <= 5)  return { bg:'var(--surface)', text:'#e08898', bar:'#9058a0', border:'var(--border-2)' };
-    if (mins <= 20) return { bg:'var(--surface)', text:'#60b0d8', bar:'#005c7f', border:'var(--border-2)' };
-    return               { bg:'var(--surface)', text:'#008780', bar:'#008780', border:'var(--border-2)' };
+    if (mins <= 5)  return { bg:'var(--surface)', text:'#e08898', bar:'#9058a0', border:'#e08898' };
+    if (mins <= 20) return { bg:'var(--surface)', text:'#60b0d8', bar:'#005c7f', border:'#60b0d8' };
+    return               { bg:'var(--surface)', text:'#008780', bar:'#008780', border:'#008780' };
   }
   if (mins <= 5)  return { bg:'#FEE2E2', text:'#B91C1C', bar:'#EF4444', border:'#FCA5A5' };
   if (mins <= 20) return { bg:'#FEF9C3', text:'#854D0E', bar:'#EAB308', border:'#FDE047' };
@@ -1266,10 +1269,18 @@ function renderSummaryStrip() {
 }
 
 function renderPredictions() {
-  const stage   = getLearningStage();
+  const stage    = getLearningStage();
   const stagePct = Math.round(stage.blend * 100);
 
-  const stageBanner = `
+  if (stagePct >= 100) {
+    if (!localStorage.getItem('fulki_100pct_at')) {
+      try { localStorage.setItem('fulki_100pct_at', Date.now()); } catch(e) {}
+    }
+  }
+  const _100pctAt  = parseInt(localStorage.getItem('fulki_100pct_at') || '0', 10);
+  const hideBanner = _100pctAt > 0 && (Date.now() - _100pctAt) > 24 * 3600e3;
+
+  const stageBanner = hideBanner ? '' : `
     <div id="learning-stage">
       <span class="stage-icon">${stage.icon}</span>
       <div class="stage-body">
@@ -1424,7 +1435,7 @@ function computeStreak() {
 function renderFoodPoopHeatmap() {
   const foodLogs = state.logs.filter(l=>l.type==='food').sort((a,b)=>a.timestamp-b.timestamp);
   const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
-  if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🍖 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
+  if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🥩 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
 
   const bucketLabels = ['<30m','30–60m','1–2h','2–4h','4h+'];
   const bucketMaxMs  = [30, 60, 120, 240, Infinity].map(m => m * 60000);
@@ -1458,7 +1469,7 @@ function renderFoodPoopHeatmap() {
   }).join('');
 
   return `<div class="corr-card">
-    <div class="corr-title">🍖 → 💩 Food to Poop Lag — 14 days</div>
+    <div class="corr-title">🥩 → 💩 Food to Poop Lag — 14 days</div>
     <div class="rhythm-header"><div class="rhythm-day-lbl"></div>${hdrCells}</div>
     ${rows}
     <div style="font-size:9px;color:var(--text-4);margin-top:6px">Darker = more poops at that lag after eating</div>
@@ -1542,13 +1553,18 @@ function renderStatsTab() {
   }).join('');
   const noteBtnLabel = catNotesList.length > 0 ? '📝 View / add notes' : '📝 Add note';
 
+  const napDurations = allOfType.filter(l => l.duration).map(l => l.duration);
+  const avgDurVal    = napDurations.length
+    ? Math.round(napDurations.reduce((a,b)=>a+b,0)/napDurations.length) + 'm avg'
+    : '—';
+
   const statsRow = [
     ['Last 7 days', totalLast7+'×'],
     ['Avg/day',     avgPerDay],
     ['Peak time',   topHr],
     ['Avg interval',avgInterval],
-    ['Log streak',  streak+'d'],
-    ['Total logged',allOfType.length+'×'],
+    ['Since Fulki', streak+'d'],
+    ['Total logged', sel === 'nap' ? avgDurVal : allOfType.length+'×'],
   ].map(([k,v]) => `<div class="stats-stat-card">
     <div class="stats-stat-val" style="color:${cat.color}">${v}</div>
     <div class="stats-stat-lbl">${k}</div>
@@ -1789,9 +1805,34 @@ function renderVetTab() {
       </div>
     </div>` : '';
 
-  const notesHtml = state.vetNotes.length === 0
-    ? `<div class="empty-state">No vet records yet.<br><span class="sub">Add weight checks, treatments &amp; vaccines above.</span></div>`
-    : `<div class="vet-note-list">${state.vetNotes.map(n => {
+  const filterTypeIds = ['all', ...VET_TYPES.filter(t => t.id !== 'other').map(t => t.id)];
+  const filterBtns = filterTypeIds.map(id => {
+    const t = id === 'all' ? { emoji:'📋', label:'All', color:'#7A8090' } : vtFind(id);
+    const active = state.vetFilter.type === id;
+    return `<button data-action="vet-filter-type" data-type="${id}"
+      style="background:${active?t.color:'var(--surface)'};color:${active?'#fff':t.color};
+      border:1.5px solid ${t.color};border-radius:8px;padding:5px 10px;font-size:11px;
+      font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">${t.emoji} ${t.label}</button>`;
+  }).join('');
+
+  const filterBar = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${filterBtns}</div>
+    <input type="search" placeholder="🔍 Search records…" value="${state.vetFilter.search.replace(/"/g,'&quot;')}"
+      oninput="state.vetFilter.search=this.value;renderVetTab()"
+      style="width:100%;border:1.5px solid var(--border-2);border-radius:10px;padding:9px 12px;
+      font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);
+      outline:none;margin-bottom:12px;box-sizing:border-box">`;
+
+  const filteredNotes = state.vetNotes.filter(n => {
+    if (state.vetFilter.type !== 'all' && n.category !== state.vetFilter.type) return false;
+    const q = state.vetFilter.search.trim().toLowerCase();
+    if (!q) return true;
+    return (n.value||'').toLowerCase().includes(q) || (n.notes||'').toLowerCase().includes(q);
+  });
+
+  const notesHtml = filteredNotes.length === 0
+    ? `<div class="empty-state">${state.vetNotes.length === 0 ? 'No vet records yet.<br><span class="sub">Add weight checks, treatments &amp; vaccines above.</span>' : 'No records match your filter.'}</div>`
+    : `<div class="vet-note-list">${filteredNotes.map(n => {
         const t       = vtFind(n.category);
         const nDate   = n.nextDue ? new Date(n.nextDue + 'T12:00:00') : null;
         const overdue = nDate && nDate < new Date();
@@ -1805,7 +1846,7 @@ function renderVetTab() {
           <div class="vet-note-body">
             <div class="vet-note-type" style="color:${t.color}">${t.label}</div>
             <div class="vet-note-detail">
-              ${fmtDate(n.date)}${n.value?' · '+n.value:''}${n.notes?' · '+n.notes:''}
+              ${(()=>{const vd=n.value&&n.category==='weight'?parseFloat(n.value)+'kg':n.value;return fmtDate(n.date)+(vd?' · '+vd:'')+(n.notes?' · '+n.notes:'');})()}
             </div>
             ${ndHtml}
             ${n.photo ? `<img src="${n.photo}" style="width:100%;border-radius:8px;margin-top:6px;max-height:160px;object-fit:cover;cursor:pointer" onclick="window.open(this.src)" title="Tap to view full size">` : ''}
@@ -1857,12 +1898,33 @@ function renderVetTab() {
     </div>`;
   }
 
+  const sheetsSection = `
+    <div style="margin-top:16px;background:var(--surface);border:1.5px solid var(--border-2);
+      border-radius:14px;padding:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;
+        letter-spacing:.8px;margin-bottom:10px">📊 Google Sheets Sync</div>
+      <input type="url" placeholder="Paste Apps Script web app URL…"
+        value="${(state.sheetsUrl||'').replace(/"/g,'&quot;')}"
+        oninput="state.sheetsUrl=this.value;try{localStorage.setItem('fulki_sheets_url',this.value)}catch(e){}"
+        style="width:100%;border:1.5px solid var(--border-2);border-radius:10px;padding:9px 12px;
+        font-family:inherit;font-size:12px;color:var(--text);background:var(--bg);outline:none;
+        margin-bottom:8px;box-sizing:border-box">
+      <button data-action="sheets-sync" style="width:100%;background:#1a7a4a;border:none;
+        border-radius:10px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;
+        padding:10px;cursor:pointer">📤 Push to Google Sheets</button>
+      <div style="font-size:10px;color:var(--text-4);margin-top:6px">
+        First time: paste your Apps Script web app URL above
+      </div>
+    </div>`;
+
   tab.innerHTML = `
     <div class="section-label">Health &amp; Vet Records</div>
     <div class="vet-type-grid">${typeButtons}</div>
     ${weightChartHtml}
     ${formHtml}
-    ${notesHtml}`;
+    ${filterBar}
+    ${notesHtml}
+    ${sheetsSection}`;
 }
 
 // ============================================================
@@ -1964,6 +2026,13 @@ document.addEventListener('click', e => {
     state.vetFormData  = {};
     renderVetTab();
   }
+
+  if (action === 'vet-filter-type') {
+    state.vetFilter.type = el.dataset.type;
+    renderVetTab();
+  }
+
+  if (action === 'sheets-sync') pushToSheets();
 
   if (action === 'edit-vet') {
     const note = state.vetNotes.find(n => n.id === el.dataset.id);
@@ -2220,6 +2289,29 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+function pushToSheets() {
+  const url = state.sheetsUrl;
+  if (!url) { showToast('⚠️ Paste your Apps Script URL first'); return; }
+  showToast('📊 Syncing to Sheets…');
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      logs: state.logs.map(l => ({
+        timestamp: l.timestamp.toISOString(),
+        type: l.type, size: l.size||null, ml: l.ml||null, duration: l.duration||null,
+      })),
+      vetNotes: state.vetNotes.map(n => ({
+        date: n.date ? new Date(n.date).toISOString() : null,
+        category: n.category, value: n.value||'', notes: n.notes||'', nextDue: n.nextDue||'',
+      })),
+    }),
+  })
+  .then(r => r.json())
+  .then(r => showToast(r.ok ? '✅ Google Sheets updated!' : '⚠️ ' + (r.error||'Unknown error')))
+  .catch(e => showToast('⚠️ ' + e.message));
+}
+
 function renderNotesList(cat) {
   const list  = document.getElementById('notes-list');
   if (!list) return;
@@ -2251,6 +2343,7 @@ setInterval(() => {
 }, 30000);
 
 // ── Initial render ──
+state.sheetsUrl = localStorage.getItem('fulki_sheets_url') || '';
 if (localStorage.getItem('fulki_a11y') === '1') {
   document.body.classList.add('a11y');
   document.getElementById('a11y-btn')?.classList.add('on');
