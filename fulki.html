@@ -32,33 +32,56 @@
     }
 
     /* ── Accessibility mode ── */
-    #a11y-btn { transition: background 0.2s, color 0.2s; }
-    #a11y-btn.on { background: #B04F6C; color: #fff; }
+    #a11y-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    #a11y-btn.on {
+      background: #B04F6C;
+      border-color: rgba(255,255,255,0.9);
+      box-shadow: 0 0 0 3px rgba(176,79,108,0.35);
+    }
 
     body.a11y                  { font-size: 20px; }
     body.a11y #header-title    { font-size: 34px; }
-    body.a11y #header-subtitle { font-size: 13px; }
-    body.a11y .section-label   { font-size: 13px; }
+    body.a11y #header-subtitle { font-size: 14px; }
+    body.a11y .section-label   { font-size: 14px; }
     body.a11y .log-btn         { padding: 22px 6px 18px; }
-    body.a11y .btn-emoji       { font-size: 36px; }
-    body.a11y .btn-label       { font-size: 14px; }
+    body.a11y .btn-emoji       { font-size: 42px; }
     body.a11y .timeline-entry  { padding: 16px; min-height: 56px; }
-    body.a11y .tl-label        { font-size: 16px; }
-    body.a11y .tl-time         { font-size: 14px; }
+    body.a11y .tl-label        { font-size: 20px; }
+    body.a11y .tl-time         { font-size: 16px; }
     body.a11y .summary-pill    { font-size: 15px; padding: 8px 16px; }
     body.a11y .pred-time       { font-size: 20px; }
-    body.a11y .pred-lbl        { font-size: 13px; }
-    body.a11y .pred-emoji      { font-size: 28px; }
+    body.a11y .pred-lbl        { font-size: 14px; }
+    body.a11y .pred-emoji      { font-size: 30px; }
     body.a11y .nav-btn .nav-icon  { font-size: 22px; }
     body.a11y .nav-btn .nav-label { font-size: 13px; }
-    body.a11y .vet-note-type   { font-size: 16px; }
-    body.a11y .vet-note-detail { font-size: 15px; }
-    body.a11y .stats-pill      { font-size: 15px; padding: 7px 14px; }
-    body.a11y .stats-stat-val  { font-size: 22px; }
-    body.a11y .stats-stat-lbl  { font-size: 13px; }
-    body.a11y .vet-type-btn    { font-size: 14px; padding: 14px 8px; }
-    body.a11y .vet-type-icon   { font-size: 24px; }
-    body.a11y .tl-delete       { font-size: 24px; min-width: 44px; min-height: 52px; }
+    body.a11y .vet-note-type   { font-size: 20px; }
+    body.a11y .vet-note-detail { font-size: 18px; }
+    body.a11y .vet-field-lbl   { font-size: 16px; }
+    body.a11y .vet-input       { font-size: 18px; padding: 11px 14px; }
+    body.a11y .vet-form-title  { font-size: 20px; }
+    body.a11y .vet-save-btn    { font-size: 18px; padding: 14px; }
+    body.a11y .vet-cancel-btn  { font-size: 18px; }
+    body.a11y .vet-type-btn    { font-size: 15px; padding: 14px 8px; }
+    body.a11y .vet-type-icon   { font-size: 26px; }
+    body.a11y .stats-pill      { font-size: 18px; padding: 8px 16px; }
+    body.a11y .stats-stat-val  { font-size: 24px; }
+    body.a11y .stats-stat-lbl  { font-size: 16px; }
+    body.a11y .heatmap-day-lbl { font-size: 11px; }
+    body.a11y .tl-delete       { font-size: 24px; min-width: 48px; min-height: 52px; }
+    body.a11y .empty-state     { font-size: 20px; }
+
+    /* ── Photo upload ── */
+    .photo-upload-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--surface); border: 1.5px dashed var(--border-2);
+      border-radius: 10px; padding: 10px; cursor: pointer;
+      font-size: 13px; font-weight: 600; color: var(--text-2);
+    }
+    .photo-upload-btn:active { opacity: 0.75; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -534,7 +557,7 @@
       margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px;
     }
 
-    /* ── Feed correlation ── */
+    /* ── Metabolic rhythm charts ── */
     .corr-card { background:var(--surface); border:1.5px solid var(--border-2); border-radius:14px; padding:14px; margin-top:16px; }
     .corr-title { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
     .corr-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -542,6 +565,11 @@
     .corr-bar-bg { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
     .corr-bar-fill { height:100%; border-radius:4px; }
     .corr-val { font-size:10px; color:var(--text-3); min-width:28px; text-align:right; font-family:sans-serif; }
+    .rhythm-row { display:flex; align-items:center; gap:3px; margin-bottom:3px; }
+    .rhythm-header { display:flex; align-items:center; gap:3px; margin-bottom:4px; }
+    .rhythm-day-lbl { font-size:9px; color:var(--text-3); width:52px; flex-shrink:0; font-family:sans-serif; }
+    .rhythm-hdr { flex:1; font-size:8px; color:var(--text-4); text-align:center; font-family:sans-serif; font-weight:700; }
+    .rhythm-cell { flex:1; aspect-ratio:2/1; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; font-family:sans-serif; }
 
     /* ── Category notes modal ── */
     #notes-modal {
@@ -793,6 +821,7 @@ if (!USE_MOCK) {
       value:    d.data().value,
       notes:    d.data().notes || '',
       nextDue:  d.data().nextDue || null,
+      photo:    d.data().photo   || null,
     }));
     if (state.tab === 'vet') renderVetTab();
   });
@@ -846,6 +875,23 @@ function deleteLog(id) {
     return;
   }
   db.collection('logs').doc(id).delete().catch(e => showToast('⚠️ ' + e.message));
+}
+
+function updateNapEnd(id, newDate) {
+  const log = state.logs.find(l => l.id === id);
+  if (!log) return;
+  const duration = Math.max(0, Math.round((newDate - log.timestamp) / 60000));
+  if (USE_MOCK) {
+    log.napEnd = newDate;
+    log.duration = duration;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(id).update({
+    napEnd:   firebase.firestore.Timestamp.fromDate(newDate),
+    duration,
+  }).catch(e => showToast('⚠️ ' + e.message));
 }
 
 function updateLogTime(id, newDate) {
@@ -935,8 +981,9 @@ function deleteVetNote(id) {
 // ============================================================
 function computePredictions() {
   state.predictions = {};
-  const allAsc    = [...state.logs].sort((a,b) => a.timestamp - b.timestamp);
-  const lastNapEnd = allAsc.slice().reverse().find(l => l.type === 'nap' && l.napEnd)?.napEnd || null;
+  const allAsc     = [...state.logs].sort((a,b) => a.timestamp - b.timestamp);
+  const napsDone   = allAsc.filter(l => l.type === 'nap' && l.napEnd);
+  const lastNapEnd = napsDone.slice(-1)[0]?.napEnd || null;
 
   PREDICT_CATS.forEach(cat => {
     const events = allAsc.filter(l => l.type === cat).slice(-WINDOW);
@@ -949,8 +996,18 @@ function computePredictions() {
     }
 
     const intervals = [];
-    for (let i = 1; i < events.length; i++)
-      intervals.push(events[i].timestamp - events[i-1].timestamp);
+    for (let i = 1; i < events.length; i++) {
+      let gap = events[i].timestamp - events[i-1].timestamp;
+      // For pee: subtract nap sleep time within this interval so we learn awake-time patterns
+      if (cat === 'pee') {
+        napsDone.forEach(nap => {
+          if (nap.timestamp >= events[i-1].timestamp && nap.napEnd <= events[i].timestamp)
+            gap -= (nap.napEnd - nap.timestamp);
+        });
+        if (gap < 0) gap = 0;
+      }
+      intervals.push(gap);
+    }
 
     const weights = intervals.map((_,i) => Math.exp(-DECAY * (intervals.length - 1 - i)));
     const wSum    = weights.reduce((a,b) => a+b, 0);
@@ -959,17 +1016,24 @@ function computePredictions() {
     let nextMs = events[events.length - 1].timestamp.getTime() + wMean;
     let source = `${count} logs`;
 
+    // Pee: if currently napping, push prediction forward by nap elapsed time
+    // (awake-time isn't accumulating so the clock on "time to next pee" pauses)
+    if (cat === 'pee' && state.napInProgress) {
+      const napElapsed = Date.now() - new Date(state.napInProgress.startTime).getTime();
+      nextMs += napElapsed;
+      source  = 'nap-adjusted';
+    }
+
+    // Pee/poop: override with post-nap trigger when Fulki just woke up
     if ((cat === 'pee' || cat === 'poop') && lastNapEnd) {
       const delays = [];
-      allAsc.forEach(l => {
-        if (l.type === 'nap' && l.napEnd) {
-          const first = allAsc.find(x =>
-            x.type === cat &&
-            x.timestamp > l.napEnd &&
-            (x.timestamp - l.napEnd) < 30 * 60000
-          );
-          if (first) delays.push(first.timestamp - l.napEnd);
-        }
+      napsDone.forEach(nap => {
+        const first = allAsc.find(x =>
+          x.type === cat &&
+          x.timestamp > nap.napEnd &&
+          (x.timestamp - nap.napEnd) < 30 * 60000
+        );
+        if (first) delays.push(first.timestamp - nap.napEnd);
       });
       if (delays.length >= 2) {
         const meanDelay = delays.reduce((a,b) => a+b, 0) / delays.length;
@@ -1007,7 +1071,7 @@ const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
 const VET_TYPES = [
   { id:'weight',      emoji:'⚖️', label:'Weight',    color:'#3A9BD5' },
-  { id:'flea',        emoji:'🛡️', label:'Flea/Worm', color:'#4CAF50' },
+  { id:'flea',        emoji:'🪱', label:'Flea/Worm', color:'#4CAF50' },
   { id:'vaccination', emoji:'💉', label:'Vaccine',   color:'#9B68C0' },
   { id:'visit',       emoji:'🏥', label:'Vet Visit', color:'#E8A838' },
   { id:'concern',     emoji:'⚠️', label:'Concern',   color:'#E53935' },
@@ -1215,17 +1279,20 @@ function renderTimeline() {
   }
 
   el.innerHTML = dayLogs.map(log => {
-    const c   = CAT[log.type] || { emoji:'•', label:log.type, color:'#999', border:'#EEE' };
-    const ts  = log.timestamp;
+    const c    = CAT[log.type] || { emoji:'•', label:log.type, color:'#999', border:'#EEE' };
+    const ts   = log.timestamp;
     const tStr = ts.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
 
-    let durHtml = '';
-    let subTime = tStr;
+    let durHtml  = '';
+    let timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`;
+
     if (log.type === 'nap') {
       if (log.napEnd) {
         const endStr = log.napEnd.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
         durHtml  = `<span class="tl-dur">${log.duration}m</span>`;
-        subTime  = `${tStr} – ${endStr}`;
+        timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
+                 + `<span style="opacity:0.45"> – </span>`
+                 + `<span class="tl-time-value" data-action="edit-nap-end" data-id="${log.id}" data-ts="${log.napEnd.getTime()}">${endStr}</span>`;
       } else {
         durHtml = `<span class="tl-dur">In progress…</span>`;
       }
@@ -1235,9 +1302,7 @@ function renderTimeline() {
       <span class="tl-emoji">${c.emoji}</span>
       <div class="tl-body">
         <div class="tl-label" style="color:${c.color}">${c.label}${durHtml}</div>
-        <div class="tl-time">
-          <span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${subTime}</span>
-        </div>
+        <div class="tl-time">${timeHtml}</div>
       </div>
       <button class="tl-delete" data-action="delete" data-id="${log.id}" aria-label="Delete">×</button>
     </div>`;
@@ -1252,64 +1317,91 @@ function computeStreak() {
   return streak;
 }
 
-function renderHeatmap(cat) {
-  const c   = CAT[cat];
-  const now = new Date();
-  const cells = [];
-  // Start on Monday of 5 weeks ago
-  const startD = new Date(now);
-  startD.setDate(startD.getDate() - 34);
-  startD.setHours(0,0,0,0);
-
-  const counts = [];
-  for (let i = 0; i < 35; i++) {
-    const d = new Date(startD); d.setDate(d.getDate() + i);
-    counts.push(state.logs.filter(l => l.type === cat && isSameDay(l.timestamp, d)).length);
-  }
-  const maxCount = Math.max(...counts, 1);
-  counts.forEach((count, i) => {
-    const d       = new Date(startD); d.setDate(d.getDate() + i);
-    const opacity = count === 0 ? 0.3 : 0.25 + (count / maxCount) * 0.75;
-    const bg      = count === 0 ? 'var(--border)' : c.color;
-    cells.push(`<div class="heatmap-cell" style="background:${bg};opacity:${opacity}" title="${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${count?' · '+count+'×':''}">
-      ${count > 0 ? count : ''}
-    </div>`);
-  });
-
-  const dayNames = ['M','T','W','T','F','S','S'];
-  return `
-    <div class="heatmap-section">
-      <div class="heatmap-day-labels">${dayNames.map(n=>`<div class="heatmap-day-lbl">${n}</div>`).join('')}</div>
-      <div class="heatmap-grid">${cells.join('')}</div>
-    </div>`;
-}
-
-function renderFeedCorrelation() {
+function renderFoodPoopHeatmap() {
   const foodLogs = state.logs.filter(l=>l.type==='food').sort((a,b)=>a.timestamp-b.timestamp);
   const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
-  if (foodLogs.length < 2 || poopLogs.length < 2) return '';
+  if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🍖 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
 
-  const buckets = {'0–30m':0,'30–60m':0,'1–2h':0,'2–4h':0,'4h+':0};
+  const bucketLabels = ['<30m','30–60m','1–2h','2–4h','4h+'];
+  const bucketMaxMs  = [30, 60, 120, 240, Infinity].map(m => m * 60000);
+
+  const days = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+    days.push(d);
+  }
+
+  const grid = days.map(() => Array(5).fill(0));
   poopLogs.forEach(poop => {
-    const lastFood = foodLogs.filter(f=>f.timestamp < poop.timestamp).slice(-1)[0];
+    const di = days.findIndex(d => isSameDay(d, poop.timestamp));
+    if (di === -1) return;
+    const lastFood = foodLogs.filter(f => f.timestamp < poop.timestamp).slice(-1)[0];
     if (!lastFood) return;
-    const mins = (poop.timestamp - lastFood.timestamp) / 60000;
-    if      (mins < 30)  buckets['0–30m']++;
-    else if (mins < 60)  buckets['30–60m']++;
-    else if (mins < 120) buckets['1–2h']++;
-    else if (mins < 240) buckets['2–4h']++;
-    else                 buckets['4h+']++;
+    const lag = poop.timestamp - lastFood.timestamp;
+    const bi  = bucketMaxMs.findIndex(max => lag < max);
+    if (bi >= 0) grid[di][bi]++;
   });
-  const max = Math.max(...Object.values(buckets), 1);
-  const rows = Object.entries(buckets).map(([lbl,n]) =>
-    `<div class="corr-bar-row">
-      <div class="corr-lbl">${lbl}</div>
-      <div class="corr-bar-bg"><div class="corr-bar-fill" style="width:${Math.round(n/max*100)}%;background:${CAT.poop.color}"></div></div>
-      <div class="corr-val">${n}×</div>
-    </div>`).join('');
+
+  const maxCell = Math.max(...grid.flat(), 1);
+  const hdrCells = bucketLabels.map(l => `<div class="rhythm-hdr">${l}</div>`).join('');
+  const rows = days.map((d, di) => {
+    const lbl   = d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' });
+    const cells = grid[di].map(count => {
+      const op = count === 0 ? 0.07 : 0.2 + (count / maxCell) * 0.8;
+      return `<div class="rhythm-cell" style="background:${CAT.poop.color};opacity:${op}">${count||''}</div>`;
+    }).join('');
+    return `<div class="rhythm-row"><div class="rhythm-day-lbl">${lbl}</div>${cells}</div>`;
+  }).join('');
+
   return `<div class="corr-card">
-    <div class="corr-title">⏱ Time from food → poop</div>
+    <div class="corr-title">🍖 → 💩 Food to Poop Lag — 14 days</div>
+    <div class="rhythm-header"><div class="rhythm-day-lbl"></div>${hdrCells}</div>
     ${rows}
+    <div style="font-size:9px;color:var(--text-4);margin-top:6px">Darker = more poops at that lag after eating</div>
+  </div>`;
+}
+
+function renderHydrationVsPee() {
+  const waterLogs = state.logs.filter(l=>l.type==='water');
+  const peeLogs   = state.logs.filter(l=>l.type==='pee');
+  if (waterLogs.length < 2 && peeLogs.length < 2) return '';
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+    days.push(d);
+  }
+
+  const wCts = days.map(d => state.logs.filter(l=>l.type==='water' && isSameDay(l.timestamp,d)).length);
+  const pCts = days.map(d => state.logs.filter(l=>l.type==='pee'   && isSameDay(l.timestamp,d)).length);
+  const maxW = Math.max(...wCts, 1);
+  const maxP = Math.max(...pCts, 1);
+
+  const cols = days.map((d, i) => {
+    const lbl  = d.toLocaleDateString('en-GB', { weekday:'short' });
+    const wH   = Math.round((wCts[i]/maxW)*60);
+    const pH   = Math.round((pCts[i]/maxP)*60);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="display:flex;align-items:flex-end;height:64px;gap:2px">
+        <div style="width:9px;height:${Math.max(wH,2)}px;background:linear-gradient(to top,${CAT.water.color}60,${CAT.water.color});border-radius:3px 3px 0 0"></div>
+        <div style="width:9px;height:${Math.max(pH,2)}px;background:linear-gradient(to top,${CAT.pee.color}60,${CAT.pee.color});border-radius:3px 3px 0 0"></div>
+      </div>
+      <div style="font-size:8px;color:var(--text-3);font-family:sans-serif">${lbl}</div>
+      <div style="font-size:7px;font-family:sans-serif;color:${CAT.water.color}">${wCts[i]||'·'}</div>
+      <div style="font-size:7px;font-family:sans-serif;color:${CAT.pee.color}">${pCts[i]||'·'}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="corr-card">
+    <div class="corr-title">💧 Hydration vs 🌱 Pee — 7 days</div>
+    <div style="display:flex;gap:12px;margin-bottom:8px">
+      <span style="font-size:10px;color:${CAT.water.color};font-weight:700">💧 Water (left bar)</span>
+      <span style="font-size:10px;color:${CAT.pee.color};font-weight:700">🌱 Pee (right bar)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+      ${cols}
+    </div>
+    <div style="font-size:9px;color:var(--text-4);margin-top:6px">Each series normalised to its own daily max</div>
   </div>`;
 }
 
@@ -1440,8 +1532,8 @@ function renderStatsTab() {
     </button>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
     ${mainContent}
-    ${renderHeatmap(sel)}
-    ${sel === 'poop' ? renderFeedCorrelation() : ''}
+    ${renderFoodPoopHeatmap()}
+    ${renderHydrationVsPee()}
     <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
 }
 
@@ -1449,6 +1541,41 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-action="export-csv"]');
   if (el) exportCSV();
 });
+
+function photoField(form) {
+  return `<div class="vet-field">
+    <div class="vet-field-lbl">Photo (optional)</div>
+    <label class="photo-upload-btn">
+      📷 ${form.photo ? 'Change photo' : 'Add photo'}
+      <input type="file" accept="image/*" capture="environment" style="display:none" onchange="handleVetPhoto(this)">
+    </label>
+    ${form.photo ? `<img src="${form.photo}" style="width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover">` : ''}
+  </div>`;
+}
+
+function handleVetPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 900;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else       { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      state.vetFormData.photo = canvas.toDataURL('image/jpeg', 0.72);
+      renderVetTab();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 function renderVetTab() {
   const tab    = document.getElementById('vet-tab');
@@ -1490,19 +1617,19 @@ function renderVetTab() {
       <div class="vet-field-lbl">Reason / clinic</div>
       <input class="vet-input" id="vet-value"
         placeholder="e.g. checkup at City Vets" value="${form.value||''}">
-    </div>`;
+    </div>${photoField(form)}`;
   } else if (adding === 'note') {
     extraFields = `<div class="vet-field">
       <div class="vet-field-lbl">Note</div>
       <textarea class="vet-input vet-textarea" id="vet-value"
         placeholder="Anything worth remembering…">${form.value||''}</textarea>
-    </div>`;
+    </div>${photoField(form)}`;
   } else if (adding === 'concern') {
     extraFields = `<div class="vet-field">
       <div class="vet-field-lbl">Concern / symptom</div>
       <textarea class="vet-input vet-textarea" id="vet-value"
         placeholder="Describe what you noticed…">${form.value||''}</textarea>
-    </div>`;
+    </div>${photoField(form)}`;
   }
 
   const editing  = !!state.vetEditingId;
@@ -1539,6 +1666,7 @@ function renderVetTab() {
               ${fmtDate(n.date)}${n.value?' · '+n.value:''}${n.notes?' · '+n.notes:''}
             </div>
             ${ndHtml}
+            ${n.photo ? `<img src="${n.photo}" style="width:100%;border-radius:8px;margin-top:6px;max-height:160px;object-fit:cover;cursor:pointer" onclick="window.open(this.src)" title="Tap to view full size">` : ''}
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
             <button class="vet-note-edit"   data-action="edit-vet"   data-id="${n.id}">✏️</button>
@@ -1688,6 +1816,7 @@ document.addEventListener('click', e => {
       value:   note.value   || '',
       notes:   note.notes   || '',
       nextDue: note.nextDue || '',
+      photo:   note.photo   || null,
     };
     renderVetTab();
     document.getElementById('vet-date').scrollIntoView({ behavior:'smooth', block:'center' });
@@ -1708,7 +1837,8 @@ document.addEventListener('click', e => {
       value,
       notes: '',
       date: new Date(dateStr + 'T12:00:00'),
-      ...(nextDue && { nextDue }),
+      ...(nextDue  && { nextDue }),
+      ...(state.vetFormData.photo && { photo: state.vetFormData.photo }),
     };
     if (state.vetEditingId) {
       const id = state.vetEditingId;
@@ -1758,6 +1888,37 @@ document.addEventListener('click', e => {
       const nd = new Date(dInp.value + 'T12:00:00');
       nd.setHours(nh,nm,0,0);
       updateLogTime(id, nd);
+    };
+    tInp.addEventListener('blur',  save);
+    dInp.addEventListener('change', save);
+    tInp.addEventListener('keydown', ev => { if (ev.key==='Enter') tInp.blur(); });
+  }
+
+  if (action === 'edit-nap-end') {
+    const id   = el.dataset.id;
+    const orig = new Date(parseInt(el.dataset.ts));
+    const hh   = String(orig.getHours()).padStart(2,'0');
+    const mm   = String(orig.getMinutes()).padStart(2,'0');
+    const yyyy = orig.getFullYear();
+    const mo   = String(orig.getMonth()+1).padStart(2,'0');
+    const dd   = String(orig.getDate()).padStart(2,'0');
+    const wrap = document.createElement('span');
+    const dInp = Object.assign(document.createElement('input'), {
+      type:'date', className:'tl-time-input', value:`${yyyy}-${mo}-${dd}`,
+      style:'width:108px;margin-bottom:2px',
+    });
+    const tInp = Object.assign(document.createElement('input'), {
+      type:'time', className:'tl-time-input', value:`${hh}:${mm}`,
+    });
+    wrap.append(dInp, document.createElement('br'), tInp);
+    el.replaceWith(wrap);
+    tInp.focus();
+    const save = () => {
+      if (!tInp.value || !dInp.value) return;
+      const [nh,nm] = tInp.value.split(':').map(Number);
+      const nd = new Date(dInp.value + 'T12:00:00');
+      nd.setHours(nh,nm,0,0);
+      updateNapEnd(id, nd);
     };
     tInp.addEventListener('blur',  save);
     dInp.addEventListener('change', save);
