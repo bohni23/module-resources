@@ -713,6 +713,11 @@
       background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
     }
     #nap-type-modal.open { display:flex; }
+    #play-type-modal {
+      display:none; position:fixed; inset:0; z-index:300;
+      background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
+    }
+    #play-type-modal.open { display:flex; }
     .water-size-sheet {
       background:var(--bg); border-radius:20px 20px 0 0;
       padding:20px; width:100%; max-width:480px;
@@ -882,6 +887,23 @@
       </button>
     </div>
     <button class="water-size-cancel" data-action="nap-type-cancel">Cancel</button>
+  </div>
+</div>
+
+<div id="play-type-modal">
+  <div class="water-size-sheet">
+    <div class="water-size-title">🎾 What kind of play?</div>
+    <div class="water-size-btns">
+      <button class="water-size-btn" data-action="play-type" data-type="session">
+        <span class="water-size-emoji">🎾</span>
+        <span class="water-size-lbl">Active Play</span>
+      </button>
+      <button class="water-size-btn" data-action="play-type" data-type="zoomies">
+        <span class="water-size-emoji">🌀</span>
+        <span class="water-size-lbl">Zoomies</span>
+      </button>
+    </div>
+    <button class="water-size-cancel" data-action="play-type-cancel">Cancel</button>
   </div>
 </div>
 
@@ -2696,7 +2718,7 @@ document.addEventListener('click', e => {
       document.getElementById('food-size-modal').classList.add('open');
     } else if (type === 'zoomies') {
       if (state.playInProgress) { endPlay(); showToast('🎾 Play ended'); }
-      else { startPlay(); showToast('🎾 Play started'); }
+      else { document.getElementById('play-type-modal').classList.add('open'); }
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
@@ -2740,6 +2762,20 @@ document.addEventListener('click', e => {
 
   if (action === 'nap-type-cancel') {
     document.getElementById('nap-type-modal').classList.remove('open');
+  }
+
+  if (action === 'play-type') {
+    document.getElementById('play-type-modal').classList.remove('open');
+    if (el.dataset.type === 'zoomies') {
+      addLog('zoomies', null, { instant: true });
+      showToast('🌀 Zoomies logged');
+    } else {
+      startPlay(); showToast('🎾 Play started');
+    }
+  }
+
+  if (action === 'play-type-cancel') {
+    document.getElementById('play-type-modal').classList.remove('open');
   }
 
   if (action === 'walkies') {
