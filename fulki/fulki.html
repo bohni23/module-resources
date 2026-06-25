@@ -71,37 +71,45 @@
     #dark-btn:active { opacity: 0.75; }
 
     body.a11y *                { font-weight: 700 !important; }
-    body.a11y                  { font-size: 39px; }
-    body.a11y #header-title    { font-size: 60px; }
-    body.a11y #header-subtitle { font-size: 33px; }
-    body.a11y .section-label   { font-size: 33px; }
-    body.a11y .log-btn         { padding: 30px 8px 24px; }
-    body.a11y .btn-emoji       { font-size: 72px; }
-    body.a11y .btn-label       { font-size: 30px; }
-    body.a11y .timeline-entry  { padding: 24px; min-height: 72px; }
-    body.a11y .tl-label        { font-size: 39px; }
-    body.a11y .tl-time         { font-size: 33px; }
-    body.a11y .summary-pill    { font-size: 36px; padding: 12px 20px; }
-    body.a11y .pred-time       { font-size: 54px; }
-    body.a11y .pred-lbl        { font-size: 30px; }
-    body.a11y .pred-emoji      { font-size: 78px; }
-    body.a11y .nav-btn .nav-icon  { font-size: 60px; }
-    body.a11y .nav-btn .nav-label { font-size: 30px; }
-    body.a11y .vet-note-type   { font-size: 39px; }
-    body.a11y .vet-note-detail { font-size: 36px; }
-    body.a11y .vet-field-lbl   { font-size: 33px; }
-    body.a11y .vet-input       { font-size: 39px; padding: 16px 18px; }
-    body.a11y .vet-form-title  { font-size: 42px; }
-    body.a11y .vet-save-btn    { font-size: 39px; padding: 20px; }
-    body.a11y .vet-cancel-btn  { font-size: 39px; }
-    body.a11y .vet-type-btn    { font-size: 33px; padding: 20px 10px; }
-    body.a11y .vet-type-icon   { font-size: 54px; }
-    body.a11y .stats-pill      { font-size: 36px; padding: 12px 20px; }
-    body.a11y .stats-stat-val  { font-size: 60px; }
-    body.a11y .stats-stat-lbl  { font-size: 33px; }
-    body.a11y .heatmap-day-lbl { font-size: 24px; }
-    body.a11y .tl-delete       { font-size: 54px; min-width: 60px; min-height: 60px; }
-    body.a11y .empty-state     { font-size: 42px; }
+    body.a11y                  { font-size: 32px; overflow-x: hidden; }
+    body.a11y #card            { max-width: 100%; overflow-x: hidden; }
+    body.a11y #header-title    { font-size: 48px; }
+    body.a11y #header-subtitle { font-size: 20px; }
+    body.a11y .section-label   { font-size: 28px; }
+    body.a11y .log-btn         { padding: 26px 6px 20px; min-width: 0; }
+    body.a11y .btn-emoji       { font-size: 58px; }
+    body.a11y .btn-label       { font-size: 26px; }
+    body.a11y .timeline-entry  { padding: 20px; min-height: 60px; }
+    body.a11y .tl-label        { font-size: 32px; }
+    body.a11y .tl-time         { font-size: 26px; }
+    body.a11y .summary-pill    { font-size: 28px; padding: 10px 16px; }
+    body.a11y .pred-time       { font-size: 44px; }
+    body.a11y .pred-lbl        { font-size: 26px; }
+    body.a11y .pred-emoji      { font-size: 62px; }
+    body.a11y .gr-fact-card    { padding: 20px; }
+    body.a11y .gr-fact-label   { font-size: 22px !important; }
+    body.a11y .gr-fact-text    { font-size: 28px !important; line-height: 1.5; }
+    body.a11y .corr-card div   { font-size: 24px !important; }
+    body.a11y .corr-title      { font-size: 30px !important; }
+    body.a11y .nav-btn .nav-icon  { font-size: 48px; }
+    body.a11y .nav-btn .nav-label { font-size: 24px; }
+    body.a11y .vet-note-type   { font-size: 32px; }
+    body.a11y .vet-note-detail { font-size: 28px; }
+    body.a11y .vet-field-lbl   { font-size: 28px; }
+    body.a11y .vet-input       { font-size: 32px; padding: 14px 16px; }
+    body.a11y .vet-form-title  { font-size: 34px; }
+    body.a11y .vet-save-btn    { font-size: 32px; padding: 18px; }
+    body.a11y .vet-cancel-btn  { font-size: 32px; }
+    body.a11y .vet-type-btn    { font-size: 28px; padding: 16px 8px; }
+    body.a11y .vet-type-icon   { font-size: 44px; }
+    body.a11y .stats-pill      { font-size: 28px; padding: 10px 16px; }
+    body.a11y .stats-stat-val  { font-size: 28px; }
+    body.a11y .stats-stat-lbl  { font-size: 18px; }
+    body.a11y .heatmap-day-lbl { font-size: 20px; }
+    body.a11y .tl-delete       { font-size: 44px; min-width: 50px; min-height: 50px; }
+    body.a11y .empty-state     { font-size: 34px; }
+    body.a11y #log-grid        { flex-wrap: wrap; gap: 8px; }
+    body.a11y #summary-strip   { flex-wrap: wrap; overflow-x: hidden; }
 
     /* ── Photo upload ── */
     .photo-upload-btn {
@@ -2269,9 +2277,30 @@ function renderStatsTab() {
       });
     });
 
+    const crossChips = crossings.slice(0, 6).map(cr => {
+      const matchA = LINE_CATS.find(c => cr.startsWith(c.label));
+      const matchB = LINE_CATS.find(c => cr.includes('& ' + c.label));
+      const colA = matchA ? matchA.color : 'var(--text-3)';
+      const colB = matchB ? matchB.color : 'var(--text-3)';
+      const time  = cr.match(/near (.+)$/)?.[1] || '';
+      const labA  = matchA?.label || '';
+      const labB  = matchB?.label || '';
+      return `<div style="display:inline-flex;align-items:center;gap:5px;background:var(--surface);
+        border:1.5px solid var(--border);border-radius:20px;padding:4px 10px;
+        font-size:10px;font-family:sans-serif;white-space:nowrap;
+        box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${colA}"></span>
+        <span style="color:${colA}">${labA}</span>
+        <span style="color:var(--text-4);font-size:9px">↔</span>
+        <span style="color:${colB}">${labB}</span>
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${colB}"></span>
+        <span style="color:var(--text-3);font-size:9px">~${time}</span>
+      </div>`;
+    }).join('');
     const crossHtml = crossings.length
-      ? `<div style="font-size:9px;color:var(--text-3);margin-top:6px;font-family:sans-serif">
-          🔀 Crossings: ${crossings.slice(0,4).join(' · ')}${crossings.length > 4 ? ` +${crossings.length-4} more` : ''}
+      ? `<div style="margin-top:10px">
+          <div style="font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-family:sans-serif">🔀 Pattern crossings</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">${crossChips}${crossings.length > 6 ? `<div style="display:inline-flex;align-items:center;padding:4px 10px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;font-size:10px;color:var(--text-3);font-family:sans-serif">+${crossings.length-6} more</div>` : ''}</div>
          </div>`
       : '';
 
