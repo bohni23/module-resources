@@ -893,6 +893,8 @@ const state = {
   activeCatNote:    null, // cat key currently being edited
   waterSizePending: false,
   foodTypePending:  false,
+  grFact:           null,
+  anthropicApiKey:  '',
   vetFilter:        { type: 'all', search: '' },
   sheetsUrl:        '',
   heatmapOffset:    0,
@@ -1256,40 +1258,61 @@ function recoverNapState() {
 // F — RENDER FUNCTIONS
 // ============================================================
 
-const GR_FACTS = [
-  "Female golden retrievers typically weigh 55–65 lbs and stand 21–22 inches — slightly smaller than males but just as mighty! 🐾",
-  "The first golden retriever to win an AKC obedience championship was a female named Moreland's Golden Tonk, who earned eight perfect scores! 🏆",
-  "Female golden retrievers tend to mature faster than males and are known for their nurturing, focused nature. 🌸",
-  "Female golden retrievers are often chosen as guide and therapy dogs for their calm focus and gentle temperament. 🎓",
-  "Female golden retrievers are typically more task-focused during training — very independent problem-solvers! 💪",
-  "Golden retrievers can carry a raw egg in their mouths without cracking it — one of the softest bites of any breed. 🥚",
-  "Golden retrievers are the 4th most intelligent dog breed, capable of learning over 200 commands! 🧠",
-  "Their double coat is naturally water-repellent and they have webbed toes — born swimmers! 🏊",
-  "A golden retriever named Augie holds the world record for most tennis balls held in one mouth — 5 at once! 🎾",
-  "Golden retrievers were bred in the Scottish Highlands in the 1860s to retrieve waterfowl for hunters. 🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  "Golden retrievers consistently rank in the top 5 most popular dog breeds in the US. 🌟",
-  "Despite their size, golden retrievers are famously gentle with babies and small children. 🍼",
-  "A golden retriever's coat ranges from pale cream to deep golden-red and can be straight or wavy. ✨",
-  "Golden retrievers are natural 'mouthy' dogs who love carrying things — expect surprise sock deliveries! 👟",
-  "Golden retrievers have been trained as search-and-rescue dogs and have saved countless lives worldwide. 🔍",
-  "Golden retrievers typically live 10–12 years — every day packed with cuddles and unconditional love. 💛",
-];
-function getTodaysFact() {
-  const today = new Date().toDateString();
-  let shown = JSON.parse(localStorage.getItem('grFactsShown') || '[]');
-  let idx   = parseInt(localStorage.getItem('grFactIdx') || '-1', 10);
-  if (localStorage.getItem('grFactDate') !== today) {
-    if (shown.length >= GR_FACTS.length) shown = [];
-    const unseen = GR_FACTS.map((_,i) => i).filter(i => !shown.includes(i));
-    idx = unseen[Math.floor(Math.random() * unseen.length)];
-    shown.push(idx);
+function factCardHtml() {
+  if (!state.grFact || state.grFact === 'loading')
+    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">✨ Generating today's fact…</div></div>`;
+  if (state.grFact === 'no-key')
+    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Add your Anthropic API key in the Vet tab → Settings to get a fresh AI-generated fact every day. 🤖</div></div>`;
+  if (state.grFact === 'error')
+    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Couldn't fetch today's fact — check your API key in Vet → Settings.</div></div>`;
+  return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text">${state.grFact}</div></div>`;
+}
+
+function initFact() {
+  const today  = new Date().toDateString();
+  const cached = localStorage.getItem('grFactDate') === today ? localStorage.getItem('grFactText') : null;
+  if (cached) { state.grFact = cached; return; }
+  if (!state.anthropicApiKey) { state.grFact = 'no-key'; return; }
+  state.grFact = 'loading';
+  fetchTodaysFact();
+}
+
+async function fetchTodaysFact() {
+  const history = JSON.parse(localStorage.getItem('grFactHistory') || '[]');
+  const avoidClause = history.length
+    ? `Do NOT repeat or rephrase any of these previously shown facts:\n${history.map((f,i) => `${i+1}. ${f}`).join('\n')}\n\n`
+    : '';
+  const prompt = `${avoidClause}Generate one unique, engaging golden retriever fact. Prioritise facts about female golden retrievers. Warm, conversational tone, 1–2 sentences, include a relevant emoji at the end. Reply with ONLY the fact text, no intro or preamble.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': state.anthropicApiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 120,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const fact = data.content?.[0]?.text?.trim();
+    if (!fact) throw new Error('empty response');
+    history.push(fact);
     try {
-      localStorage.setItem('grFactsShown', JSON.stringify(shown));
-      localStorage.setItem('grFactDate', today);
-      localStorage.setItem('grFactIdx', String(idx));
+      localStorage.setItem('grFactHistory', JSON.stringify(history));
+      localStorage.setItem('grFactDate', new Date().toDateString());
+      localStorage.setItem('grFactText', fact);
     } catch(e) {}
+    state.grFact = fact;
+  } catch(e) {
+    state.grFact = 'error';
   }
-  return GR_FACTS[idx >= 0 ? idx : 0];
+  renderPredictions();
 }
 
 const CATS = [
@@ -1473,7 +1496,7 @@ function renderPredictions() {
 
   document.getElementById('prediction-section').innerHTML =
     stageBanner +
-    `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text">${getTodaysFact()}</div></div>` +
+    factCardHtml() +
     `<div class="section-label">Next predictions 🔮</div>` +
     `<div class="predictions-row">${cards}</div>` +
     `<div class="pred-note">Accuracy grows as more events are logged</div>`;
@@ -1694,6 +1717,10 @@ function waterMl(logs) {
   return logs.filter(l => l.type === 'water').reduce((s, l) => s + (l.ml || 100), 0);
 }
 
+function foodGrams(logs) {
+  return logs.reduce((s, l) => s + (l.grams || 0), 0);
+}
+
 function renderStatsTab() {
   const tab = document.getElementById('stats-tab');
   const sel = state.selectedStatsCat || 'pee';
@@ -1890,21 +1917,68 @@ function renderStatsTab() {
   }
 
   if (sel === 'food') {
-    const foodToday = state.logs.filter(l => l.type === 'food' && isSameDay(l.timestamp, new Date()))
-                                .sort((a,b) => a.timestamp - b.timestamp);
-    const sinceMs   = msAgoSinceLast('food');
-    const activeDays = activeDaysIn7('food');
-    let maxGapStr = null;
-    if (foodToday.length >= 2) {
-      let mx = 0;
-      for (let i = 1; i < foodToday.length; i++) mx = Math.max(mx, foodToday[i].timestamp - foodToday[i-1].timestamp);
-      maxGapStr = fmtDur(mx);
+    // 7-day daily grams chart
+    const dailyGrams = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const dl = state.logs.filter(l => l.type === 'food' && isSameDay(l.timestamp, d));
+      dailyGrams.push({ date: d, grams: foodGrams(dl), count: dl.length });
     }
-    categorySection = insightCard('💡', 'Meal insights', [
-      irow(`Meals today: <strong style="color:${cat.color}">${foodToday.length}</strong> · avg ${(totalLast7/7).toFixed(1)}/day this week`),
-      sinceMs !== null ? irow(`Last meal: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 8*3600e3 ? ' ⚠️ feeding time soon?' : ' ✓'}`) : '',
-      maxGapStr ? irow(`Longest gap between meals today: <strong>${maxGapStr}</strong>`) : '',
-      irow(`Meal days this week: <strong>${activeDays}/7</strong> ${activeDays >= 6 ? '✅ very consistent' : activeDays >= 4 ? '👍 mostly regular' : '💡 try to feed daily'}`, true),
+    const avgDailyG  = Math.round(dailyGrams.reduce((s, d) => s + d.grams, 0) / 7);
+    const todayG     = dailyGrams[6].grams;
+    const todayVsAvg = avgDailyG > 0 ? Math.round((todayG / avgDailyG) * 100) : null;
+
+    // Snack vs Meal split (last 7 days)
+    const foodLast7 = state.logs.filter(l => l.type === 'food' && +l.timestamp > sevenAgo);
+    const snacks    = foodLast7.filter(l => l.portion === 'Snack');
+    const meals     = foodLast7.filter(l => l.portion === 'Meal');
+    const snackG    = snacks.reduce((s, l) => s + (l.grams || 0), 0);
+    const mealG     = meals.reduce((s, l)  => s + (l.grams || 0), 0);
+
+    // Stat cards
+    const volCards = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="stats-stat-card">
+        <div class="stats-stat-val" style="color:#F89831">${todayG}g</div>
+        <div class="stats-stat-lbl">Today</div>
+      </div>
+      <div class="stats-stat-card">
+        <div class="stats-stat-val" style="color:#F89831">${avgDailyG}g</div>
+        <div class="stats-stat-lbl">Daily avg (7d)</div>
+      </div>
+    </div>`;
+
+    // Bar chart
+    const maxG = Math.max(...dailyGrams.map(d => d.grams), 1);
+    const foodBars = dailyGrams.map(d => {
+      const h   = Math.max(4, Math.round((d.grams / maxG) * 52));
+      const day = d.date.toLocaleDateString('en-GB', { weekday:'short' });
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+        <div style="font-size:8px;font-family:sans-serif;color:var(--text-3);font-weight:700">${d.grams > 0 ? d.grams+'g' : ''}</div>
+        <div style="height:52px;display:flex;align-items:flex-end">
+          <div style="width:20px;height:${h}px;background:#F89831;border-radius:4px 4px 0 0;opacity:${d.grams > 0 ? 1 : 0.2}"></div>
+        </div>
+        <div style="font-size:8px;font-family:sans-serif;color:var(--text-3)">${day}</div>
+      </div>`;
+    }).join('');
+    const dailyChart = `<div class="weight-chart-wrap" style="margin-bottom:14px">
+      <div class="weight-chart-title">🥩 Daily intake (g) — last 7 days</div>
+      <div style="display:flex;gap:2px;align-items:flex-end">${foodBars}</div>
+    </div>`;
+
+    const sinceMs    = msAgoSinceLast('food');
+    const activeDays = activeDaysIn7('food');
+
+    categorySection = volCards + dailyChart + insightCard('💡', 'Meal insights', [
+      todayVsAvg !== null
+        ? irow(`Today vs 7-day avg: <strong style="color:${todayVsAvg >= 90 ? '#3D8F3D' : '#D17078'}">${todayVsAvg}%</strong>${todayVsAvg >= 110 ? ' 🍖 eating well!' : todayVsAvg < 80 ? ' ⚠️ below usual' : ' ✓ on track'}`)
+        : '',
+      foodLast7.length > 0
+        ? irow(`This week: <strong>${snacks.length} snack${snacks.length !== 1 ? 's' : ''}</strong> (${snackG}g) · <strong>${meals.length} meal${meals.length !== 1 ? 's' : ''}</strong> (${mealG}g)`)
+        : '',
+      sinceMs !== null
+        ? irow(`Last meal: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 8 * 3600e3 ? ' ⚠️ feeding time soon?' : ' ✓'}`)
+        : '',
+      irow(`Feeding days this week: <strong>${activeDays}/7</strong> ${activeDays >= 6 ? '✅ very consistent' : activeDays >= 4 ? '👍 mostly regular' : '💡 try to feed daily'}`, true),
     ]);
   }
 
@@ -2217,6 +2291,20 @@ function renderVetTab() {
       </div>
     </div>`;
 
+  const apiKeySection = `
+    <div style="margin-top:12px;background:var(--surface);border:1.5px solid var(--border-2);
+      border-radius:14px;padding:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;
+        letter-spacing:.8px;margin-bottom:10px">🤖 Anthropic API Key</div>
+      <input type="password" placeholder="sk-ant-…"
+        value="${(state.anthropicApiKey||'').replace(/"/g,'&quot;')}"
+        oninput="state.anthropicApiKey=this.value;try{localStorage.setItem('anthropicApiKey',this.value)}catch(e){}"
+        style="width:100%;border:1.5px solid var(--border-2);border-radius:10px;padding:9px 12px;
+        font-family:inherit;font-size:12px;color:var(--text);background:var(--bg);outline:none;
+        margin-bottom:8px;box-sizing:border-box">
+      <div style="font-size:10px;color:var(--text-4)">Used for AI-generated golden retriever facts · stored on this device only</div>
+    </div>`;
+
   tab.innerHTML = `
     <div class="section-label">Health &amp; Vet Records</div>
     <div class="vet-type-grid">${typeButtons}</div>
@@ -2224,7 +2312,8 @@ function renderVetTab() {
     ${formHtml}
     ${filterBar}
     ${notesHtml}
-    ${sheetsSection}`;
+    ${sheetsSection}
+    ${apiKeySection}`;
 }
 
 // ============================================================
@@ -2672,7 +2761,9 @@ setInterval(() => {
 }, 30000);
 
 // ── Initial render ──
-state.sheetsUrl = localStorage.getItem('fulki_sheets_url') || '';
+state.sheetsUrl       = localStorage.getItem('fulki_sheets_url') || '';
+state.anthropicApiKey = localStorage.getItem('anthropicApiKey')  || '';
+initFact();
 if (localStorage.getItem('fulki_a11y') === '1') {
   document.body.classList.add('a11y');
   document.getElementById('a11y-btn')?.classList.add('on');
