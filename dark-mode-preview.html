@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Fulki — Theme Toggle Preview</title>
   <style>
-    /* ── Light palette ── */
     :root {
       --bg:      #FAF5FC;
       --surface: #FFFFFF;
@@ -15,10 +14,7 @@
       --text-2:  #6E3B83;
       --text-3:  #B56AB2;
       --text-4:  #D4A0D5;
-      --accent:  #F89831;
     }
-
-    /* ── Dark palette — navy/teal ── */
     body.dark {
       --bg:      #181b38;
       --surface: #292f56;
@@ -28,11 +24,9 @@
       --text-2:  #7eb8c8;
       --text-3:  #4c7890;
       --text-4:  #2a3f58;
-      --accent:  #008780;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Cochin', 'Palatino Linotype', Georgia, serif;
       display: flex; justify-content: center;
@@ -44,17 +38,13 @@
 
     #card {
       width: 100%; max-width: 390px;
-      background: var(--bg);
-      border-radius: 24px; overflow: hidden;
+      background: var(--bg); border-radius: 24px; overflow: hidden;
       box-shadow: 0 24px 60px rgba(0,0,0,0.55);
       transition: background 0.35s;
     }
 
     /* ── Header ── */
-    #header-bar {
-      color: #fff; padding: 22px 20px 16px;
-      transition: background 0.35s;
-    }
+    #header-bar { color: #fff; padding: 22px 20px 16px; transition: background 0.35s; }
     body:not(.dark) #header-bar { background: #B04F6C; }
     body.dark       #header-bar { background: linear-gradient(135deg, #005c7f, #292f56); }
 
@@ -62,25 +52,18 @@
     #header-title    { font-size: 26px; font-weight: 700; line-height: 1.1; }
     #header-subtitle { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 3px;
                        letter-spacing: 0.8px; text-transform: uppercase; }
-
     .header-btns { display: flex; gap: 7px; align-items: center; }
-
     #dark-btn, #a11y-btn {
-      background: rgba(255,255,255,0.18);
-      border: 1.5px solid rgba(255,255,255,0.45);
-      border-radius: 10px; color: #fff;
-      font-family: inherit; padding: 6px 11px;
-      cursor: pointer; min-height: 36px;
-      transition: background 0.25s;
+      background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.45);
+      border-radius: 10px; color: #fff; font-family: inherit;
+      padding: 6px 11px; cursor: pointer; min-height: 36px; transition: background 0.25s;
     }
-    #dark-btn   { font-size: 15px; line-height: 1; }
-    #a11y-btn   { font-size: 12px; font-weight: 700; }
-
+    #dark-btn { font-size: 15px; line-height: 1; }
+    #a11y-btn { font-size: 12px; font-weight: 700; }
     .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
     .nav-arrow { background: rgba(255,255,255,0.18); border: none; border-radius: 8px;
                  color: #fff; font-size: 16px; padding: 4px 10px; cursor: pointer; }
-    .date-nav span { font-size: 13px; font-weight: 600; opacity: 0.9;
-                     flex: 1; text-align: center; }
+    .date-nav span { font-size: 13px; font-weight: 600; opacity: 0.9; flex: 1; text-align: center; }
 
     /* ── Summary strip ── */
     #summary-strip {
@@ -89,14 +72,12 @@
       overflow-x: auto; transition: background 0.35s, border-color 0.35s;
     }
     .summary-pill {
-      display: flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 20px;
-      font-size: 12px; font-weight: 700; white-space: nowrap;
-      transition: filter 0.35s;
+      display: flex; align-items: center; gap: 5px; padding: 5px 12px;
+      border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap;
     }
-    body.dark .summary-pill { filter: brightness(0.68) saturate(0.55); }
+    body.dark .summary-pill { filter: brightness(0.65) saturate(0.5); }
 
-    /* ── Section label ── */
+    /* ── Section ── */
     .section { padding: 18px 20px 0; }
     .section-label {
       font-size: 11px; font-weight: 700; letter-spacing: 1px;
@@ -104,41 +85,41 @@
     }
 
     /* ── Prediction cards ── */
-    .predictions-row {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px; margin-bottom: 6px;
-    }
+    .predictions-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 6px; }
     .pred-card {
-      border-radius: 16px; padding: 13px 8px 11px;
-      text-align: center; border: 1.5px solid;
-      transition: background 0.35s, border-color 0.35s;
+      border-radius: 16px; padding: 13px 8px 11px; text-align: center;
+      border: 1.5px solid; transition: background 0.35s, border-color 0.35s;
     }
-    .pred-emoji { font-size: 22px; margin-bottom: 3px; }
+    /* dark mode cards: use surface so they read as cards, not blobs */
+    body.dark .pred-card {
+      background: var(--surface) !important;
+      border-color: var(--border-2) !important;
+    }
+    .pred-emoji { font-size: 22px; margin-bottom: 4px; }
     .pred-time  { font-size: 16px; font-weight: 700; line-height: 1.2; }
-    .pred-sub   { font-size: 10px; opacity: 0.75; margin-top: 1px; }
-    .pred-lbl   { font-size: 10px; opacity: 0.72; margin-top: 2px; }
-    .conf-wrap  { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-    .conf-bg    { flex: 1; height: 4px; border-radius: 2px; overflow: hidden;
+    .pred-sub   { font-size: 10px; opacity: 0.78; margin-top: 2px; }
+    .pred-lbl   { font-size: 10px; margin-top: 3px; color: var(--text-3); }
+    .conf-wrap  { display: flex; align-items: center; gap: 5px; margin-top: 6px; }
+    .conf-bg    { flex:1; height: 4px; border-radius: 2px; overflow: hidden;
                   background: rgba(0,0,0,0.08); }
     body.dark .conf-bg { background: rgba(255,255,255,0.1); }
     .conf-fill  { height: 100%; border-radius: 2px; }
-    .conf-pct   { font-size: 9px; font-weight: 700; opacity: 0.65;
-                  min-width: 26px; font-family: sans-serif; }
+    .conf-pct   { font-size: 9px; font-weight: 700; opacity: 0.65; min-width: 26px; font-family: sans-serif; }
 
     /* ── Log buttons ── */
-    #log-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 10px; margin-bottom: 18px;
-    }
+    #log-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
     .log-btn {
-      display: flex; flex-direction: column; align-items: center; gap: 5px;
-      padding: 14px 4px 11px; border-radius: 18px; cursor: pointer;
-      border: 2.5px solid transparent; font-family: inherit;
-      transition: filter 0.35s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 4px 12px; border-radius: 18px; cursor: pointer;
+      border: 2px solid; font-family: inherit; transition: background 0.35s, border-color 0.35s;
     }
-    body.dark .log-btn { filter: brightness(0.7) saturate(0.5); }
-    .btn-emoji { font-size: 24px; line-height: 1; }
-    .btn-label { font-size: 10px; font-weight: 700; }
+    /* dark mode: surface bg, category-coloured border, emoji natural */
+    body.dark .log-btn {
+      background: var(--surface) !important;
+    }
+    .btn-emoji { font-size: 26px; line-height: 1; }
+    .btn-label { font-size: 10px; font-weight: 700; transition: color 0.35s; }
+    body.dark .btn-label { color: var(--text-2) !important; }
 
     /* ── Timeline ── */
     .tl-label-row {
@@ -151,6 +132,7 @@
       border-radius: 14px; margin-bottom: 8px; border: 1.5px solid;
       transition: background 0.35s, border-color 0.35s;
     }
+    body.dark .tl-entry { border-color: var(--border) !important; }
     .tl-emoji { font-size: 18px; width: 26px; text-align: center; flex-shrink: 0; }
     .tl-body  { flex: 1; }
     .tl-name  { font-size: 13px; font-weight: 700; color: var(--text); }
@@ -168,9 +150,9 @@
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
       background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit;
     }
-    .nav-icon  { font-size: 20px; }
-    .nav-lbl   { font-size: 9px; font-weight: 700; text-transform: uppercase;
-                 letter-spacing: 0.6px; color: var(--text-3); }
+    .nav-icon { font-size: 20px; }
+    .nav-lbl  { font-size: 9px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.6px; color: var(--text-3); }
     .nav-btn.active .nav-lbl { color: var(--text-2); }
     .nav-btn:not(.active) { opacity: 0.4; }
   </style>
@@ -178,7 +160,6 @@
 <body>
 <div id="card">
 
-  <!-- HEADER -->
   <div id="header-bar">
     <div id="header-top">
       <div>
@@ -197,11 +178,10 @@
     </div>
   </div>
 
-  <!-- SUMMARY STRIP -->
   <div id="summary-strip">
     <div class="summary-pill" style="background:#FFF3D1;color:#C07828">💧 3 waters</div>
     <div class="summary-pill" style="background:#E8F8E8;color:#2E7D32">🍗 2 meals</div>
-    <div class="summary-pill" style="background:#F0E8FA;color:#6E3B83">💤 1h 20m nap</div>
+    <div class="summary-pill" style="background:#F0E8FA;color:#6E3B83">💤 1h 20m</div>
     <div class="summary-pill" style="background:#FDE8EE;color:#B04F6C">🌱 4 pees</div>
   </div>
 
@@ -210,35 +190,35 @@
     <div class="section-label">Next up</div>
     <div class="predictions-row">
 
-      <div class="pred-card" id="pred-a">
+      <div class="pred-card" id="pa" style="background:#FEE2E2;border-color:#FCA5A5">
         <div class="pred-emoji">🌱</div>
-        <div class="pred-time" id="pa-time">2:45 PM</div>
-        <div class="pred-sub"  id="pa-sub">in 4m</div>
+        <div class="pred-time" id="pa-t" style="color:#B91C1C">2:45 PM</div>
+        <div class="pred-sub"  id="pa-s" style="color:#B91C1C">in 4m</div>
         <div class="pred-lbl">Pee</div>
         <div class="conf-wrap">
-          <div class="conf-bg"><div class="conf-fill" id="pa-bar" style="width:88%"></div></div>
-          <div class="conf-pct" id="pa-pct">88%</div>
+          <div class="conf-bg"><div class="conf-fill" id="pa-b" style="width:88%;background:#EF4444"></div></div>
+          <div class="conf-pct" id="pa-p" style="color:#B91C1C">88%</div>
         </div>
       </div>
 
-      <div class="pred-card" id="pred-b">
+      <div class="pred-card" id="pb" style="background:#FEF9C3;border-color:#FDE047">
         <div class="pred-emoji">💩</div>
-        <div class="pred-time" id="pb-time">4:15 PM</div>
-        <div class="pred-sub"  id="pb-sub">in 1h 34m</div>
+        <div class="pred-time" id="pb-t" style="color:#854D0E">4:15 PM</div>
+        <div class="pred-sub"  id="pb-s" style="color:#854D0E">in 1h 34m</div>
         <div class="pred-lbl">Poop</div>
         <div class="conf-wrap">
-          <div class="conf-bg"><div class="conf-fill" id="pb-bar" style="width:55%"></div></div>
-          <div class="conf-pct" id="pb-pct">55%</div>
+          <div class="conf-bg"><div class="conf-fill" id="pb-b" style="width:55%;background:#EAB308"></div></div>
+          <div class="conf-pct" id="pb-p" style="color:#854D0E">55%</div>
         </div>
       </div>
 
-      <div class="pred-card" id="pred-c">
+      <div class="pred-card" id="pc" style="background:#DCFCE7;border-color:#86EFAC">
         <div class="pred-emoji">⚡</div>
-        <div class="pred-time" id="pc-time">Learning…</div>
+        <div class="pred-time" id="pc-t" style="color:#166534">Learning…</div>
         <div class="pred-lbl">Zoomies</div>
         <div class="conf-wrap">
-          <div class="conf-bg"><div class="conf-fill" id="pc-bar" style="width:20%"></div></div>
-          <div class="conf-pct" id="pc-pct">20%</div>
+          <div class="conf-bg"><div class="conf-fill" id="pc-b" style="width:20%;background:#22C55E"></div></div>
+          <div class="conf-pct" id="pc-p" style="color:#166534">20%</div>
         </div>
       </div>
 
@@ -279,8 +259,7 @@
   <!-- TIMELINE -->
   <div class="section" style="padding-bottom:20px">
     <div class="tl-label-row">Today's timeline</div>
-
-    <div class="tl-entry" style="border-color:#A8D8A8">
+    <div class="tl-entry">
       <span class="tl-emoji">🌱</span>
       <div class="tl-body">
         <div class="tl-name">Pee</div>
@@ -288,8 +267,7 @@
       </div>
       <button class="tl-del">×</button>
     </div>
-
-    <div class="tl-entry" style="border-color:#FDDBA0">
+    <div class="tl-entry">
       <span class="tl-emoji">🥩</span>
       <div class="tl-body">
         <div class="tl-name">Food</div>
@@ -297,8 +275,7 @@
       </div>
       <button class="tl-del">×</button>
     </div>
-
-    <div class="tl-entry" style="border-color:#D4B8E8">
+    <div class="tl-entry">
       <span class="tl-emoji">💤</span>
       <div class="tl-body">
         <div class="tl-name">Nap <span style="font-size:11px;font-weight:600;color:#9B8EC4">54 min</span></div>
@@ -306,8 +283,7 @@
       </div>
       <button class="tl-del">×</button>
     </div>
-
-    <div class="tl-entry" style="border-color:#B0D4F5">
+    <div class="tl-entry">
       <span class="tl-emoji">💧</span>
       <div class="tl-body">
         <div class="tl-name">Water</div>
@@ -317,60 +293,56 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <div id="bottom-nav">
-    <button class="nav-btn active">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-lbl">Home</span>
-    </button>
-    <button class="nav-btn">
-      <span class="nav-icon">📊</span>
-      <span class="nav-lbl">Patterns</span>
-    </button>
-    <button class="nav-btn">
-      <span class="nav-icon">🏥</span>
-      <span class="nav-lbl">Vet</span>
-    </button>
+    <button class="nav-btn active"><span class="nav-icon">🏠</span><span class="nav-lbl">Home</span></button>
+    <button class="nav-btn"><span class="nav-icon">📊</span><span class="nav-lbl">Patterns</span></button>
+    <button class="nav-btn"><span class="nav-icon">🏥</span><span class="nav-lbl">Vet</span></button>
   </div>
 
 </div>
 <script>
-  /* Urgency colour palettes */
-  const LIGHT = {
-    a: { bg:'#FEE2E2', border:'#FCA5A5', text:'#B91C1C', bar:'#EF4444' },
-    b: { bg:'#FEF9C3', border:'#FDE047', text:'#854D0E', bar:'#EAB308' },
-    c: { bg:'#DCFCE7', border:'#86EFAC', text:'#166534', bar:'#22C55E' },
-  };
-  const DARK = {
-    /* urgent — muted rose */
-    a: { bg:'#1e1428', border:'#4a2848', text:'#d8a8c8', bar:'#9058a0' },
-    /* soon — muted teal-blue (accent #005c7f) */
-    b: { bg:'#0c1e2a', border:'#1a4060', text:'#78b8d8', bar:'#005c7f' },
-    /* calm — teal-green (accent #008780) */
-    c: { bg:'#0a1e1e', border:'#1a4840', text:'#68c0b8', bar:'#008780' },
-  };
+  /* Dark mode urgency: use teal/blue accent colours, high contrast on navy surface */
+  const DARK_PRED = [
+    { t:'#60d0c0', s:'#60d0c0', b:'#008780' }, /* urgent  → teal  */
+    { t:'#60b0d8', s:'#60b0d8', b:'#005c7f' }, /* soon    → blue  */
+    { t:'#008780', s:'#008780', b:'#008780' }, /* calm    → teal  */
+  ];
+  const LIGHT_PRED = [
+    { t:'#B91C1C', s:'#B91C1C', b:'#EF4444' },
+    { t:'#854D0E', s:'#854D0E', b:'#EAB308' },
+    { t:'#166534', s:'#166534', b:'#22C55E' },
+  ];
+
+  /* Dark log button border colours — muted but still readable */
+  const DARK_BORDERS = ['#2a5040','#501830','#182848','#503010','#301850','#501828'];
 
   function applyColors(dark) {
-    const P = dark ? DARK : LIGHT;
-    ['a','b','c'].forEach(k => {
-      const card = document.getElementById('pred-' + k);
-      card.style.background  = P[k].bg;
-      card.style.borderColor = P[k].border;
-      ['time','sub','pct'].forEach(p => {
-        const el = document.getElementById('p' + k + '-' + p);
-        if (el) el.style.color = P[k].text;
-      });
-      document.getElementById('p' + k + '-bar').style.background = P[k].bar;
+    const ids = ['pa','pb','pc'];
+    ids.forEach((id, i) => {
+      const P = dark ? DARK_PRED[i] : LIGHT_PRED[i];
+      document.getElementById(id + '-t').style.color = P.t;
+      const sub = document.getElementById(id + '-s');
+      if (sub) sub.style.color = P.s;
+      document.getElementById(id + '-b').style.background = P.b;
+      document.getElementById(id + '-p').style.color = P.t;
+    });
+
+    /* Log button borders in dark mode */
+    const btns = document.querySelectorAll('.log-btn');
+    btns.forEach((btn, i) => {
+      btn.style.borderColor = dark ? DARK_BORDERS[i] : btn.dataset.lightBorder || btn.style.borderColor;
+      if (!btn.dataset.lightBorder) btn.dataset.lightBorder = btn.style.borderColor;
     });
   }
+
+  /* Store light borders before first toggle */
+  document.querySelectorAll('.log-btn').forEach(b => b.dataset.lightBorder = b.style.borderColor);
 
   function toggleDark() {
     const on = document.body.classList.toggle('dark');
     document.getElementById('dark-btn').textContent = on ? '☀️' : '🌙';
     applyColors(on);
   }
-
-  applyColors(false);
 </script>
 </body>
 </html>
