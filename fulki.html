@@ -10,41 +10,41 @@
     :root {
       --bg:       #FAF5FC;
       --surface:  #FFFFFF;
-      --border:   #EDD8EE;
-      --border-2: #DFC4E0;
-      --text:     #3D1A4A;
-      --text-2:   #6E3B83;
-      --text-3:   #B56AB2;
-      --text-4:   #D4A0D5;
-      --accent:   #F89831;
-      --accent-d: #D17078;
+      --border:   #C8A0CA;
+      --border-2: #A870AA;
+      --text:     #2D0A3A;
+      --text-2:   #4A1F60;
+      --text-3:   #55186A;
+      --text-4:   #72329A;
+      --accent:   #B35000;
+      --accent-d: #7A1828;
       color-scheme: light dark;
     }
     body.dark {
-      --bg:#181b38; --surface:#292f56; --border:#363d6e; --border-2:#464f88;
-      --text:#d8e8f8; --text-2:#7eb8c8; --text-3:#4c7890; --text-4:#2a3f58;
-      --accent:#008780; --accent-d:#005c7f;
+      --bg:#0E1028; --surface:#1A1F48; --border:#3C4282; --border-2:#4C54A8;
+      --text:#F0F8FF; --text-2:#C8E0F0; --text-3:#A0C4DC; --text-4:#82A8C0;
+      --accent:#30C0B0; --accent-d:#2090AA;
     }
-    body.dark #header-bar { background: #005c7f; }
-    body.dark .log-btn { filter: none; background: #363d70 !important; }
-    body.dark .btn-label { color: #ffffff !important; }
-    body.dark .vet-type-btn { filter: none; background: #1e2445 !important; }
+    body.dark #header-bar { background: #1A2060; }
+    body.dark .log-btn { filter: none; background: #252A5C !important; }
+    body.dark .btn-label { color: #F0F8FF !important; }
+    body.dark .vet-type-btn { filter: none; background: #141840 !important; }
     body.dark .pred-card { background: var(--surface) !important; }
     body.dark .stats-stat-card, body.dark .stats-peaks-card,
-    body.dark .weight-chart-wrap, body.dark .corr-card { background: #1e2445; }
+    body.dark .weight-chart-wrap, body.dark .corr-card { background: #141840; }
     @media (prefers-color-scheme: dark) {
       body:not(.light) {
-        --bg:#181b38; --surface:#292f56; --border:#363d6e; --border-2:#464f88;
-        --text:#d8e8f8; --text-2:#7eb8c8; --text-3:#4c7890; --text-4:#2a3f58;
-        --accent:#008780; --accent-d:#005c7f;
+        --bg:#0E1028; --surface:#1A1F48; --border:#3C4282; --border-2:#4C54A8;
+        --text:#F0F8FF; --text-2:#C8E0F0; --text-3:#A0C4DC; --text-4:#82A8C0;
+        --accent:#30C0B0; --accent-d:#2090AA;
       }
-      body:not(.light) #header-bar { background: #005c7f; }
-      body:not(.light) .log-btn { filter: none; background: #363d70 !important; }
-      body:not(.light) .btn-label { color: #ffffff !important; }
-      body:not(.light) .vet-type-btn { filter: none; background: #1e2445 !important; }
+      body:not(.light) #header-bar { background: #1A2060; }
+      body:not(.light) .log-btn { filter: none; background: #252A5C !important; }
+      body:not(.light) .btn-label { color: #F0F8FF !important; }
+      body:not(.light) .vet-type-btn { filter: none; background: #141840 !important; }
       body:not(.light) .pred-card { background: var(--surface) !important; }
       body:not(.light) .stats-stat-card, body:not(.light) .stats-peaks-card,
-      body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #1e2445; }
+      body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #141840; }
     }
 
     /* ── Accessibility mode ── */
@@ -70,36 +70,38 @@
     }
     #dark-btn:active { opacity: 0.75; }
 
-    body.a11y                  { font-size: 20px; }
-    body.a11y #header-title    { font-size: 34px; }
-    body.a11y #header-subtitle { font-size: 14px; }
-    body.a11y .section-label   { font-size: 14px; }
-    body.a11y .log-btn         { padding: 22px 6px 18px; }
-    body.a11y .btn-emoji       { font-size: 42px; }
-    body.a11y .timeline-entry  { padding: 16px; min-height: 56px; }
-    body.a11y .tl-label        { font-size: 20px; }
-    body.a11y .tl-time         { font-size: 16px; }
-    body.a11y .summary-pill    { font-size: 15px; padding: 8px 16px; }
-    body.a11y .pred-time       { font-size: 20px; }
-    body.a11y .pred-lbl        { font-size: 14px; }
-    body.a11y .pred-emoji      { font-size: 30px; }
-    body.a11y .nav-btn .nav-icon  { font-size: 22px; }
-    body.a11y .nav-btn .nav-label { font-size: 13px; }
-    body.a11y .vet-note-type   { font-size: 20px; }
-    body.a11y .vet-note-detail { font-size: 18px; }
-    body.a11y .vet-field-lbl   { font-size: 16px; }
-    body.a11y .vet-input       { font-size: 18px; padding: 11px 14px; }
-    body.a11y .vet-form-title  { font-size: 20px; }
-    body.a11y .vet-save-btn    { font-size: 18px; padding: 14px; }
-    body.a11y .vet-cancel-btn  { font-size: 18px; }
-    body.a11y .vet-type-btn    { font-size: 15px; padding: 14px 8px; }
-    body.a11y .vet-type-icon   { font-size: 26px; }
-    body.a11y .stats-pill      { font-size: 18px; padding: 8px 16px; }
-    body.a11y .stats-stat-val  { font-size: 24px; }
-    body.a11y .stats-stat-lbl  { font-size: 16px; }
-    body.a11y .heatmap-day-lbl { font-size: 11px; }
-    body.a11y .tl-delete       { font-size: 24px; min-width: 48px; min-height: 52px; }
-    body.a11y .empty-state     { font-size: 20px; }
+    body.a11y *                { font-weight: 700 !important; }
+    body.a11y                  { font-size: 39px; }
+    body.a11y #header-title    { font-size: 60px; }
+    body.a11y #header-subtitle { font-size: 33px; }
+    body.a11y .section-label   { font-size: 33px; }
+    body.a11y .log-btn         { padding: 30px 8px 24px; }
+    body.a11y .btn-emoji       { font-size: 72px; }
+    body.a11y .btn-label       { font-size: 30px; }
+    body.a11y .timeline-entry  { padding: 24px; min-height: 72px; }
+    body.a11y .tl-label        { font-size: 39px; }
+    body.a11y .tl-time         { font-size: 33px; }
+    body.a11y .summary-pill    { font-size: 36px; padding: 12px 20px; }
+    body.a11y .pred-time       { font-size: 54px; }
+    body.a11y .pred-lbl        { font-size: 30px; }
+    body.a11y .pred-emoji      { font-size: 78px; }
+    body.a11y .nav-btn .nav-icon  { font-size: 60px; }
+    body.a11y .nav-btn .nav-label { font-size: 30px; }
+    body.a11y .vet-note-type   { font-size: 39px; }
+    body.a11y .vet-note-detail { font-size: 36px; }
+    body.a11y .vet-field-lbl   { font-size: 33px; }
+    body.a11y .vet-input       { font-size: 39px; padding: 16px 18px; }
+    body.a11y .vet-form-title  { font-size: 42px; }
+    body.a11y .vet-save-btn    { font-size: 39px; padding: 20px; }
+    body.a11y .vet-cancel-btn  { font-size: 39px; }
+    body.a11y .vet-type-btn    { font-size: 33px; padding: 20px 10px; }
+    body.a11y .vet-type-icon   { font-size: 54px; }
+    body.a11y .stats-pill      { font-size: 36px; padding: 12px 20px; }
+    body.a11y .stats-stat-val  { font-size: 60px; }
+    body.a11y .stats-stat-lbl  { font-size: 33px; }
+    body.a11y .heatmap-day-lbl { font-size: 24px; }
+    body.a11y .tl-delete       { font-size: 54px; min-width: 60px; min-height: 60px; }
+    body.a11y .empty-state     { font-size: 42px; }
 
     /* ── Photo upload ── */
     .photo-upload-btn {
@@ -134,6 +136,10 @@
     @keyframes playglow {
       0%,100% { background: rgba(209,112,120,0.08); border-color: #F5B8BC; }
       50%     { background: rgba(209,112,120,0.18); border-color: #D17078; }
+    }
+    @keyframes sleepglow {
+      0%,100% { background: rgba(26,16,88,0.07); border-color: #B8C0E0; }
+      50%     { background: rgba(26,16,88,0.15); border-color: #8898C8; }
     }
 
     #app-wrapper {
@@ -312,6 +318,28 @@
     .play-banner-body  { flex: 1; }
     .play-banner-title { font-size: 14px; font-weight: 700; color: #D17078; }
     .play-banner-sub   { font-size: 12px; color: #D17078; margin-top: 1px; font-weight: 600; opacity: 0.8; }
+    /* ── Active sleep banner ── */
+    #sleep-banner {
+      border: 2px solid #B8C0E0; border-radius: 14px;
+      padding: 12px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+      animation: sleepglow 2.2s infinite;
+    }
+    .sleep-banner-emoji { font-size: 22px; flex-shrink: 0; }
+    .sleep-banner-body  { flex: 1; }
+    .sleep-banner-title { font-size: 14px; font-weight: 700; color: #3A2888; }
+    .sleep-banner-sub   { font-size: 12px; color: #5A48A8; margin-top: 1px; font-weight: 600; }
+    .sleep-wake-btn {
+      background: #3A2888; border: none; border-radius: 10px;
+      color: #fff; font-family: inherit;
+      font-size: 12px; font-weight: 700;
+      padding: 7px 12px; cursor: pointer; flex-shrink: 0;
+    }
+    .log-btn.sleep-active { animation: sleepglow 2.2s infinite; border-color: #8898C8; }
+    /* ── Play progress bar ── */
+    .play-progress-wrap { height: 6px; background: rgba(209,112,120,0.2); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+    .play-progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s linear; }
+    .play-progress-hint { font-size: 10px; color: #D17078; margin-top: 3px; font-weight: 600; }
     .play-stop-btn {
       background: #D17078; border: none; border-radius: 10px;
       color: #fff; font-family: inherit;
@@ -799,15 +827,20 @@
   <div class="water-size-sheet">
     <div class="water-size-title">🥩 What did Fulki eat?</div>
     <div class="water-size-btns">
-      <button class="water-size-btn" data-action="food-type" data-portion="Snack" data-grams="15">
-        <span class="water-size-emoji">🦴</span>
-        <span class="water-size-lbl">Snack</span>
+      <button class="water-size-btn" data-action="food-type" data-portion="Small" data-grams="15">
+        <span class="water-size-emoji">🐾</span>
+        <span class="water-size-lbl">Small</span>
         <span class="water-size-ml">15 g</span>
       </button>
-      <button class="water-size-btn" data-action="food-type" data-portion="Meal" data-grams="25">
+      <button class="water-size-btn" data-action="food-type" data-portion="Medium" data-grams="25">
         <span class="water-size-emoji">🥩</span>
-        <span class="water-size-lbl">Meal</span>
+        <span class="water-size-lbl">Medium</span>
         <span class="water-size-ml">25 g</span>
+      </button>
+      <button class="water-size-btn" data-action="food-type" data-portion="Large" data-grams="40">
+        <span class="water-size-emoji">🍖</span>
+        <span class="water-size-lbl">Large</span>
+        <span class="water-size-ml">40 g</span>
       </button>
     </div>
     <button class="water-size-cancel" data-action="food-type-cancel">Cancel</button>
@@ -883,6 +916,7 @@ const state = {
   vetNotes:         [],
   napInProgress:    null,
   playInProgress:   null,
+  sleepInProgress:  null,
   predictions:      {},
   selectedStatsCat: 'pee',
   vetFormType:      null,
@@ -894,10 +928,9 @@ const state = {
   waterSizePending: false,
   foodTypePending:  false,
   grFact:           null,
-  anthropicApiKey:  '',
   vetFilter:        { type: 'all', search: '' },
-  sheetsUrl:        '',
   heatmapOffset:    0,
+  statsChartMode:   'bar',
 };
 
 function isSameDay(a, b) {
@@ -941,12 +974,18 @@ if (!USE_MOCK) {
       id:        d.id,
       type:      d.data().type,
       timestamp: toDate(d.data().timestamp),
-      napEnd:    toDate(d.data().napEnd) || null,
+      napEnd:    toDate(d.data().napEnd)   || null,
+      sleepEnd:  toDate(d.data().sleepEnd) || null,
+      playEnd:   toDate(d.data().playEnd)  || null,
       duration:  d.data().duration || null,
-      size:      d.data().size  || null,
-      ml:        d.data().ml    || null,
+      size:      d.data().size     || null,
+      ml:        d.data().ml       || null,
+      portion:   d.data().portion  || null,
+      grams:     d.data().grams    || null,
     }));
     recoverNapState();
+    recoverPlayState();
+    recoverSleepState();
     computePredictions();
     render();
   });
@@ -981,6 +1020,8 @@ if (!USE_MOCK) {
     state.catNotes = _cn;
   } catch(e) {}
   recoverNapState();
+  recoverPlayState();
+  recoverSleepState();
   computePredictions();
 }
 
@@ -1092,11 +1133,12 @@ function endNap() {
   state.napInProgress = null;
 }
 
-let _playNotifyTimer = null;
+let _playNotify7Timer  = null;
+let _playNotify15Timer = null;
 
 function startPlay() {
   const ts = new Date();
-  schedulePlayNotification();
+  schedulePlayNotifications();
   if (USE_MOCK) {
     const id = 'play_' + Date.now();
     state.logs.unshift({ id, type:'zoomies', timestamp: ts, playEnd: null, duration: null });
@@ -1114,7 +1156,8 @@ function startPlay() {
 }
 
 function endPlay() {
-  clearTimeout(_playNotifyTimer); _playNotifyTimer = null;
+  clearTimeout(_playNotify7Timer);  _playNotify7Timer  = null;
+  clearTimeout(_playNotify15Timer); _playNotify15Timer = null;
   const end      = new Date();
   const duration = Math.round((end - state.playInProgress.startTime) / 60000);
   if (USE_MOCK) {
@@ -1131,20 +1174,58 @@ function endPlay() {
   state.playInProgress = null;
 }
 
-function schedulePlayNotification() {
-  clearTimeout(_playNotifyTimer);
-  const fire = () => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('🎾 Active Play', { body: "Fulki has been playing for 7 minutes — time for a water break! 💧" });
-    }
+function schedulePlayNotifications() {
+  clearTimeout(_playNotify7Timer); clearTimeout(_playNotify15Timer);
+  const arm = cb => {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then(p => { if (p === 'granted') cb(); });
+    } else if (Notification.permission === 'granted') { cb(); }
   };
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(p => {
-      if (p === 'granted') { _playNotifyTimer = setTimeout(fire, 7 * 60000); }
-    });
-  } else {
-    _playNotifyTimer = setTimeout(fire, 7 * 60000);
+  arm(() => {
+    _playNotify7Timer = setTimeout(() => {
+      new Notification('🎾 Active Play — 7 min', { body: 'Time for a water break! 💧' });
+    }, 7 * 60000);
+    _playNotify15Timer = setTimeout(() => {
+      new Notification('🎾 Active Play — 15 min', { body: 'Time to wind down! Great session 🌟' });
+      if ('vibrate' in navigator) navigator.vibrate([400, 150, 400, 150, 600]);
+    }, 15 * 60000);
+  });
+}
+
+function startSleep() {
+  const ts = new Date();
+  if (USE_MOCK) {
+    const id = 'sleep_' + Date.now();
+    state.logs.unshift({ id, type:'sleep', timestamp: ts, sleepEnd: null, duration: null });
+    state.sleepInProgress = { docId: id, startTime: ts };
+    render();
+    return;
   }
+  db.collection('logs').add({
+    type: 'sleep',
+    timestamp: firebase.firestore.Timestamp.fromDate(ts),
+    sleepEnd: null, duration: null,
+  }).then(ref => {
+    state.sleepInProgress = { docId: ref.id, startTime: ts };
+  }).catch(e => showToast('⚠️ ' + e.message));
+}
+
+function endSleep() {
+  const end      = new Date();
+  const duration = Math.round((end - state.sleepInProgress.startTime) / 60000);
+  if (USE_MOCK) {
+    const log = state.logs.find(l => l.id === state.sleepInProgress.docId);
+    if (log) { log.sleepEnd = end; log.duration = duration; }
+    state.sleepInProgress = null;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(state.sleepInProgress.docId).update({
+    sleepEnd: firebase.firestore.Timestamp.fromDate(end), duration,
+  }).catch(e => showToast('⚠️ ' + e.message));
+  state.sleepInProgress = null;
 }
 
 function saveVetNote(data) {
@@ -1179,9 +1260,11 @@ function deleteVetNote(id) {
 // ============================================================
 function computePredictions() {
   state.predictions = {};
-  const allAsc     = [...state.logs].sort((a,b) => a.timestamp - b.timestamp);
-  const napsDone   = allAsc.filter(l => l.type === 'nap' && l.napEnd);
-  const lastNapEnd = napsDone.slice(-1)[0]?.napEnd || null;
+  const allAsc      = [...state.logs].sort((a,b) => a.timestamp - b.timestamp);
+  const napsDone    = allAsc.filter(l => l.type === 'nap'   && l.napEnd);
+  const sleepsDone  = allAsc.filter(l => l.type === 'sleep' && l.sleepEnd);
+  const lastNapEnd  = napsDone.slice(-1)[0]?.napEnd  || null;
+  const lastSleepEnd = sleepsDone.slice(-1)[0]?.sleepEnd || null;
 
   PREDICT_CATS.forEach(cat => {
     const events = allAsc.filter(l => l.type === cat).slice(-WINDOW);
@@ -1243,6 +1326,28 @@ function computePredictions() {
       }
     }
 
+    // Nap: if overnight sleep ended before 9am, predict first morning nap
+    if (cat === 'nap' && lastSleepEnd) {
+      const wakeHour = lastSleepEnd.getHours();
+      if (wakeHour < 9) {
+        const overnightDelays = sleepsDone.map(s => {
+          const firstNap = allAsc.find(n =>
+            n.type === 'nap' && n.timestamp > s.sleepEnd &&
+            (n.timestamp - s.sleepEnd) < 4 * 3600e3
+          );
+          return firstNap ? firstNap.timestamp - s.sleepEnd : null;
+        }).filter(Boolean);
+        const avgDelay = overnightDelays.length >= 1
+          ? overnightDelays.reduce((a,b) => a+b, 0) / overnightDelays.length
+          : 2 * 3600e3;
+        const predicted = lastSleepEnd.getTime() + avgDelay;
+        if (predicted > Date.now() - 30 * 60000) {
+          nextMs = predicted;
+          source = 'after overnight sleep';
+        }
+      }
+    }
+
     state.predictions[cat] = { conf, minutesUntil: (nextMs - Date.now()) / 60000, source };
   });
 }
@@ -1254,57 +1359,48 @@ function recoverNapState() {
     : null;
 }
 
+function recoverPlayState() {
+  const active = state.logs.find(l => l.type === 'zoomies' && !l.playEnd);
+  state.playInProgress = active
+    ? { docId: active.id, startTime: active.timestamp }
+    : null;
+}
+
+function recoverSleepState() {
+  const active = state.logs.find(l => l.type === 'sleep' && !l.sleepEnd);
+  state.sleepInProgress = active
+    ? { docId: active.id, startTime: active.timestamp }
+    : null;
+}
+
 // ============================================================
 // F — RENDER FUNCTIONS
 // ============================================================
 
 function factCardHtml() {
   if (!state.grFact || state.grFact === 'loading')
-    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">✨ Generating today's fact…</div></div>`;
-  if (state.grFact === 'no-key')
-    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Add your Anthropic API key in the Vet tab → Settings to get a fresh AI-generated fact every day. 🤖</div></div>`;
+    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Dog Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Fetching today's fact…</div></div>`;
   if (state.grFact === 'error')
-    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Couldn't fetch today's fact — check your API key in Vet → Settings.</div></div>`;
-  return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text">${state.grFact}</div></div>`;
+    return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Dog Fact</div><div class="gr-fact-text" style="color:var(--text-4)">Couldn't fetch today's fact — check your connection.</div></div>`;
+  return `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Dog Fact</div><div class="gr-fact-text">${state.grFact}</div></div>`;
 }
 
 function initFact() {
   const today  = new Date().toDateString();
   const cached = localStorage.getItem('grFactDate') === today ? localStorage.getItem('grFactText') : null;
   if (cached) { state.grFact = cached; return; }
-  if (!state.anthropicApiKey) { state.grFact = 'no-key'; return; }
   state.grFact = 'loading';
   fetchTodaysFact();
 }
 
 async function fetchTodaysFact() {
-  const history = JSON.parse(localStorage.getItem('grFactHistory') || '[]');
-  const avoidClause = history.length
-    ? `Do NOT repeat or rephrase any of these previously shown facts:\n${history.map((f,i) => `${i+1}. ${f}`).join('\n')}\n\n`
-    : '';
-  const prompt = `${avoidClause}Generate one unique, engaging golden retriever fact. Prioritise facts about female golden retrievers. Warm, conversational tone, 1–2 sentences, include a relevant emoji at the end. Reply with ONLY the fact text, no intro or preamble.`;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': state.anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 120,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-    if (!res.ok) throw new Error(await res.text());
+    const res  = await fetch('https://dogapi.dog/api/v2/facts?number=1');
+    if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    const fact = data.content?.[0]?.text?.trim();
-    if (!fact) throw new Error('empty response');
-    history.push(fact);
+    const fact = data?.data?.[0]?.attributes?.body?.trim();
+    if (!fact) throw new Error('empty');
     try {
-      localStorage.setItem('grFactHistory', JSON.stringify(history));
       localStorage.setItem('grFactDate', new Date().toDateString());
       localStorage.setItem('grFactText', fact);
     } catch(e) {}
@@ -1316,12 +1412,13 @@ async function fetchTodaysFact() {
 }
 
 const CATS = [
-  { key:'food',    emoji:'🥩', label:'Food',    color:'#F89831', bg:'#FEF3E0', border:'#FDDBA0', darkBg:'rgba(200,118,0,0.18)',   darkColor:'#c8a060' },
-  { key:'water',   emoji:'💧', label:'Water',   color:'#5B9ED6', bg:'#E3F0FC', border:'#B0D4F5', darkBg:'rgba(0,92,127,0.25)',    darkColor:'#7eb8d8' },
-  { key:'nap',     emoji:'💤', label:'Nap',     color:'#6E3B83', bg:'#F0E8F8', border:'#D4B8E8', darkBg:'rgba(110,59,131,0.22)',  darkColor:'#a880d0' },
-  { key:'pee',     emoji:'🌱', label:'Pee',     color:'#3D8F3D', bg:'#E8F5E8', border:'#A8D8A8', darkBg:'rgba(61,143,61,0.22)',   darkColor:'#70c070' },
-  { key:'poop',    emoji:'💩', label:'Poop',    color:'#B04F6C', bg:'#FDE8EE', border:'#F0C0D0', darkBg:'rgba(176,79,108,0.22)',  darkColor:'#d090a8' },
-  { key:'zoomies', emoji:'🎾', label:'Active Play', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#d09098' },
+  { key:'food',    emoji:'🥩', label:'Food',        color:'#8C3A00', bg:'#FEF3E0', border:'#FDDBA0', darkBg:'rgba(200,118,0,0.18)',   darkColor:'#F0A060' },
+  { key:'water',   emoji:'💧', label:'Water',       color:'#0A4080', bg:'#E3F0FC', border:'#B0D4F5', darkBg:'rgba(0,92,127,0.25)',    darkColor:'#88C4E0' },
+  { key:'nap',     emoji:'💤', label:'Nap',         color:'#380858', bg:'#F0E8F8', border:'#D4B8E8', darkBg:'rgba(110,59,131,0.22)',  darkColor:'#B880D8' },
+  { key:'pee',     emoji:'🌱', label:'Pee',         color:'#0A420A', bg:'#E8F5E8', border:'#A8D8A8', darkBg:'rgba(61,143,61,0.22)',   darkColor:'#78C078' },
+  { key:'poop',    emoji:'💩', label:'Poop',        color:'#600A28', bg:'#FDE8EE', border:'#F0C0D0', darkBg:'rgba(176,79,108,0.22)',  darkColor:'#D090A8' },
+  { key:'zoomies', emoji:'🎾', label:'Active Play', color:'#6A0E18', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#E88890' },
+  { key:'sleep',   emoji:'🌙', label:'Sleep',       color:'#1A1058', bg:'#E8E8F8', border:'#9898D8', darkBg:'rgba(26,16,88,0.4)',    darkColor:'#A0A0F0' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
@@ -1503,13 +1600,16 @@ function renderPredictions() {
 }
 
 function renderLogButtons() {
-  const napActive  = !!state.napInProgress;
-  const playActive = !!state.playInProgress;
+  const napActive   = !!state.napInProgress;
+  const playActive  = !!state.playInProgress;
+  const sleepActive = !!state.sleepInProgress;
 
-  const napElapsed  = napActive  ? elapsedMins(state.napInProgress.startTime)  : 0;
-  const playElapsed = playActive ? elapsedMins(state.playInProgress.startTime) : 0;
-  const napStart  = napActive  ? new Date(state.napInProgress.startTime).toLocaleTimeString('en-GB',  { hour:'2-digit', minute:'2-digit' }) : '';
-  const playStart = playActive ? new Date(state.playInProgress.startTime).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : '';
+  const napElapsed   = napActive   ? elapsedMins(state.napInProgress.startTime)   : 0;
+  const playElapsed  = playActive  ? elapsedMins(state.playInProgress.startTime)  : 0;
+  const sleepElapsed = sleepActive ? elapsedMins(state.sleepInProgress.startTime) : 0;
+  const napStart   = napActive   ? new Date(state.napInProgress.startTime).toLocaleTimeString('en-GB',   { hour:'2-digit', minute:'2-digit' }) : '';
+  const playStart  = playActive  ? new Date(state.playInProgress.startTime).toLocaleTimeString('en-GB',  { hour:'2-digit', minute:'2-digit' }) : '';
+  const sleepStart = sleepActive ? new Date(state.sleepInProgress.startTime).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : '';
 
   const napBanner = napActive ? `
     <div id="nap-banner">
@@ -1521,28 +1621,53 @@ function renderLogButtons() {
       <button class="nap-wake-btn" data-action="log" data-type="nap">☀️ Awake</button>
     </div>` : '';
 
+  const playPct  = Math.min(100, Math.round((playElapsed / 15) * 100));
+  const playBarClr = playElapsed >= 15 ? '#D17078' : playElapsed >= 7 ? '#F89831' : '#3D8F3D';
+  const playHint = playElapsed < 7
+    ? '⏱ Water break reminder at 7 min'
+    : playElapsed < 15
+    ? '💧 Water break time! · ⏱ Wind-down reminder at 15 min'
+    : '🛑 15 min reached — time to wind down';
   const playBanner = playActive ? `
     <div id="play-banner">
       <span class="play-banner-emoji">🎾</span>
       <div class="play-banner-body">
         <div class="play-banner-title">Active Play in progress</div>
         <div class="play-banner-sub">${playElapsed} min · started ${playStart}</div>
+        <div class="play-progress-wrap">
+          <div class="play-progress-fill" style="width:${playPct}%;background:${playBarClr}"></div>
+        </div>
+        <div class="play-progress-hint">${playHint}</div>
       </div>
-      <button class="play-stop-btn" data-action="log" data-type="zoomies">Stop Play</button>
+      <button class="play-stop-btn" data-action="log" data-type="zoomies">End Play</button>
+    </div>` : '';
+
+  const sleepBanner = sleepActive ? `
+    <div id="sleep-banner">
+      <span class="sleep-banner-emoji">🌙</span>
+      <div class="sleep-banner-body">
+        <div class="sleep-banner-title">Sleep in progress</div>
+        <div class="sleep-banner-sub">${sleepElapsed} min · started ${sleepStart}</div>
+      </div>
+      <button class="sleep-wake-btn" data-action="log" data-type="sleep">☀️ Wake up</button>
     </div>` : '';
 
   const buttons = CATS.map(c => {
     const isNap      = c.key === 'nap';
     const isPlay     = c.key === 'zoomies';
-    const isNapBtn   = isNap  && napActive;
-    const isPlayBtn  = isPlay && playActive;
-    const label      = isNap  ? (napActive  ? 'Awake'     : 'Start Nap')
-                     : isPlay ? (playActive ? 'Stop Play' : 'Active Play')
+    const isSleep    = c.key === 'sleep';
+    const isNapBtn   = isNap   && napActive;
+    const isPlayBtn  = isPlay  && playActive;
+    const isSleepBtn = isSleep && sleepActive;
+    const label      = isNap   ? (napActive   ? 'Awake'      : 'Start Nap')
+                     : isPlay  ? (playActive  ? 'End Play'   : 'Active Play')
+                     : isSleep ? (sleepActive ? 'Wake Up'    : 'Sleep')
                      : c.label;
-    const borderClr  = isNapBtn  ? '#9B8EC4'
-                     : isPlayBtn ? '#D17078'
+    const borderClr  = isNapBtn   ? '#9B8EC4'
+                     : isPlayBtn  ? '#D17078'
+                     : isSleepBtn ? '#8898C8'
                      : 'transparent';
-    return `<button class="log-btn${isNapBtn ? ' nap-active' : isPlayBtn ? ' play-active' : ''}"
+    return `<button class="log-btn${isNapBtn ? ' nap-active' : isPlayBtn ? ' play-active' : isSleepBtn ? ' sleep-active' : ''}"
       style="background:${c.bg};color:${c.color};border-color:${borderClr}"
       data-action="log" data-type="${c.key}">
       <span class="btn-emoji">${c.emoji}</span>
@@ -1552,6 +1677,7 @@ function renderLogButtons() {
 
   document.getElementById('log-section').innerHTML =
     napBanner +
+    sleepBanner +
     playBanner +
     `<div class="section-label">Quick log</div>
      <button id="walkies-btn" data-action="walkies">
@@ -1609,12 +1735,25 @@ function renderTimeline() {
       }
     }
 
+    if (log.type === 'sleep') {
+      if (log.sleepEnd) {
+        const endStr = new Date(log.sleepEnd).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+        durHtml  = `<span class="tl-dur">${log.duration}m</span>`;
+        timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
+                 + `<span style="opacity:0.45"> – </span>`
+                 + `<span class="tl-time-value">${endStr}</span>`;
+      } else {
+        durHtml = `<span class="tl-dur">In progress…</span>`;
+      }
+    }
+
     const sizeBadge = (log.type === 'water' && log.size)
-      ? `<span style="font-size:9px;font-family:sans-serif;background:#E3F0FC;color:#3A7EC8;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.size} · ${log.ml}ml</span>`
+      ? `<span style="font-size:9px;font-family:sans-serif;background:#E3F0FC;color:#0A4080;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.size} · ${log.ml}ml</span>`
       : '';
 
+    const portionLabel = { Small:'Small', Medium:'Medium', Large:'Large', Snack:'Snack', Meal:'Meal' }[log.portion] || log.portion;
     const foodBadge = (log.type === 'food' && log.portion)
-      ? `<span style="font-size:9px;font-family:sans-serif;background:#FEF3E0;color:#C8780A;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.portion} · ${log.grams}g</span>`
+      ? `<span style="font-size:9px;font-family:sans-serif;background:#FEF3E0;color:#8C3A00;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${portionLabel} · ${log.grams}g</span>`
       : '';
 
     return `<div class="timeline-entry" data-id="${log.id}" style="border-color:${c.border}">
@@ -1928,12 +2067,14 @@ function renderStatsTab() {
     const todayG     = dailyGrams[6].grams;
     const todayVsAvg = avgDailyG > 0 ? Math.round((todayG / avgDailyG) * 100) : null;
 
-    // Snack vs Meal split (last 7 days)
+    // Small / Medium / Large split (last 7 days, also handles legacy Snack/Meal)
     const foodLast7 = state.logs.filter(l => l.type === 'food' && +l.timestamp > sevenAgo);
-    const snacks    = foodLast7.filter(l => l.portion === 'Snack');
-    const meals     = foodLast7.filter(l => l.portion === 'Meal');
-    const snackG    = snacks.reduce((s, l) => s + (l.grams || 0), 0);
-    const mealG     = meals.reduce((s, l)  => s + (l.grams || 0), 0);
+    const smalls  = foodLast7.filter(l => l.portion === 'Small'  || l.portion === 'Snack');
+    const mediums = foodLast7.filter(l => l.portion === 'Medium' || l.portion === 'Meal');
+    const larges  = foodLast7.filter(l => l.portion === 'Large');
+    const snackG  = smalls.reduce((s,  l) => s + (l.grams || 0), 0);
+    const mealG   = mediums.reduce((s, l) => s + (l.grams || 0), 0);
+    const largeG  = larges.reduce((s,  l) => s + (l.grams || 0), 0);
 
     // Stat cards
     const volCards = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
@@ -1973,7 +2114,7 @@ function renderStatsTab() {
         ? irow(`Today vs 7-day avg: <strong style="color:${todayVsAvg >= 90 ? '#3D8F3D' : '#D17078'}">${todayVsAvg}%</strong>${todayVsAvg >= 110 ? ' 🍖 eating well!' : todayVsAvg < 80 ? ' ⚠️ below usual' : ' ✓ on track'}`)
         : '',
       foodLast7.length > 0
-        ? irow(`This week: <strong>${snacks.length} snack${snacks.length !== 1 ? 's' : ''}</strong> (${snackG}g) · <strong>${meals.length} meal${meals.length !== 1 ? 's' : ''}</strong> (${mealG}g)`)
+        ? irow(`This week: <strong>${smalls.length} small</strong> (${snackG}g) · <strong>${mediums.length} medium</strong> (${mealG}g) · <strong>${larges.length} large</strong> (${largeG}g)`)
         : '',
       sinceMs !== null
         ? irow(`Last meal: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 8 * 3600e3 ? ' ⚠️ feeding time soon?' : ' ✓'}`)
@@ -2054,8 +2195,122 @@ function renderStatsTab() {
     ]);
   }
 
+  if (sel === 'sleep') {
+    const sleepDurs   = allOfType.filter(l => l.duration).map(l => l.duration);
+    const avgSleep    = sleepDurs.length ? Math.round(sleepDurs.reduce((a,b) => a+b, 0) / sleepDurs.length) : null;
+    const longestSleep = sleepDurs.length ? Math.max(...sleepDurs) : null;
+    const todaySleepMs = state.logs.filter(l => l.type === 'sleep' && isSameDay(l.timestamp, new Date()) && l.duration)
+                                   .reduce((s, l) => s + l.duration, 0);
+    const activeDays  = activeDaysIn7('sleep');
+    const sinceMs     = msAgoSinceLast('sleep');
+    categorySection = insightCard('💡', 'Sleep insights', [
+      avgSleep    ? irow(`Avg sleep duration: <strong style="color:${cat.color}">${avgSleep}m (${(avgSleep/60).toFixed(1)}h)</strong>`) : '',
+      longestSleep ? irow(`Longest sleep recorded: <strong>${longestSleep}m (${(longestSleep/60).toFixed(1)}h)</strong>`) : '',
+      todaySleepMs > 0 ? irow(`Total sleep today: <strong>${todaySleepMs}m</strong>`) : '',
+      sinceMs !== null ? irow(`Last sleep ended: <strong>${fmtDur(sinceMs)} ago</strong>`) : '',
+      irow(`Sleep nights this week: <strong>${activeDays}/7</strong> ${activeDays >= 6 ? '✅ great routine' : activeDays >= 4 ? '👍 decent' : '💡 log overnight sleep for better predictions'}`, true),
+    ]);
+  }
+
+  // Line chart category definitions (also used by tooltip handler below)
+  const LINE_CATS = [
+    { key:'food',    color:'#8C3A00', label:'Food'        },
+    { key:'water',   color:'#0A4080', label:'Water'       },
+    { key:'nap',     color:'#380858', label:'Nap'         },
+    { key:'pee',     color:'#0A420A', label:'Pee'         },
+    { key:'poop',    color:'#600A28', label:'Poop'        },
+    { key:'zoomies', color:'#6A0E18', label:'Active Play' },
+    { key:'sleep',   color:'#1A1058', label:'Sleep'       },
+  ];
+
+  // Build the hourly line chart (all categories, avg events per hour)
+  const lineChartHtml = (function() {
+    const numDays = Math.max(new Set(state.logs.map(l => l.timestamp.toDateString())).size, 1);
+    const data = {};
+    LINE_CATS.forEach(lc => {
+      data[lc.key] = Array(24).fill(0);
+      state.logs.filter(l => l.type === lc.key).forEach(l => data[lc.key][l.timestamp.getHours()]++);
+      data[lc.key] = data[lc.key].map(n => n / numDays);
+    });
+    const globalMax = Math.max(...LINE_CATS.flatMap(lc => data[lc.key]), 0.01);
+    const W = 330, H = 150, padL = 26, padB = 22, padT = 8, padR = 8;
+    const cW = W - padL - padR, cH = H - padT - padB;
+    const px = h => padL + (h / 23) * cW;
+    const py = v => padT + (1 - v / globalMax) * cH;
+
+    // X-axis labels every 3h
+    const xLabels = [0,3,6,9,12,15,18,21].map(h =>
+      `<text x="${px(h)}" y="${H}" font-size="7" text-anchor="middle" fill="var(--text-3)" font-family="sans-serif">${hrLabel(h)}</text>`
+    ).join('');
+
+    // Lines and square markers
+    let linesHtml = '';
+    const crossings = [];
+    LINE_CATS.forEach(lc => {
+      const vals = data[lc.key];
+      const pts  = vals.map((v,h) => `${px(h)},${py(v)}`).join(' ');
+      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
+      vals.forEach((v,h) => {
+        const x = px(h), y = py(v);
+        linesHtml += `<rect x="${x-4}" y="${y-4}" width="8" height="8" fill="${lc.color}" rx="1" data-cat="${lc.key}" data-hr="${h}" data-avg="${v.toFixed(2)}" style="cursor:pointer"/>`;
+      });
+    });
+
+    // Crossing detection
+    LINE_CATS.forEach((lcA, ai) => {
+      LINE_CATS.slice(ai + 1).forEach(lcB => {
+        for (let h = 0; h < 23; h++) {
+          const aD = data[lcA.key][h] - data[lcB.key][h];
+          const bD = data[lcA.key][h+1] - data[lcB.key][h+1];
+          if (aD !== 0 && bD !== 0 && Math.sign(aD) !== Math.sign(bD)) {
+            crossings.push(`${lcA.label} & ${lcB.label} cross near ${hrLabel(h)}–${hrLabel(h+1)}`);
+          }
+        }
+      });
+    });
+
+    const crossHtml = crossings.length
+      ? `<div style="font-size:9px;color:var(--text-3);margin-top:6px;font-family:sans-serif">
+          🔀 Crossings: ${crossings.slice(0,4).join(' · ')}${crossings.length > 4 ? ` +${crossings.length-4} more` : ''}
+         </div>`
+      : '';
+
+    const legendHtml = LINE_CATS.map(lc =>
+      `<div style="display:flex;align-items:center;gap:4px">
+        <div style="width:10px;height:10px;background:${lc.color};border-radius:1px"></div>
+        <span>${lc.label}</span>
+      </div>`
+    ).join('');
+
+    return `<div class="weight-chart-wrap" style="margin-bottom:14px;position:relative">
+      <div class="weight-chart-title">📈 Average activity by hour of day</div>
+      <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible;display:block">
+        ${xLabels}
+        ${linesHtml}
+      </svg>
+      <div id="line-tooltip" style="display:none;position:absolute;background:var(--surface);border:1.5px solid var(--border-2);border-radius:8px;padding:5px 8px;font-size:11px;color:var(--text);pointer-events:none;z-index:10;font-family:sans-serif;white-space:nowrap"></div>
+      ${crossHtml}
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:9px;color:var(--text-2);font-family:sans-serif">${legendHtml}</div>
+    </div>`;
+  })();
+
+  const chartToggle = `<div style="display:flex;gap:8px;margin-bottom:12px">
+    <button data-action="chart-mode" data-mode="bar"
+      style="flex:1;padding:7px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;
+      background:${state.statsChartMode==='bar'?'var(--text)':'var(--surface)'};
+      color:${state.statsChartMode==='bar'?'var(--bg)':'var(--text-2)'};
+      border:1.5px solid var(--border-2)">📊 Bar</button>
+    <button data-action="chart-mode" data-mode="line"
+      style="flex:1;padding:7px;border-radius:8px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;
+      background:${state.statsChartMode==='line'?'var(--text)':'var(--surface)'};
+      color:${state.statsChartMode==='line'?'var(--bg)':'var(--text-2)'};
+      border:1.5px solid var(--border-2)">📈 All Lines</button>
+  </div>`;
+
   tab.innerHTML = `
-    <div class="section-label">Hourly patterns · past 7 days</div>
+    <div class="section-label">Patterns · past 7 days</div>
+    ${chartToggle}
+    ${state.statsChartMode === 'line' ? lineChartHtml : ''}
     <div class="stats-cat-pills">${pills}</div>
     ${noteHtml}
     <button class="stats-pill" data-action="notes-open" data-cat="${sel}"
@@ -2064,9 +2319,33 @@ function renderStatsTab() {
     </button>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
     ${categorySection}
-    ${mainContent}
+    ${state.statsChartMode === 'bar' ? mainContent : ''}
     ${renderFoodPoopHeatmap()}
     <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
+
+  // Line chart tooltip handler
+  if (state.statsChartMode === 'line') {
+    const svg = document.getElementById('hourly-line-svg');
+    const tip = document.getElementById('line-tooltip');
+    if (svg && tip) {
+      svg.addEventListener('click', ev => {
+        const rect = ev.target.closest('rect[data-cat]');
+        if (!rect) { tip.style.display = 'none'; return; }
+        const catKey = rect.dataset.cat;
+        const hr     = parseInt(rect.dataset.hr, 10);
+        const avg    = parseFloat(rect.dataset.avg);
+        const lc = LINE_CATS.find(l => l.key === catKey);
+        tip.innerHTML = `<strong style="color:${lc?.color}">${lc?.label}</strong> · ${hrLabel(hr)} · avg ${avg.toFixed(2)}/day`;
+        const svgRect = svg.getBoundingClientRect();
+        const wrapRect = svg.parentElement.getBoundingClientRect();
+        const relX = ev.clientX - wrapRect.left;
+        const relY = ev.clientY - wrapRect.top;
+        tip.style.left = Math.min(relX + 8, wrapRect.width - 180) + 'px';
+        tip.style.top  = Math.max(relY - 36, 0) + 'px';
+        tip.style.display = 'block';
+      });
+    }
+  }
 }
 
 document.addEventListener('click', e => {
@@ -2220,8 +2499,9 @@ function renderVetTab() {
           <div class="vet-note-body">
             <div class="vet-note-type" style="color:${t.color}">${t.label}</div>
             <div class="vet-note-detail">
-              ${(()=>{const vd=n.value&&n.category==='weight'?parseFloat(n.value)+'kg':n.value;return fmtDate(n.date)+(vd?' · '+vd:'')+(n.notes?' · '+n.notes:'');})()}
+              ${(()=>{const vd=n.value&&n.category==='weight'?parseFloat(n.value)+'kg':n.value;return fmtDate(n.date)+(vd?' · '+vd.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>'):'');})()}
             </div>
+            ${n.notes ? `<div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.55;white-space:pre-wrap">${n.notes.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : ''}
             ${ndHtml}
             ${n.photo ? `<img src="${n.photo}" style="width:100%;border-radius:8px;margin-top:6px;max-height:160px;object-fit:cover;cursor:pointer" onclick="window.open(this.src)" title="Tap to view full size">` : ''}
           </div>
@@ -2272,48 +2552,18 @@ function renderVetTab() {
     </div>`;
   }
 
-  const sheetsSection = `
-    <div style="margin-top:16px;background:var(--surface);border:1.5px solid var(--border-2);
-      border-radius:14px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;
-        letter-spacing:.8px;margin-bottom:10px">📊 Google Sheets Sync</div>
-      <input type="url" placeholder="Paste Apps Script web app URL…"
-        value="${(state.sheetsUrl||'').replace(/"/g,'&quot;')}"
-        oninput="state.sheetsUrl=this.value;try{localStorage.setItem('fulki_sheets_url',this.value)}catch(e){}"
-        style="width:100%;border:1.5px solid var(--border-2);border-radius:10px;padding:9px 12px;
-        font-family:inherit;font-size:12px;color:var(--text);background:var(--bg);outline:none;
-        margin-bottom:8px;box-sizing:border-box">
-      <button data-action="sheets-sync" style="width:100%;background:#1a7a4a;border:none;
-        border-radius:10px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;
-        padding:10px;cursor:pointer">📤 Push to Google Sheets</button>
-      <div style="font-size:10px;color:var(--text-4);margin-top:6px">
-        First time: paste your Apps Script web app URL above
-      </div>
-    </div>`;
-
-  const apiKeySection = `
-    <div style="margin-top:12px;background:var(--surface);border:1.5px solid var(--border-2);
-      border-radius:14px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;
-        letter-spacing:.8px;margin-bottom:10px">🤖 Anthropic API Key</div>
-      <input type="password" placeholder="sk-ant-…"
-        value="${(state.anthropicApiKey||'').replace(/"/g,'&quot;')}"
-        oninput="state.anthropicApiKey=this.value;try{localStorage.setItem('anthropicApiKey',this.value)}catch(e){}"
-        style="width:100%;border:1.5px solid var(--border-2);border-radius:10px;padding:9px 12px;
-        font-family:inherit;font-size:12px;color:var(--text);background:var(--bg);outline:none;
-        margin-bottom:8px;box-sizing:border-box">
-      <div style="font-size:10px;color:var(--text-4)">Used for AI-generated golden retriever facts · stored on this device only</div>
-    </div>`;
-
   tab.innerHTML = `
     <div class="section-label">Health &amp; Vet Records</div>
+    <a href="tel:01732353668" style="display:flex;align-items:center;justify-content:center;gap:10px;
+      background:#1A7A4A;color:#fff;border-radius:14px;padding:16px;text-decoration:none;
+      font-size:16px;font-weight:700;margin-bottom:16px;min-height:56px;letter-spacing:0.3px">
+      📞 Call Vet — 01732 353 668
+    </a>
     <div class="vet-type-grid">${typeButtons}</div>
     ${weightChartHtml}
     ${formHtml}
     ${filterBar}
-    ${notesHtml}
-    ${sheetsSection}
-    ${apiKeySection}`;
+    ${notesHtml}`;
 }
 
 // ============================================================
@@ -2343,6 +2593,9 @@ document.addEventListener('click', e => {
     } else if (type === 'zoomies') {
       if (state.playInProgress) { endPlay(); showToast('🎾 Play ended'); }
       else { startPlay(); showToast('🎾 Play started'); }
+    } else if (type === 'sleep') {
+      if (state.sleepInProgress) { endSleep(); showToast('🌙 Sleep ended'); }
+      else { startSleep(); showToast('🌙 Sleep started'); }
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
@@ -2441,7 +2694,10 @@ document.addEventListener('click', e => {
     renderVetTab();
   }
 
-  if (action === 'sheets-sync') pushToSheets();
+  if (action === 'chart-mode') {
+    state.statsChartMode = el.dataset.mode;
+    renderStatsTab();
+  }
 
   if (action === 'heatmap-prev') {
     state.heatmapOffset = (state.heatmapOffset || 0) + 1;
@@ -2707,31 +2963,6 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-function pushToSheets() {
-  const url = state.sheetsUrl;
-  if (!url) { showToast('⚠️ Paste your Apps Script URL first'); return; }
-  showToast('📊 Syncing to Sheets…');
-  fetch(url, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({
-      logs: state.logs.map(l => ({
-        id: l.id, type: l.type,
-        timestamp: l.timestamp.toISOString(),
-        portion: l.portion||null, grams: l.grams||null,
-        size: l.size||null, ml: l.ml||null,
-        duration: l.duration||null,
-      })),
-      vetNotes: state.vetNotes.map(n => ({
-        date: n.date ? new Date(n.date).toISOString() : null,
-        category: n.category, value: n.value||'', notes: n.notes||'', nextDue: n.nextDue||'',
-      })),
-    }),
-  })
-  .then(() => showToast('✅ Google Sheets updated!'))
-  .catch(e => showToast('⚠️ ' + e.message));
-}
 
 function renderNotesList(cat) {
   const list  = document.getElementById('notes-list');
@@ -2756,16 +2987,14 @@ function renderNotesList(cat) {
   }).join('');
 }
 
-// Refresh predictions + nap elapsed timer every 30s
+// Refresh predictions + elapsed timers every 30s
 setInterval(() => {
   computePredictions();
   renderPredictions();
-  if (state.napInProgress) renderLogButtons();
+  if (state.napInProgress || state.playInProgress || state.sleepInProgress) renderLogButtons();
 }, 30000);
 
 // ── Initial render ──
-state.sheetsUrl       = localStorage.getItem('fulki_sheets_url') || '';
-state.anthropicApiKey = localStorage.getItem('anthropicApiKey')  || '';
 initFact();
 if (localStorage.getItem('fulki_a11y') === '1') {
   document.body.classList.add('a11y');
