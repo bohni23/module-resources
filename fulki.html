@@ -1537,7 +1537,6 @@ function renderStatsTab() {
   const ranked     = hourCounts.map((c,h) => ({h,c})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c);
   const peaks      = ranked.slice(0, 3);
   const topHr      = peaks[0] ? hrLabel(peaks[0].h) : '—';
-  const streak     = computeStreak();
 
   // Avg interval between consecutive events
   let avgInterval = '—';
@@ -1568,19 +1567,24 @@ function renderStatsTab() {
   }).join('');
   const noteBtnLabel = catNotesList.length > 0 ? '📝 View / add notes' : '📝 Add note';
 
-  const napDurations = allOfType.filter(l => l.duration).map(l => l.duration);
-  const avgDurVal    = napDurations.length
-    ? Math.round(napDurations.reduce((a,b)=>a+b,0)/napDurations.length) + 'm avg'
-    : '—';
+  let avgMlMonth = '—';
+  if (sel === 'water') {
+    const waterWithMl = state.logs.filter(l => l.type === 'water' && l.ml);
+    if (waterWithMl.length > 0) {
+      const totalMl  = waterWithMl.reduce((s, l) => s + l.ml, 0);
+      const earliest = Math.min(...waterWithMl.map(l => +l.timestamp));
+      const months   = Math.max((Date.now() - earliest) / (30.44 * 24 * 3600e3), 1);
+      avgMlMonth = Math.round(totalMl / months) + 'ml';
+    }
+  }
 
   const statsRow = [
     ['Last 7 days', totalLast7+'×'],
     ['Avg/day',     avgPerDay],
     ['Peak time',   topHr],
     ['Avg interval',avgInterval],
-    ['Since Fulki', streak+'d'],
-    ['Total logged', sel === 'nap' ? avgDurVal : allOfType.length+'×'],
-  ].map(([k,v]) => `<div class="stats-stat-card">
+    sel === 'water' ? ['Avg ml/month', avgMlMonth] : null,
+  ].filter(Boolean).map(([k,v]) => `<div class="stats-stat-card">
     <div class="stats-stat-val" style="color:${cat.color}">${v}</div>
     <div class="stats-stat-lbl">${k}</div>
   </div>`).join('');
