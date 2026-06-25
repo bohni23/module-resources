@@ -592,11 +592,12 @@
     .corr-bar-bg { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
     .corr-bar-fill { height:100%; border-radius:4px; }
     .corr-val { font-size:10px; color:var(--text-3); min-width:28px; text-align:right; font-family:sans-serif; }
-    .rhythm-row { display:flex; align-items:center; gap:3px; margin-bottom:3px; }
-    .rhythm-header { display:flex; align-items:center; gap:3px; margin-bottom:4px; }
-    .rhythm-day-lbl { font-size:9px; color:var(--text-3); width:52px; flex-shrink:0; font-family:sans-serif; }
-    .rhythm-hdr { flex:1; font-size:8px; color:var(--text-4); text-align:center; font-family:sans-serif; font-weight:700; }
-    .rhythm-cell { flex:1; aspect-ratio:2/1; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; font-family:sans-serif; }
+    .rhythm-row { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
+    .rhythm-bucket-lbl { font-size:8px; color:var(--text-3); width:42px; flex-shrink:0; font-family:sans-serif; font-weight:700; text-align:right; padding-right:4px; }
+    .rhythm-col-hdr { flex:1; font-size:8px; color:var(--text-4); text-align:center; font-family:sans-serif; font-weight:700; line-height:1.3; }
+    .rhythm-cell { flex:1; height:22px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; font-family:sans-serif; }
+    .heatmap-nav-btn { background:none; border:none; cursor:pointer; color:var(--text-3); font-size:14px; padding:0 4px; line-height:1; }
+    .heatmap-nav-btn:disabled { opacity:0.25; cursor:default; }
 
     /* ── Category notes modal ── */
     #notes-modal {
@@ -744,20 +745,20 @@
   <div class="water-size-sheet">
     <div class="water-size-title">💧 How much did Fulki drink?</div>
     <div class="water-size-btns">
-      <button class="water-size-btn" data-action="water-size" data-size="S" data-ml="50">
+      <button class="water-size-btn" data-action="water-size" data-size="S" data-ml="20">
         <span class="water-size-emoji">💧</span>
         <span class="water-size-lbl">Small</span>
-        <span class="water-size-ml">~50 ml</span>
+        <span class="water-size-ml">20 ml</span>
       </button>
-      <button class="water-size-btn" data-action="water-size" data-size="M" data-ml="100">
+      <button class="water-size-btn" data-action="water-size" data-size="M" data-ml="40">
         <span class="water-size-emoji">💧💧</span>
         <span class="water-size-lbl">Medium</span>
-        <span class="water-size-ml">~100 ml</span>
+        <span class="water-size-ml">40 ml</span>
       </button>
-      <button class="water-size-btn" data-action="water-size" data-size="L" data-ml="200">
+      <button class="water-size-btn" data-action="water-size" data-size="L" data-ml="100">
         <span class="water-size-emoji">💧💧💧</span>
         <span class="water-size-lbl">Large</span>
-        <span class="water-size-ml">~200 ml</span>
+        <span class="water-size-ml">100 ml</span>
       </button>
     </div>
     <button class="water-size-cancel" data-action="water-size-cancel">Cancel</button>
@@ -843,6 +844,7 @@ const state = {
   waterSizePending: false,
   vetFilter:        { type: 'all', search: '' },
   sheetsUrl:        '',
+  heatmapOffset:    0,
 };
 
 function isSameDay(a, b) {
@@ -1437,16 +1439,19 @@ function renderFoodPoopHeatmap() {
   const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
   if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🥩 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
 
-  const bucketLabels = ['<3h','3–6h','6–9h','9–12h','12h+'];
-  const bucketMaxMs  = [3, 6, 9, 12, Infinity].map(h => h === Infinity ? Infinity : h * 3600000);
+  const bucketLabels = ['<2h','2–4h','4–6h','6–8h','8–10h','10–12h','12–15h','15h+'];
+  const bucketMaxMs  = [2, 4, 6, 8, 10, 12, 15, Infinity].map(h => h === Infinity ? Infinity : h * 3600000);
 
+  const offset = state.heatmapOffset || 0;
   const days = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+  for (let i = 4; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - (offset * 5) - i);
+    d.setHours(0,0,0,0);
     days.push(d);
   }
 
-  const grid = days.map(() => Array(5).fill(0));
+  const grid = Array.from({length: bucketLabels.length}, () => Array(5).fill(0));
   poopLogs.forEach(poop => {
     const di = days.findIndex(d => isSameDay(d, poop.timestamp));
     if (di === -1) return;
@@ -1454,23 +1459,33 @@ function renderFoodPoopHeatmap() {
     if (!lastFood) return;
     const lag = poop.timestamp - lastFood.timestamp;
     const bi  = bucketMaxMs.findIndex(max => lag < max);
-    if (bi >= 0) grid[di][bi]++;
+    if (bi >= 0) grid[bi][di]++;
   });
 
   const maxCell = Math.max(...grid.flat(), 1);
-  const hdrCells = bucketLabels.map(l => `<div class="rhythm-hdr">${l}</div>`).join('');
-  const rows = days.map((d, di) => {
-    const lbl   = d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' });
-    const cells = grid[di].map(count => {
-      const op = count === 0 ? 0.07 : 0.2 + (count / maxCell) * 0.8;
+
+  const dateHdrs = days.map(d => {
+    const lbl = d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' });
+    return `<div class="rhythm-col-hdr">${lbl}</div>`;
+  }).join('');
+
+  const rows = bucketLabels.map((label, bi) => {
+    const cells = grid[bi].map(count => {
+      const op = count === 0 ? 0.08 : 0.2 + (count / maxCell) * 0.8;
       return `<div class="rhythm-cell" style="background:${CAT.poop.color};opacity:${op}">${count||''}</div>`;
     }).join('');
-    return `<div class="rhythm-row"><div class="rhythm-day-lbl">${lbl}</div>${cells}</div>`;
+    return `<div class="rhythm-row"><div class="rhythm-bucket-lbl">${label}</div>${cells}</div>`;
   }).join('');
 
   return `<div class="corr-card">
-    <div class="corr-title">🥩 → 💩 Food to Poop Lag — 14 days</div>
-    <div class="rhythm-header"><div class="rhythm-day-lbl"></div>${hdrCells}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="corr-title" style="margin-bottom:0">🥩 → 💩 Food to Poop Lag</div>
+      <div style="display:flex;gap:2px">
+        <button class="heatmap-nav-btn" data-action="heatmap-prev" title="Earlier">◀</button>
+        <button class="heatmap-nav-btn" data-action="heatmap-next" ${offset===0?'disabled':''} title="More recent">▶</button>
+      </div>
+    </div>
+    <div class="rhythm-row"><div class="rhythm-bucket-lbl"></div>${dateHdrs}</div>
     ${rows}
     <div style="font-size:9px;color:var(--text-4);margin-top:6px">Darker = more poops at that lag after eating</div>
   </div>`;
@@ -2033,6 +2048,15 @@ document.addEventListener('click', e => {
   }
 
   if (action === 'sheets-sync') pushToSheets();
+
+  if (action === 'heatmap-prev') {
+    state.heatmapOffset = (state.heatmapOffset || 0) + 1;
+    renderStatsTab();
+  }
+  if (action === 'heatmap-next') {
+    state.heatmapOffset = Math.max(0, (state.heatmapOffset || 0) - 1);
+    renderStatsTab();
+  }
 
   if (action === 'edit-vet') {
     const note = state.vetNotes.find(n => n.id === el.dataset.id);
