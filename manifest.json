@@ -1,0 +1,17 @@
+{
+  "name": "Fulki Tracker",
+  "short_name": "Fulki",
+  "description": "Daily puppy tracker for Fulki",
+  "start_url": "fulki.html",
+  "display": "standalone",
+  "background_color": "#FAF5FC",
+  "theme_color": "#6E3B83",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236E3B83'/><text y='.9em' font-size='80' x='10'>🐾</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -3,19 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#6E3B83">
+  <link rel="manifest" href="manifest.json">
   <title>Fulki Tracker</title>
   <style>
     :root {
-      --bg:       #FDF6EC;
+      --bg:       #FAF5FC;
       --surface:  #FFFFFF;
-      --border:   #F0DCC0;
-      --border-2: #EDD5A8;
-      --text:     #4A2E10;
-      --text-2:   #7B5030;
-      --text-3:   #B08050;
-      --text-4:   #C0A070;
-      --accent:   #E8A838;
-      --accent-d: #C87820;
+      --border:   #EDD8EE;
+      --border-2: #DFC4E0;
+      --text:     #3D1A4A;
+      --text-2:   #6E3B83;
+      --text-3:   #B56AB2;
+      --text-4:   #D4A0D5;
+      --accent:   #F89831;
+      --accent-d: #D17078;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#150A1C; --surface:#1E0F28; --border:#3A1A4A; --border-2:#4A2A5A;
+        --text:#F0D8F8; --text-2:#C8A0D8; --text-3:#9060A0; --text-4:#604070;
+        --accent:#F89831; --accent-d:#D17078;
+      }
+      #header-bar { background: linear-gradient(140deg,#4A1860,#8A2848); }
+      .log-btn, .vet-type-btn { filter: brightness(0.85); }
+      .stats-stat-card, .stats-peaks-card, .weight-chart-wrap, .corr-card { background: #1A0A24; }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -36,8 +49,8 @@
     }
     @keyframes pulse-opacity { 0%,100%{opacity:1} 50%{opacity:0.6} }
     @keyframes napglow {
-      0%,100% { background: rgba(122,104,176,0.11); border-color: #CFC8EE; }
-      50%     { background: rgba(122,104,176,0.22); border-color: #B0A0DC; }
+      0%,100% { background: rgba(110,59,131,0.08); border-color: #D4B8E8; }
+      50%     { background: rgba(110,59,131,0.16); border-color: #B56AB2; }
     }
 
     #app-wrapper {
@@ -59,7 +72,7 @@
 
     /* ── Header ── */
     #header-bar {
-      background: linear-gradient(140deg, #E8A838, #C87820);
+      background: linear-gradient(140deg, #6E3B83, #B04F6C);
       color: #fff;
       padding: 22px 20px 16px;
       flex-shrink: 0;
@@ -154,7 +167,7 @@
     .stage-body { flex: 1; }
     .stage-label { font-size: 12px; font-weight: 700; color: var(--text-2); }
     .stage-bar-bg { margin-top: 4px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-    .stage-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #4CAF50); border-radius: 2px; transition: width 0.6s; }
+    .stage-bar-fill { height: 100%; background: linear-gradient(90deg, #B56AB2, #F89831); border-radius: 2px; transition: width 0.6s; }
     .stage-pct { font-size: 11px; font-weight: 700; color: var(--text-3); min-width: 34px; text-align: right; font-family: sans-serif; }
 
     /* ── Prediction cards ── */
@@ -190,17 +203,17 @@
 
     /* ── Active nap banner ── */
     #nap-banner {
-      border: 2px solid #CFC8EE; border-radius: 14px;
+      border: 2px solid #D4B8E8; border-radius: 14px;
       padding: 12px 16px; margin-bottom: 16px;
       display: flex; align-items: center; gap: 12px;
       animation: napglow 2.2s infinite;
     }
     .nap-banner-emoji { font-size: 22px; flex-shrink: 0; }
     .nap-banner-body  { flex: 1; }
-    .nap-banner-title { font-size: 14px; font-weight: 700; color: #7A68B0; }
-    .nap-banner-sub   { font-size: 12px; color: #9B8EC4; margin-top: 1px; font-weight: 600; }
+    .nap-banner-title { font-size: 14px; font-weight: 700; color: #6E3B83; }
+    .nap-banner-sub   { font-size: 12px; color: #B56AB2; margin-top: 1px; font-weight: 600; }
     .nap-wake-btn {
-      background: #7A68B0; border: none; border-radius: 10px;
+      background: #6E3B83; border: none; border-radius: 10px;
       color: #fff; font-family: inherit;
       font-size: 12px; font-weight: 700;
       padding: 7px 12px; cursor: pointer; flex-shrink: 0;
@@ -211,10 +224,10 @@
 
     #walkies-btn {
       width: 100%;
-      background: linear-gradient(135deg, #E8F5E8, #F5EDE3);
-      border: 2px solid #C0D4C0; border-radius: 16px;
+      background: linear-gradient(135deg, #F0E8F8, #FDE8F0);
+      border: 2px solid #DFC4E0; border-radius: 16px;
       padding: 13px 16px; font-family: inherit;
-      font-size: 14px; font-weight: 700; color: #4A6A4A;
+      font-size: 14px; font-weight: 700; color: #6E3B83;
       cursor: pointer; display: flex;
       align-items: center; justify-content: center;
       gap: 10px; margin-bottom: 14px;
@@ -237,7 +250,7 @@
       transition: opacity 0.12s;
     }
     .log-btn:active { opacity: 0.75; }
-    .log-btn.nap-active { animation: napglow 2.2s infinite; border-color: #9B8EC4; }
+    .log-btn.nap-active { animation: napglow 2.2s infinite; border-color: #B56AB2; }
 
     .btn-emoji { font-size: 24px; line-height: 1; }
     .btn-label { font-size: 10px; font-weight: 700; }
@@ -449,6 +462,84 @@
       white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Date navigation ── */
+    #date-nav { display:flex; align-items:center; gap:6px; margin-top:10px; }
+    .date-nav-btn {
+      background:rgba(255,255,255,0.22); border:none; border-radius:8px;
+      color:#fff; font-size:13px; padding:5px 9px; cursor:pointer;
+      min-width:32px; min-height:32px; line-height:1;
+    }
+    #header-date { flex:1; text-align:center; font-size:13px; font-weight:600; opacity:0.9; cursor:pointer; }
+    #back-today-pill {
+      display:none; margin:6px 20px 0;
+      background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.35);
+      border-radius:20px; padding:5px 14px; font-size:11px; font-weight:700;
+      color:#fff; cursor:pointer; text-align:center;
+    }
+
+    /* ── Heatmap calendar ── */
+    .heatmap-section { margin-top:18px; }
+    .heatmap-day-labels { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:3px; }
+    .heatmap-day-lbl { font-size:8px; text-align:center; color:var(--text-3); font-family:sans-serif; font-weight:700; }
+    .heatmap-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .heatmap-cell {
+      aspect-ratio:1; border-radius:4px; position:relative;
+      display:flex; align-items:center; justify-content:center;
+      font-size:7px; font-family:sans-serif; font-weight:700; color:#fff;
+    }
+    .heatmap-cell[title] { cursor:default; }
+
+    /* ── Weight chart ── */
+    .weight-chart-wrap { background:var(--surface); border:1.5px solid var(--border-2); border-radius:14px; padding:14px; margin-top:16px; }
+    .weight-chart-title { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+
+    /* ── Stats extras ── */
+    .stats-row-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+    .export-btn {
+      width:100%; background:var(--surface); border:1.5px solid var(--border-2);
+      border-radius:12px; padding:11px; font-family:inherit;
+      font-size:13px; font-weight:700; color:var(--text-2); cursor:pointer;
+      margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+
+    /* ── Feed correlation ── */
+    .corr-card { background:var(--surface); border:1.5px solid var(--border-2); border-radius:14px; padding:14px; margin-top:16px; }
+    .corr-title { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+    .corr-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .corr-lbl { font-size:10px; color:var(--text-2); font-weight:600; min-width:44px; }
+    .corr-bar-bg { flex:1; height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+    .corr-bar-fill { height:100%; border-radius:4px; }
+    .corr-val { font-size:10px; color:var(--text-3); min-width:28px; text-align:right; font-family:sans-serif; }
+
+    /* ── Category notes modal ── */
+    #notes-modal {
+      display:none; position:fixed; inset:0; z-index:300;
+      background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
+    }
+    #notes-modal.open { display:flex; }
+    .notes-sheet {
+      background:var(--bg); border-radius:20px 20px 0 0;
+      padding:20px; width:100%; max-width:480px; max-height:70vh;
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .notes-sheet-title { font-size:16px; font-weight:700; color:var(--text); }
+    .notes-textarea {
+      flex:1; min-height:120px; border:1.5px solid var(--border-2);
+      border-radius:12px; padding:10px 12px; font-family:inherit;
+      font-size:13px; color:var(--text); background:var(--surface);
+      outline:none; resize:none;
+    }
+    .notes-textarea:focus { border-color:var(--accent); }
+    .notes-sheet-actions { display:flex; gap:8px; }
+    .notes-save-btn {
+      flex:1; background:var(--accent); border:none; border-radius:10px;
+      color:#fff; font-family:inherit; font-size:13px; font-weight:700; padding:10px; cursor:pointer;
+    }
+    .notes-cancel-btn {
+      padding:10px 16px; background:var(--surface); border:1.5px solid var(--border-2);
+      border-radius:10px; color:var(--text-2); font-family:inherit; font-size:13px; cursor:pointer;
+    }
   </style>
 </head>
 <body>
@@ -464,8 +555,14 @@
         </div>
         <button class="edit-name-btn" data-action="toggle-name-edit">✏️ Name</button>
       </div>
-      <div id="header-date"></div>
+      <div id="date-nav">
+        <button class="date-nav-btn" data-action="date-prev">◀</button>
+        <div id="header-date" data-action="date-pick"></div>
+        <button class="date-nav-btn" data-action="date-next" id="date-next-btn">▶</button>
+      </div>
+      <input type="date" id="date-picker-input" style="position:absolute;opacity:0;pointer-events:none">
     </div>
+    <div id="back-today-pill" data-action="date-today">⬅ Back to Today</div>
 
     <div id="name-edit-bar">
       <input id="puppy-name-input" type="text" placeholder="Your puppy's name">
@@ -512,8 +609,21 @@
 
 <div id="toast"></div>
 
+<!-- Notes modal -->
+<div id="notes-modal">
+  <div class="notes-sheet">
+    <div class="notes-sheet-title" id="notes-modal-title">Notes</div>
+    <textarea class="notes-textarea" id="notes-textarea" placeholder="Add notes about this category…"></textarea>
+    <div class="notes-sheet-actions">
+      <button class="notes-save-btn" data-action="notes-save">Save Note</button>
+      <button class="notes-cancel-btn" data-action="notes-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Firebase 9 compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -584,7 +694,16 @@ const state = {
   selectedStatsCat: 'pee',
   vetFormType:      null,
   vetFormData:      {},
+  viewDate:         new Date(),
+  catNotes:         {},   // { pee: 'text', poop: 'text', … }
+  activeCatNote:    null, // cat key currently being edited
 };
+
+function isSameDay(a, b) {
+  return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+}
+function startOfDay(d) { const r=new Date(d); r.setHours(0,0,0,0); return r; }
+function endOfDay(d)   { const r=new Date(d); r.setHours(23,59,59,999); return r; }
 
 // ============================================================
 // C — FIREBASE INIT & LISTENERS
@@ -595,6 +714,12 @@ if (!USE_MOCK) {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
   db.enablePersistence().catch(() => {});
+
+  // Silent anonymous auth so security rules can require request.auth != null
+  firebase.auth().signInAnonymously().catch(e => console.warn('Auth:', e.message));
+
+  // Load catNotes from localStorage (no Firestore collection needed)
+  try { state.catNotes = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}'); } catch(e) {}
 
   const toDate = ts => ts?.toDate ? ts.toDate() : ts;
 
@@ -631,6 +756,7 @@ if (!USE_MOCK) {
   state.logs     = [...MOCK.logs].sort((a,b) => b.timestamp - a.timestamp);
   state.settings = { ...MOCK.settings };
   state.vetNotes = [...MOCK.vetNotes];
+  try { state.catNotes = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}'); } catch(e) {}
   recoverNapState();
   computePredictions();
 }
@@ -639,7 +765,14 @@ if (!USE_MOCK) {
 // D — WRITE HELPERS
 // ============================================================
 function addLog(type, timestamp, extra={}) {
-  const entry = { type, timestamp: timestamp || new Date(), ...extra };
+  let ts = timestamp || new Date();
+  // When logging on a past date, preserve current H:M but use viewDate's Y/M/D
+  if (!timestamp && !isSameDay(state.viewDate, new Date())) {
+    const now = new Date();
+    ts = new Date(state.viewDate);
+    ts.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), 0);
+  }
+  const entry = { type, timestamp: ts, ...extra };
   if (USE_MOCK) {
     const id = 'mock_' + Date.now() + '_' + Math.random().toString(36).slice(2);
     state.logs.unshift({ id, ...entry });
@@ -650,7 +783,7 @@ function addLog(type, timestamp, extra={}) {
   const fs   = firebase.firestore;
   const data = { ...entry, timestamp: fs.Timestamp.fromDate(entry.timestamp) };
   if (entry.napEnd) data.napEnd = fs.Timestamp.fromDate(entry.napEnd);
-  db.collection('logs').add(data);
+  db.collection('logs').add(data).catch(e => showToast('⚠️ ' + e.message));
 }
 
 function deleteLog(id) {
@@ -661,7 +794,7 @@ function deleteLog(id) {
     render();
     return;
   }
-  db.collection('logs').doc(id).delete();
+  db.collection('logs').doc(id).delete().catch(e => showToast('⚠️ ' + e.message));
 }
 
 function updateLogTime(id, newDate) {
@@ -673,13 +806,15 @@ function updateLogTime(id, newDate) {
     render();
     return;
   }
-  db.collection('logs').doc(id).update({ timestamp: firebase.firestore.Timestamp.fromDate(newDate) });
+  db.collection('logs').doc(id).update({ timestamp: firebase.firestore.Timestamp.fromDate(newDate) })
+    .catch(e => showToast('⚠️ ' + e.message));
 }
 
 function savePuppyName(name) {
   state.settings.puppyName = name;
   if (USE_MOCK) { renderHeader(); return; }
-  db.collection('settings').doc('main').set({ puppyName: name }, { merge: true });
+  db.collection('settings').doc('main').set({ puppyName: name }, { merge: true })
+    .catch(e => showToast('⚠️ ' + e.message));
 }
 
 function startNap() {
@@ -697,7 +832,7 @@ function startNap() {
     napEnd: null, duration: null,
   }).then(ref => {
     state.napInProgress = { docId: ref.id, startTime: ts };
-  });
+  }).catch(e => showToast('⚠️ ' + e.message));
 }
 
 function endNap() {
@@ -713,7 +848,7 @@ function endNap() {
   }
   db.collection('logs').doc(state.napInProgress.docId).update({
     napEnd: firebase.firestore.Timestamp.fromDate(end), duration,
-  });
+  }).catch(e => showToast('⚠️ ' + e.message));
   state.napInProgress = null;
 }
 
@@ -732,7 +867,7 @@ function saveVetNote(data) {
     ),
   };
   if (entry.nextDue) fsEntry.nextDue = entry.nextDue;
-  db.collection('vetNotes').add(fsEntry);
+  db.collection('vetNotes').add(fsEntry).catch(e => showToast('⚠️ ' + e.message));
 }
 
 function deleteVetNote(id) {
@@ -741,7 +876,7 @@ function deleteVetNote(id) {
     renderVetTab();
     return;
   }
-  db.collection('vetNotes').doc(id).delete();
+  db.collection('vetNotes').doc(id).delete().catch(e => showToast('⚠️ ' + e.message));
 }
 
 // ============================================================
@@ -814,12 +949,12 @@ function recoverNapState() {
 // F — RENDER FUNCTIONS
 // ============================================================
 const CATS = [
-  { key:'food',    emoji:'🍗', label:'Food',    color:'#C87F1A', bg:'#FEF3DC', border:'#F5DAA0' },
-  { key:'water',   emoji:'💧', label:'Water',   color:'#3A9BD5', bg:'#E3F2FD', border:'#B3D9F5' },
-  { key:'nap',     emoji:'💤', label:'Nap',     color:'#7A68B0', bg:'#EEE9F8', border:'#CFC8EE' },
+  { key:'food',    emoji:'🥩', label:'Food',    color:'#F89831', bg:'#FEF3E0', border:'#FDDBA0' },
+  { key:'water',   emoji:'💧', label:'Water',   color:'#5B9ED6', bg:'#E3F0FC', border:'#B0D4F5' },
+  { key:'nap',     emoji:'💤', label:'Nap',     color:'#6E3B83', bg:'#F0E8F8', border:'#D4B8E8' },
   { key:'pee',     emoji:'🌱', label:'Pee',     color:'#3D8F3D', bg:'#E8F5E8', border:'#A8D8A8' },
-  { key:'poop',    emoji:'💩', label:'Poop',    color:'#7A4F2C', bg:'#F5EDE3', border:'#DDCAB8' },
-  { key:'zoomies', emoji:'🏎️', label:'Zoomies', color:'#C02828', bg:'#FEE8E8', border:'#F5B0B0' },
+  { key:'poop',    emoji:'💩', label:'Poop',    color:'#B04F6C', bg:'#FDE8EE', border:'#F0C0D0' },
+  { key:'zoomies', emoji:'🏎️', label:'Zoomies', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
@@ -888,15 +1023,32 @@ function renderHeader() {
   const name = state.settings.puppyName || 'Fulki';
   const el   = document.getElementById('header-title');
   if (el) el.textContent = `🐾 ${name}'s Log`;
-  document.getElementById('header-date').textContent =
-    new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+
+  const today   = new Date();
+  const isToday = isSameDay(state.viewDate, today);
+  const label   = isToday
+    ? state.viewDate.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' })
+    : state.viewDate.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('header-date').textContent = label;
+
+  const nextBtn = document.getElementById('date-next-btn');
+  if (nextBtn) nextBtn.disabled = isToday;
+  if (nextBtn) nextBtn.style.opacity = isToday ? '0.35' : '1';
+
+  const pill = document.getElementById('back-today-pill');
+  if (pill) pill.style.display = isToday ? 'none' : 'block';
+
+  // Update timeline section label
+  const tlLabel = document.querySelector('.tl-section-label');
+  if (tlLabel) tlLabel.textContent = isToday ? "Today's log" : label + "'s log";
 }
 
 function renderSummaryStrip() {
-  const midnight = new Date(); midnight.setHours(0,0,0,0);
-  const today    = state.logs.filter(l => l.timestamp >= midnight);
+  const start   = startOfDay(state.viewDate);
+  const end     = endOfDay(state.viewDate);
+  const dayLogs = state.logs.filter(l => l.timestamp >= start && l.timestamp <= end);
   document.getElementById('summary-strip').innerHTML = CATS.map(c => {
-    const n = today.filter(l => l.type === c.key).length;
+    const n = dayLogs.filter(l => l.type === c.key).length;
     return `<div class="summary-pill" style="background:${c.bg};color:${c.color}">${c.emoji} ${n}×</div>`;
   }).join('');
 }
@@ -996,19 +1148,21 @@ function renderLogButtons() {
 }
 
 function renderTimeline() {
-  const midnight = new Date(); midnight.setHours(0,0,0,0);
-  const today    = state.logs.filter(l => l.timestamp >= midnight);
+  const start    = startOfDay(state.viewDate);
+  const end      = endOfDay(state.viewDate);
+  const dayLogs  = state.logs.filter(l => l.timestamp >= start && l.timestamp <= end);
   const el       = document.getElementById('timeline');
+  const isToday  = isSameDay(state.viewDate, new Date());
 
-  if (!today.length) {
+  if (!dayLogs.length) {
     el.innerHTML = `<div class="empty-state">
-      No logs yet today 🐶<br>
-      <span class="sub">Tap a button above to start</span>
+      ${isToday ? 'No logs yet today 🐶' : 'No logs for this day'}<br>
+      <span class="sub">${isToday ? 'Tap a button above to start' : 'Tap a button to backdate an entry'}</span>
     </div>`;
     return;
   }
 
-  el.innerHTML = today.map(log => {
+  el.innerHTML = dayLogs.map(log => {
     const c   = CAT[log.type] || { emoji:'•', label:log.type, color:'#999', border:'#EEE' };
     const ts  = log.timestamp;
     const tStr = ts.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
@@ -1038,13 +1192,99 @@ function renderTimeline() {
   }).join('');
 }
 
+function computeStreak() {
+  const days = new Set(state.logs.map(l => startOfDay(l.timestamp).getTime()));
+  let streak = 0;
+  const d = startOfDay(new Date());
+  while (days.has(d.getTime())) { streak++; d.setDate(d.getDate()-1); }
+  return streak;
+}
+
+function renderHeatmap(cat) {
+  const c   = CAT[cat];
+  const now = new Date();
+  const cells = [];
+  // Start on Monday of 5 weeks ago
+  const startD = new Date(now);
+  startD.setDate(startD.getDate() - 34);
+  startD.setHours(0,0,0,0);
+
+  for (let i = 0; i < 35; i++) {
+    const d     = new Date(startD);
+    d.setDate(d.getDate() + i);
+    const count = state.logs.filter(l => l.type === cat && isSameDay(l.timestamp, d)).length;
+    const alpha = count === 0 ? 0.08 : Math.min(0.2 + count * 0.2, 1);
+    const bg    = count === 0 ? 'var(--border)' : c.color;
+    const lbl   = d.getDate();
+    cells.push(`<div class="heatmap-cell" style="background:${bg};opacity:${count?1:0.35}" title="${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${count?' · '+count+'×':''}">
+      ${count > 0 ? count : ''}
+    </div>`);
+  }
+
+  const dayNames = ['M','T','W','T','F','S','S'];
+  return `
+    <div class="heatmap-section">
+      <div class="heatmap-day-labels">${dayNames.map(n=>`<div class="heatmap-day-lbl">${n}</div>`).join('')}</div>
+      <div class="heatmap-grid">${cells.join('')}</div>
+    </div>`;
+}
+
+function renderFeedCorrelation() {
+  const foodLogs = state.logs.filter(l=>l.type==='food').sort((a,b)=>a.timestamp-b.timestamp);
+  const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
+  if (foodLogs.length < 2 || poopLogs.length < 2) return '';
+
+  const buckets = {'0–30m':0,'30–60m':0,'1–2h':0,'2–4h':0,'4h+':0};
+  poopLogs.forEach(poop => {
+    const lastFood = foodLogs.filter(f=>f.timestamp < poop.timestamp).slice(-1)[0];
+    if (!lastFood) return;
+    const mins = (poop.timestamp - lastFood.timestamp) / 60000;
+    if      (mins < 30)  buckets['0–30m']++;
+    else if (mins < 60)  buckets['30–60m']++;
+    else if (mins < 120) buckets['1–2h']++;
+    else if (mins < 240) buckets['2–4h']++;
+    else                 buckets['4h+']++;
+  });
+  const max = Math.max(...Object.values(buckets), 1);
+  const rows = Object.entries(buckets).map(([lbl,n]) =>
+    `<div class="corr-bar-row">
+      <div class="corr-lbl">${lbl}</div>
+      <div class="corr-bar-bg"><div class="corr-bar-fill" style="width:${Math.round(n/max*100)}%;background:${CAT.poop.color}"></div></div>
+      <div class="corr-val">${n}×</div>
+    </div>`).join('');
+  return `<div class="corr-card">
+    <div class="corr-title">⏱ Time from food → poop</div>
+    ${rows}
+  </div>`;
+}
+
+function exportCSV() {
+  const rows = [['Type','Date','Time','Duration(mins)','Notes']];
+  [...state.logs].sort((a,b)=>a.timestamp-b.timestamp).forEach(l => {
+    rows.push([
+      l.type,
+      l.timestamp.toLocaleDateString('en-GB'),
+      l.timestamp.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+      l.duration || '',
+      ''
+    ]);
+  });
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a   = Object.assign(document.createElement('a'), {
+    href:     'data:text/csv;charset=utf-8,' + encodeURIComponent(csv),
+    download: `fulki-logs-${new Date().toISOString().slice(0,10)}.csv`,
+  });
+  a.click();
+}
+
 function renderStatsTab() {
   const tab = document.getElementById('stats-tab');
   const sel = state.selectedStatsCat || 'pee';
   const cat = CAT[sel];
 
-  const sevenAgo  = Date.now() - 7 * 24 * 3600e3;
-  const recent    = state.logs.filter(l => l.type === sel && +l.timestamp > sevenAgo);
+  const sevenAgo   = Date.now() - 7 * 24 * 3600e3;
+  const recent     = state.logs.filter(l => l.type === sel && +l.timestamp > sevenAgo);
+  const allOfType  = state.logs.filter(l => l.type === sel);
   const hourCounts = Array(24).fill(0);
   recent.forEach(l => { hourCounts[l.timestamp.getHours()]++; });
   const max = Math.max(...hourCounts, 1);
@@ -1054,28 +1294,50 @@ function renderStatsTab() {
   const ranked     = hourCounts.map((c,h) => ({h,c})).filter(x=>x.c>0).sort((a,b)=>b.c-a.c);
   const peaks      = ranked.slice(0, 3);
   const topHr      = peaks[0] ? hrLabel(peaks[0].h) : '—';
+  const streak     = computeStreak();
+
+  // Avg interval between consecutive events
+  let avgInterval = '—';
+  if (allOfType.length >= 2) {
+    const sorted = [...allOfType].sort((a,b)=>a.timestamp-b.timestamp);
+    const intervals = [];
+    for (let i=1;i<sorted.length;i++) intervals.push(sorted[i].timestamp - sorted[i-1].timestamp);
+    const mean = intervals.reduce((a,b)=>a+b,0)/intervals.length;
+    const h = Math.floor(mean/3600e3), m = Math.round((mean%3600e3)/60000);
+    avgInterval = h>0 ? `${h}h${m>0?m+'m':''}` : `${m}m`;
+  }
 
   const pills = CATS.map(c => {
     const active = c.key === sel;
+    const hasNote = !!state.catNotes[c.key];
     return `<button class="stats-pill" data-action="select-stats-cat" data-cat="${c.key}"
       style="border-color:${c.border};background:${active?c.color:c.bg};color:${active?'#fff':c.color}">
-      ${c.emoji} ${c.label}
+      ${c.emoji} ${c.label}${hasNote?' 📝':''}
     </button>`;
   }).join('');
 
-  const statsRow = [['Last 7 days', totalLast7+'×'], ['Avg/day', avgPerDay], ['Peak time', topHr]]
-    .map(([k,v]) => `<div class="stats-stat-card">
-      <div class="stats-stat-val" style="color:${cat.color}">${v}</div>
-      <div class="stats-stat-lbl">${k}</div>
-    </div>`).join('');
+  const noteText = state.catNotes[sel] || '';
+  const noteHtml = noteText ? `<div style="background:${cat.bg};border:1.5px solid ${cat.border};border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:${cat.color}">📝 ${noteText}</div>` : '';
+  const noteBtnLabel = noteText ? '📝 Edit note' : '📝 Add note';
+
+  const statsRow = [
+    ['Last 7 days', totalLast7+'×'],
+    ['Avg/day',     avgPerDay],
+    ['Peak time',   topHr],
+    ['Avg interval',avgInterval],
+    ['Log streak',  streak+'d'],
+    ['Total logged',allOfType.length+'×'],
+  ].map(([k,v]) => `<div class="stats-stat-card">
+    <div class="stats-stat-val" style="color:${cat.color}">${v}</div>
+    <div class="stats-stat-lbl">${k}</div>
+  </div>`).join('');
 
   function barCol(count, h) {
-    const pct     = Math.round((count / max) * 100);
-    const opacity = count > 0 ? 0.65 + (count/max)*0.35 : 1;
-    const ctHtml  = count > 0 ? `<div class="chart-ct" style="color:${cat.color}">${count}</div>` : '';
+    const pct    = Math.round((count / max) * 100);
+    const ctHtml = count > 0 ? `<div class="chart-ct" style="color:${cat.color}">${count}</div>` : '';
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-bar" style="height:${pct}%;background:${count>0?cat.color:'transparent'};opacity:${opacity}"></div>
+        <div class="chart-bar" style="height:${pct}%;background:${count>0?cat.color:'transparent'}"></div>
       </div>
       <div class="chart-hr-lbl">${hrLabel(h)}</div>
       ${ctHtml}
@@ -1100,10 +1362,8 @@ function renderStatsTab() {
     </div>` : '';
 
   const mainContent = recent.length === 0
-    ? `<div class="empty-state">
-        No ${cat.label.toLowerCase()} events in the past 7 days yet.<br>
-        <span class="sub">Patterns appear here as you log.</span>
-      </div>`
+    ? `<div class="empty-state">No ${cat.label.toLowerCase()} events in the past 7 days yet.<br>
+       <span class="sub">Patterns appear here as you log.</span></div>`
     : `<div class="chart-half-label">AM</div>
        <div class="chart-grid">${amBars}</div>
        <div class="chart-half-label">PM</div>
@@ -1113,9 +1373,22 @@ function renderStatsTab() {
   tab.innerHTML = `
     <div class="section-label">Hourly patterns · past 7 days</div>
     <div class="stats-cat-pills">${pills}</div>
-    <div class="stats-row">${statsRow}</div>
-    ${mainContent}`;
+    ${noteHtml}
+    <button class="stats-pill" data-action="notes-open" data-cat="${sel}"
+      style="border-color:${cat.border};background:${cat.bg};color:${cat.color};margin-bottom:14px">
+      ${noteBtnLabel}
+    </button>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
+    ${mainContent}
+    ${renderHeatmap(sel)}
+    ${sel === 'poop' ? renderFeedCorrelation() : ''}
+    <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
 }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action="export-csv"]');
+  if (el) exportCSV();
+});
 
 function renderVetTab() {
   const tab    = document.getElementById('vet-tab');
@@ -1204,9 +1477,50 @@ function renderVetTab() {
         </div>`;
       }).join('')}</div>`;
 
+  // Weight chart
+  const weightEntries = state.vetNotes
+    .filter(n => n.category === 'weight' && n.value && !isNaN(parseFloat(n.value)))
+    .sort((a,b) => a.date - b.date);
+  let weightChartHtml = '';
+  if (weightEntries.length >= 2) {
+    const vals   = weightEntries.map(n => parseFloat(n.value));
+    const minV   = Math.min(...vals);
+    const maxV   = Math.max(...vals);
+    const range  = maxV - minV || 1;
+    const W = 340, H = 80, pad = 12;
+    const pts = vals.map((v,i) => {
+      const x = pad + (i / (vals.length-1)) * (W - pad*2);
+      const y = pad + (1 - (v-minV)/range) * (H - pad*2);
+      return `${x},${y}`;
+    });
+    const polyline = `<polyline points="${pts.join(' ')}" fill="none" stroke="${CAT.water ? '#3A9BD5' : '#3A9BD5'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const dots = pts.map((p,i) => {
+      const [x,y] = p.split(',');
+      return `<circle cx="${x}" cy="${y}" r="4" fill="#fff" stroke="#3A9BD5" stroke-width="2"/>`;
+    }).join('');
+    const lastVal = vals[vals.length-1];
+    const diff    = vals.length >= 2 ? (lastVal - vals[vals.length-2]).toFixed(1) : null;
+    const diffTxt = diff !== null ? (diff > 0 ? `+${diff}kg` : `${diff}kg`) : '';
+    const diffCol = diff > 0 ? '#22C55E' : diff < 0 ? '#EF4444' : '#999';
+    weightChartHtml = `<div class="weight-chart-wrap">
+      <div class="weight-chart-title">⚖️ Weight over time
+        ${diff !== null ? `<span style="font-size:12px;color:${diffCol};margin-left:8px">${diffTxt}</span>` : ''}
+      </div>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible">
+        ${polyline}${dots}
+      </svg>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:10px;color:var(--text-3)">${fmtDate(weightEntries[0].date)}</span>
+        <span style="font-size:11px;font-weight:700;color:#3A9BD5">${lastVal}kg</span>
+        <span style="font-size:10px;color:var(--text-3)">${fmtDate(weightEntries[weightEntries.length-1].date)}</span>
+      </div>
+    </div>`;
+  }
+
   tab.innerHTML = `
     <div class="section-label">Health &amp; Vet Records</div>
     <div class="vet-type-grid">${typeButtons}</div>
+    ${weightChartHtml}
     ${formHtml}
     ${notesHtml}`;
 }
@@ -1315,26 +1629,98 @@ document.addEventListener('click', e => {
   }
 
   if (action === 'edit-time') {
-    const id    = el.dataset.id;
-    const orig  = new Date(parseInt(el.dataset.ts));
-    const hh    = String(orig.getHours()).padStart(2,'0');
-    const mm    = String(orig.getMinutes()).padStart(2,'0');
-    const input = Object.assign(document.createElement('input'), {
-      type:      'time',
-      className: 'tl-time-input',
-      value:     `${hh}:${mm}`,
+    const id   = el.dataset.id;
+    const orig = new Date(parseInt(el.dataset.ts));
+    const hh   = String(orig.getHours()).padStart(2,'0');
+    const mm   = String(orig.getMinutes()).padStart(2,'0');
+    const yyyy = orig.getFullYear();
+    const mo   = String(orig.getMonth()+1).padStart(2,'0');
+    const dd   = String(orig.getDate()).padStart(2,'0');
+
+    const wrap  = document.createElement('span');
+    const dInp  = Object.assign(document.createElement('input'), {
+      type:'date', className:'tl-time-input', value:`${yyyy}-${mo}-${dd}`,
+      style:'width:108px;margin-bottom:2px',
     });
-    el.replaceWith(input);
-    input.focus();
+    const tInp  = Object.assign(document.createElement('input'), {
+      type:'time', className:'tl-time-input', value:`${hh}:${mm}`,
+    });
+    wrap.append(dInp, document.createElement('br'), tInp);
+    el.replaceWith(wrap);
+    tInp.focus();
+
     const save = () => {
-      if (!input.value) return;
-      const [nh, nm] = input.value.split(':').map(Number);
-      const nd = new Date(orig);
-      nd.setHours(nh, nm, 0, 0);
+      if (!tInp.value || !dInp.value) return;
+      const [nh,nm] = tInp.value.split(':').map(Number);
+      const nd = new Date(dInp.value + 'T12:00:00');
+      nd.setHours(nh,nm,0,0);
       updateLogTime(id, nd);
     };
-    input.addEventListener('blur', save);
-    input.addEventListener('keydown', ev => { if (ev.key === 'Enter') input.blur(); });
+    tInp.addEventListener('blur',  save);
+    dInp.addEventListener('change', save);
+    tInp.addEventListener('keydown', ev => { if (ev.key==='Enter') tInp.blur(); });
+  }
+
+  if (action === 'date-prev') {
+    const d = new Date(state.viewDate);
+    d.setDate(d.getDate() - 1);
+    state.viewDate = d;
+    render();
+  }
+
+  if (action === 'date-next') {
+    const today = new Date();
+    if (!isSameDay(state.viewDate, today)) {
+      const d = new Date(state.viewDate);
+      d.setDate(d.getDate() + 1);
+      state.viewDate = d;
+      render();
+    }
+  }
+
+  if (action === 'date-today') {
+    state.viewDate = new Date();
+    render();
+  }
+
+  if (action === 'date-pick') {
+    const inp = document.getElementById('date-picker-input');
+    if (!inp) return;
+    const d = state.viewDate;
+    inp.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    inp.max   = new Date().toISOString().slice(0,10);
+    inp.onchange = () => {
+      if (inp.value) { state.viewDate = new Date(inp.value + 'T12:00:00'); render(); }
+    };
+    inp.click();
+  }
+
+  if (action === 'notes-open') {
+    const cat = el.dataset.cat;
+    state.activeCatNote = cat;
+    const catInfo = CAT[cat];
+    document.getElementById('notes-modal-title').textContent = `${catInfo.emoji} ${catInfo.label} — Notes`;
+    document.getElementById('notes-textarea').value = state.catNotes[cat] || '';
+    document.getElementById('notes-modal').classList.add('open');
+  }
+
+  if (action === 'notes-cancel') {
+    document.getElementById('notes-modal').classList.remove('open');
+    state.activeCatNote = null;
+  }
+
+  if (action === 'notes-save') {
+    const cat  = state.activeCatNote;
+    const text = document.getElementById('notes-textarea').value.trim();
+    if (cat) {
+      if (text) state.catNotes[cat] = text;
+      else delete state.catNotes[cat];
+      try { localStorage.setItem('fulki_catNotes', JSON.stringify(state.catNotes)); } catch(e){}
+    }
+    document.getElementById('notes-modal').classList.remove('open');
+    state.activeCatNote = null;
+    if (state.tab === 'stats') renderStatsTab();
+    showToast('Note saved');
   }
 
   if (action === 'delete-vet') {
@@ -1382,6 +1768,27 @@ setInterval(() => {
 
 // ── Initial render ──
 render();
+
+// ── PWA Service Worker ──
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'fulki-v1';
+    const URLS  = [self.location.pathname];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS)).then(() => self.skipWaiting()));
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+    });
+    self.addEventListener('fetch', e => {
+      if (e.request.method !== 'GET') return;
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
 </script>
 </body>
 </html>
