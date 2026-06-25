@@ -131,6 +131,10 @@
       0%,100% { background: rgba(110,59,131,0.08); border-color: #D4B8E8; }
       50%     { background: rgba(110,59,131,0.16); border-color: #B56AB2; }
     }
+    @keyframes playglow {
+      0%,100% { background: rgba(209,112,120,0.08); border-color: #F5B8BC; }
+      50%     { background: rgba(209,112,120,0.18); border-color: #D17078; }
+    }
 
     #app-wrapper {
       min-height: 100vh;
@@ -297,6 +301,23 @@
       font-size: 12px; font-weight: 700;
       padding: 7px 12px; cursor: pointer; flex-shrink: 0;
     }
+    /* ── Active play banner ── */
+    #play-banner {
+      border: 2px solid #F5B8BC; border-radius: 14px;
+      padding: 12px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+      animation: playglow 2.2s infinite;
+    }
+    .play-banner-emoji { font-size: 22px; flex-shrink: 0; }
+    .play-banner-body  { flex: 1; }
+    .play-banner-title { font-size: 14px; font-weight: 700; color: #D17078; }
+    .play-banner-sub   { font-size: 12px; color: #D17078; margin-top: 1px; font-weight: 600; opacity: 0.8; }
+    .play-stop-btn {
+      background: #D17078; border: none; border-radius: 10px;
+      color: #fff; font-family: inherit;
+      font-size: 12px; font-weight: 700;
+      padding: 7px 12px; cursor: pointer; flex-shrink: 0;
+    }
 
     /* ── Log section ── */
     #log-section { margin-bottom: 0; }
@@ -329,7 +350,8 @@
       transition: opacity 0.12s;
     }
     .log-btn:active { opacity: 0.75; }
-    .log-btn.nap-active { animation: napglow 2.2s infinite; border-color: #B56AB2; }
+    .log-btn.nap-active  { animation: napglow  2.2s infinite; border-color: #B56AB2; }
+    .log-btn.play-active { animation: playglow 2.2s infinite; border-color: #D17078; }
 
     .btn-emoji { font-size: 24px; line-height: 1; }
     .btn-label { font-size: 10px; font-weight: 700; }
@@ -586,6 +608,9 @@
 
     /* ── Metabolic rhythm charts ── */
     .corr-card { background:var(--surface); border:1.5px solid var(--border-2); border-radius:14px; padding:14px; margin-top:16px; }
+    .gr-fact-card  { background:var(--surface); border:1.5px solid var(--border-2); border-radius:12px; padding:12px 14px; margin-bottom:18px; }
+    .gr-fact-label { font-size:10px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+    .gr-fact-text  { font-size:12px; color:var(--text-2); line-height:1.6; }
     .corr-title { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
     .corr-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
     .corr-lbl { font-size:10px; color:var(--text-2); font-weight:600; min-width:44px; }
@@ -593,7 +618,7 @@
     .corr-bar-fill { height:100%; border-radius:4px; }
     .corr-val { font-size:10px; color:var(--text-3); min-width:28px; text-align:right; font-family:sans-serif; }
     .rhythm-row { display:flex; align-items:center; gap:4px; margin-bottom:4px; }
-    .rhythm-bucket-lbl { font-size:8px; color:var(--text-3); width:42px; flex-shrink:0; font-family:sans-serif; font-weight:700; text-align:right; padding-right:4px; }
+    .rhythm-bucket-lbl { font-size:8px; color:var(--text-3); width:48px; flex-shrink:0; font-family:sans-serif; font-weight:700; text-align:right; padding-right:4px; }
     .rhythm-col-hdr { flex:1; font-size:8px; color:var(--text-4); text-align:center; font-family:sans-serif; font-weight:700; line-height:1.3; }
     .rhythm-cell { flex:1; height:22px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; font-family:sans-serif; }
     .heatmap-nav-btn { background:none; border:none; cursor:pointer; color:var(--text-3); font-size:14px; padding:0 4px; line-height:1; }
@@ -634,6 +659,11 @@
       background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
     }
     #water-size-modal.open { display:flex; }
+    #food-size-modal {
+      display:none; position:fixed; inset:0; z-index:300;
+      background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
+    }
+    #food-size-modal.open { display:flex; }
     .water-size-sheet {
       background:var(--bg); border-radius:20px 20px 0 0;
       padding:20px; width:100%; max-width:480px;
@@ -765,6 +795,25 @@
   </div>
 </div>
 
+<div id="food-size-modal">
+  <div class="water-size-sheet">
+    <div class="water-size-title">🥩 What did Fulki eat?</div>
+    <div class="water-size-btns">
+      <button class="water-size-btn" data-action="food-type" data-portion="Snack" data-grams="15">
+        <span class="water-size-emoji">🦴</span>
+        <span class="water-size-lbl">Snack</span>
+        <span class="water-size-ml">15 g</span>
+      </button>
+      <button class="water-size-btn" data-action="food-type" data-portion="Meal" data-grams="25">
+        <span class="water-size-emoji">🥩</span>
+        <span class="water-size-lbl">Meal</span>
+        <span class="water-size-ml">25 g</span>
+      </button>
+    </div>
+    <button class="water-size-cancel" data-action="food-type-cancel">Cancel</button>
+  </div>
+</div>
+
 <!-- Firebase 9 compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -833,6 +882,7 @@ const state = {
   settings:         { puppyName: 'Fulki' },
   vetNotes:         [],
   napInProgress:    null,
+  playInProgress:   null,
   predictions:      {},
   selectedStatsCat: 'pee',
   vetFormType:      null,
@@ -842,6 +892,7 @@ const state = {
   catNotes:         {},   // { pee: [{id, text, date}], … }
   activeCatNote:    null, // cat key currently being edited
   waterSizePending: false,
+  foodTypePending:  false,
   vetFilter:        { type: 'all', search: '' },
   sheetsUrl:        '',
   heatmapOffset:    0,
@@ -1039,6 +1090,61 @@ function endNap() {
   state.napInProgress = null;
 }
 
+let _playNotifyTimer = null;
+
+function startPlay() {
+  const ts = new Date();
+  schedulePlayNotification();
+  if (USE_MOCK) {
+    const id = 'play_' + Date.now();
+    state.logs.unshift({ id, type:'zoomies', timestamp: ts, playEnd: null, duration: null });
+    state.playInProgress = { docId: id, startTime: ts };
+    render();
+    return;
+  }
+  db.collection('logs').add({
+    type: 'zoomies',
+    timestamp: firebase.firestore.Timestamp.fromDate(ts),
+    playEnd: null, duration: null,
+  }).then(ref => {
+    state.playInProgress = { docId: ref.id, startTime: ts };
+  }).catch(e => showToast('⚠️ ' + e.message));
+}
+
+function endPlay() {
+  clearTimeout(_playNotifyTimer); _playNotifyTimer = null;
+  const end      = new Date();
+  const duration = Math.round((end - state.playInProgress.startTime) / 60000);
+  if (USE_MOCK) {
+    const log = state.logs.find(l => l.id === state.playInProgress.docId);
+    if (log) { log.playEnd = end; log.duration = duration; }
+    state.playInProgress = null;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(state.playInProgress.docId).update({
+    playEnd: firebase.firestore.Timestamp.fromDate(end), duration,
+  }).catch(e => showToast('⚠️ ' + e.message));
+  state.playInProgress = null;
+}
+
+function schedulePlayNotification() {
+  clearTimeout(_playNotifyTimer);
+  const fire = () => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('🎾 Active Play', { body: "Fulki has been playing for 7 minutes — time for a water break! 💧" });
+    }
+  };
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') { _playNotifyTimer = setTimeout(fire, 7 * 60000); }
+    });
+  } else {
+    _playNotifyTimer = setTimeout(fire, 7 * 60000);
+  }
+}
+
 function saveVetNote(data) {
   // data.date takes precedence over the default new Date()
   const entry = { date: new Date(), ...data };
@@ -1149,13 +1255,50 @@ function recoverNapState() {
 // ============================================================
 // F — RENDER FUNCTIONS
 // ============================================================
+
+const GR_FACTS = [
+  "Female golden retrievers typically weigh 55–65 lbs and stand 21–22 inches — slightly smaller than males but just as mighty! 🐾",
+  "The first golden retriever to win an AKC obedience championship was a female named Moreland's Golden Tonk, who earned eight perfect scores! 🏆",
+  "Female golden retrievers tend to mature faster than males and are known for their nurturing, focused nature. 🌸",
+  "Female golden retrievers are often chosen as guide and therapy dogs for their calm focus and gentle temperament. 🎓",
+  "Female golden retrievers are typically more task-focused during training — very independent problem-solvers! 💪",
+  "Golden retrievers can carry a raw egg in their mouths without cracking it — one of the softest bites of any breed. 🥚",
+  "Golden retrievers are the 4th most intelligent dog breed, capable of learning over 200 commands! 🧠",
+  "Their double coat is naturally water-repellent and they have webbed toes — born swimmers! 🏊",
+  "A golden retriever named Augie holds the world record for most tennis balls held in one mouth — 5 at once! 🎾",
+  "Golden retrievers were bred in the Scottish Highlands in the 1860s to retrieve waterfowl for hunters. 🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "Golden retrievers consistently rank in the top 5 most popular dog breeds in the US. 🌟",
+  "Despite their size, golden retrievers are famously gentle with babies and small children. 🍼",
+  "A golden retriever's coat ranges from pale cream to deep golden-red and can be straight or wavy. ✨",
+  "Golden retrievers are natural 'mouthy' dogs who love carrying things — expect surprise sock deliveries! 👟",
+  "Golden retrievers have been trained as search-and-rescue dogs and have saved countless lives worldwide. 🔍",
+  "Golden retrievers typically live 10–12 years — every day packed with cuddles and unconditional love. 💛",
+];
+function getTodaysFact() {
+  const today = new Date().toDateString();
+  let shown = JSON.parse(localStorage.getItem('grFactsShown') || '[]');
+  let idx   = parseInt(localStorage.getItem('grFactIdx') || '-1', 10);
+  if (localStorage.getItem('grFactDate') !== today) {
+    if (shown.length >= GR_FACTS.length) shown = [];
+    const unseen = GR_FACTS.map((_,i) => i).filter(i => !shown.includes(i));
+    idx = unseen[Math.floor(Math.random() * unseen.length)];
+    shown.push(idx);
+    try {
+      localStorage.setItem('grFactsShown', JSON.stringify(shown));
+      localStorage.setItem('grFactDate', today);
+      localStorage.setItem('grFactIdx', String(idx));
+    } catch(e) {}
+  }
+  return GR_FACTS[idx >= 0 ? idx : 0];
+}
+
 const CATS = [
   { key:'food',    emoji:'🥩', label:'Food',    color:'#F89831', bg:'#FEF3E0', border:'#FDDBA0', darkBg:'rgba(200,118,0,0.18)',   darkColor:'#c8a060' },
   { key:'water',   emoji:'💧', label:'Water',   color:'#5B9ED6', bg:'#E3F0FC', border:'#B0D4F5', darkBg:'rgba(0,92,127,0.25)',    darkColor:'#7eb8d8' },
   { key:'nap',     emoji:'💤', label:'Nap',     color:'#6E3B83', bg:'#F0E8F8', border:'#D4B8E8', darkBg:'rgba(110,59,131,0.22)',  darkColor:'#a880d0' },
   { key:'pee',     emoji:'🌱', label:'Pee',     color:'#3D8F3D', bg:'#E8F5E8', border:'#A8D8A8', darkBg:'rgba(61,143,61,0.22)',   darkColor:'#70c070' },
   { key:'poop',    emoji:'💩', label:'Poop',    color:'#B04F6C', bg:'#FDE8EE', border:'#F0C0D0', darkBg:'rgba(176,79,108,0.22)',  darkColor:'#d090a8' },
-  { key:'zoomies', emoji:'🏎️', label:'Zoomies', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#d09098' },
+  { key:'zoomies', emoji:'🎾', label:'Active Play', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#d09098' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
@@ -1330,34 +1473,53 @@ function renderPredictions() {
 
   document.getElementById('prediction-section').innerHTML =
     stageBanner +
+    `<div class="gr-fact-card"><div class="gr-fact-label">🐾 Golden Retriever Fact</div><div class="gr-fact-text">${getTodaysFact()}</div></div>` +
     `<div class="section-label">Next predictions 🔮</div>` +
     `<div class="predictions-row">${cards}</div>` +
     `<div class="pred-note">Accuracy grows as more events are logged</div>`;
 }
 
 function renderLogButtons() {
-  const napActive = !!state.napInProgress;
-  const elapsed   = napActive ? elapsedMins(state.napInProgress.startTime) : 0;
-  const startStr  = napActive
-    ? new Date(state.napInProgress.startTime).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
-    : '';
+  const napActive  = !!state.napInProgress;
+  const playActive = !!state.playInProgress;
+
+  const napElapsed  = napActive  ? elapsedMins(state.napInProgress.startTime)  : 0;
+  const playElapsed = playActive ? elapsedMins(state.playInProgress.startTime) : 0;
+  const napStart  = napActive  ? new Date(state.napInProgress.startTime).toLocaleTimeString('en-GB',  { hour:'2-digit', minute:'2-digit' }) : '';
+  const playStart = playActive ? new Date(state.playInProgress.startTime).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : '';
 
   const napBanner = napActive ? `
     <div id="nap-banner">
       <span class="nap-banner-emoji">💤</span>
       <div class="nap-banner-body">
         <div class="nap-banner-title">Nap in progress</div>
-        <div class="nap-banner-sub">${elapsed} min · started ${startStr}</div>
+        <div class="nap-banner-sub">${napElapsed} min · started ${napStart}</div>
       </div>
       <button class="nap-wake-btn" data-action="log" data-type="nap">☀️ Awake</button>
     </div>` : '';
 
+  const playBanner = playActive ? `
+    <div id="play-banner">
+      <span class="play-banner-emoji">🎾</span>
+      <div class="play-banner-body">
+        <div class="play-banner-title">Active Play in progress</div>
+        <div class="play-banner-sub">${playElapsed} min · started ${playStart}</div>
+      </div>
+      <button class="play-stop-btn" data-action="log" data-type="zoomies">Stop Play</button>
+    </div>` : '';
+
   const buttons = CATS.map(c => {
     const isNap      = c.key === 'nap';
-    const isNapBtn   = isNap && napActive;
-    const label      = isNap ? (napActive ? 'Awake' : 'Start Nap') : c.label;
-    const borderClr  = isNapBtn ? '#9B8EC4' : 'transparent';
-    return `<button class="log-btn${isNapBtn ? ' nap-active' : ''}"
+    const isPlay     = c.key === 'zoomies';
+    const isNapBtn   = isNap  && napActive;
+    const isPlayBtn  = isPlay && playActive;
+    const label      = isNap  ? (napActive  ? 'Awake'     : 'Start Nap')
+                     : isPlay ? (playActive ? 'Stop Play' : 'Active Play')
+                     : c.label;
+    const borderClr  = isNapBtn  ? '#9B8EC4'
+                     : isPlayBtn ? '#D17078'
+                     : 'transparent';
+    return `<button class="log-btn${isNapBtn ? ' nap-active' : isPlayBtn ? ' play-active' : ''}"
       style="background:${c.bg};color:${c.color};border-color:${borderClr}"
       data-action="log" data-type="${c.key}">
       <span class="btn-emoji">${c.emoji}</span>
@@ -1367,6 +1529,7 @@ function renderLogButtons() {
 
   document.getElementById('log-section').innerHTML =
     napBanner +
+    playBanner +
     `<div class="section-label">Quick log</div>
      <button id="walkies-btn" data-action="walkies">
        <span>🚶</span>
@@ -1411,14 +1574,30 @@ function renderTimeline() {
       }
     }
 
+    if (log.type === 'zoomies') {
+      if (log.playEnd) {
+        const endStr = new Date(log.playEnd).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+        durHtml  = `<span class="tl-dur">${log.duration}m</span>`;
+        timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
+                 + `<span style="opacity:0.45"> – </span>`
+                 + `<span class="tl-time-value">${endStr}</span>`;
+      } else if (state.playInProgress && state.playInProgress.docId === log.id) {
+        durHtml = `<span class="tl-dur">In progress…</span>`;
+      }
+    }
+
     const sizeBadge = (log.type === 'water' && log.size)
       ? `<span style="font-size:9px;font-family:sans-serif;background:#E3F0FC;color:#3A7EC8;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.size} · ${log.ml}ml</span>`
+      : '';
+
+    const foodBadge = (log.type === 'food' && log.portion)
+      ? `<span style="font-size:9px;font-family:sans-serif;background:#FEF3E0;color:#C8780A;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.portion} · ${log.grams}g</span>`
       : '';
 
     return `<div class="timeline-entry" data-id="${log.id}" style="border-color:${c.border}">
       <span class="tl-emoji">${c.emoji}</span>
       <div class="tl-body">
-        <div class="tl-label" style="color:${c.color}">${c.label}${durHtml}${sizeBadge}</div>
+        <div class="tl-label" style="color:${c.color}">${c.label}${durHtml}${sizeBadge}${foodBadge}</div>
         <div class="tl-time">${timeHtml}</div>
       </div>
       <button class="tl-delete" data-action="delete" data-id="${log.id}" aria-label="Delete">×</button>
@@ -1439,8 +1618,8 @@ function renderFoodPoopHeatmap() {
   const poopLogs = state.logs.filter(l=>l.type==='poop').sort((a,b)=>a.timestamp-b.timestamp);
   if (foodLogs.length < 1 || poopLogs.length < 1) return `<div class="corr-card"><div class="corr-title">🥩 → 💩 Food to Poop Lag</div><div style="font-size:11px;color:var(--text-4);padding:6px 0">Log food and poop to see Fulki's rhythm</div></div>`;
 
-  const bucketLabels = ['<2h','2–4h','4–6h','6–8h','8–10h','10–12h','12–15h','15h+'];
-  const bucketMaxMs  = [2, 4, 6, 8, 10, 12, 15, Infinity].map(h => h === Infinity ? Infinity : h * 3600000);
+  const bucketLabels = ['<2h','2–3h','3–4h','4–5h','5–6h','6–7h','7–8h','8–9h','9–10h','10–11h','11–12h','12–15h','15h+'];
+  const bucketMaxMs  = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, Infinity].map(h => h === Infinity ? Infinity : h * 3600000);
 
   const offset = state.heatmapOffset || 0;
   const days = [];
@@ -2069,6 +2248,12 @@ document.addEventListener('click', e => {
     } else if (type === 'water') {
       state.waterSizePending = true;
       document.getElementById('water-size-modal').classList.add('open');
+    } else if (type === 'food') {
+      state.foodTypePending = true;
+      document.getElementById('food-size-modal').classList.add('open');
+    } else if (type === 'zoomies') {
+      if (state.playInProgress) { endPlay(); showToast('🎾 Play ended'); }
+      else { startPlay(); showToast('🎾 Play started'); }
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
@@ -2087,6 +2272,20 @@ document.addEventListener('click', e => {
   if (action === 'water-size-cancel') {
     document.getElementById('water-size-modal').classList.remove('open');
     state.waterSizePending = false;
+  }
+
+  if (action === 'food-type') {
+    const portion = el.dataset.portion;
+    const grams   = parseInt(el.dataset.grams, 10);
+    addLog('food', null, { portion, grams });
+    showToast(`🥩 ${portion} logged (${grams}g)`);
+    document.getElementById('food-size-modal').classList.remove('open');
+    state.foodTypePending = false;
+  }
+
+  if (action === 'food-type-cancel') {
+    document.getElementById('food-size-modal').classList.remove('open');
+    state.foodTypePending = false;
   }
 
   if (action === 'walkies') {
