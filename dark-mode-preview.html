@@ -3,10 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Fulki — Dark Mode Preview</title>
+  <title>Fulki — Theme Toggle Preview</title>
   <style>
-    /* ── Dark palette (exactly as in app) ── */
+    /* ── Light palette ── */
     :root {
+      --bg:      #FAF5FC;
+      --surface: #FFFFFF;
+      --border:  #EDD8EE;
+      --border-2:#DFC4E0;
+      --text:    #3D1A4A;
+      --text-2:  #6E3B83;
+      --text-3:  #B56AB2;
+      --text-4:  #D4A0D5;
+      --accent:  #F89831;
+    }
+
+    /* ── Dark palette ── */
+    body.dark {
       --bg:      #2A0F1E;
       --surface: #3D1529;
       --border:  #5C2040;
@@ -16,19 +29,20 @@
       --text-3:  #A86090;
       --text-4:  #6A3050;
       --accent:  #F89831;
-      --accent-d:#D17078;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Cochin', 'Palatino Linotype', Georgia, serif;
-      background: #1A0812;
+      background: #111;
       display: flex;
       justify-content: center;
       min-height: 100vh;
-      padding: 24px 16px;
-      color: var(--text);
+      padding: 24px 16px 40px;
+      transition: background 0.3s;
     }
+    body:not(.dark) { background: #E8E0F0; }
 
     #card {
       width: 100%;
@@ -36,36 +50,48 @@
       background: var(--bg);
       border-radius: 24px;
       overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transition: background 0.3s;
     }
 
     /* ── Header ── */
     #header-bar {
-      background: linear-gradient(135deg, #7A1850, #572649);
+      background: #B04F6C;
       color: #fff;
       padding: 22px 20px 16px;
+      transition: background 0.3s;
+    }
+    body.dark #header-bar {
+      background: linear-gradient(135deg, #7A1850, #572649);
     }
     #header-top { display: flex; align-items: flex-start; justify-content: space-between; }
     #header-title    { font-size: 26px; font-weight: 700; line-height: 1.1; }
     #header-subtitle { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 3px; letter-spacing: 0.8px; text-transform: uppercase; }
-    #header-date     { margin-top: 10px; font-size: 13px; font-weight: 600; opacity: 0.85; }
 
-    .header-btns { display: flex; gap: 8px; align-items: center; }
-    .edit-name-btn, #a11y-btn {
-      background: rgba(255,255,255,0.22);
+    .header-btns { display: flex; gap: 7px; align-items: center; }
+
+    #dark-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 10px; color: #fff;
+      font-family: inherit; font-size: 14px;
+      padding: 6px 10px; cursor: pointer;
+      min-height: 36px; min-width: 36px;
+      transition: background 0.25s, border-color 0.25s;
+      line-height: 1;
+    }
+    #dark-btn:active { opacity: 0.75; }
+
+    #a11y-btn {
+      background: transparent;
       border: 1.5px solid rgba(255,255,255,0.5);
       border-radius: 10px; color: #fff;
       font-family: inherit; font-size: 12px; font-weight: 700;
       padding: 6px 12px; cursor: pointer;
       min-height: 36px;
-    }
-    #a11y-btn.on {
-      background: #B04F6C;
-      border-color: rgba(255,255,255,0.9);
-      box-shadow: 0 0 0 3px rgba(176,79,108,0.35);
+      transition: background 0.25s;
     }
 
-    /* ── Date nav ── */
     .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
     .nav-arrow {
       background: rgba(255,255,255,0.18); border: none; border-radius: 8px;
@@ -79,15 +105,18 @@
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       overflow-x: auto;
+      transition: background 0.3s, border-color 0.3s;
     }
     .summary-pill {
       display: flex; align-items: center; gap: 5px;
       padding: 5px 12px; border-radius: 20px;
       font-size: 12px; font-weight: 700; white-space: nowrap;
+      transition: filter 0.3s;
     }
+    body.dark .summary-pill { filter: brightness(0.72) saturate(0.6); }
 
     /* ── Predictions ── */
-    #pred-section { padding: 18px 20px 0; }
+    .section { padding: 18px 20px 0; }
     .section-label {
       font-size: 11px; font-weight: 700; letter-spacing: 1px;
       text-transform: uppercase; color: var(--text-3); margin-bottom: 10px;
@@ -98,34 +127,19 @@
     .pred-card {
       border-radius: 16px; padding: 13px 8px 11px;
       text-align: center; border: 1.5px solid;
+      transition: background 0.3s, border-color 0.3s;
     }
     .pred-emoji { font-size: 22px; margin-bottom: 3px; }
     .pred-time  { font-size: 16px; font-weight: 700; line-height: 1.2; }
     .pred-time-small { font-size: 10px; opacity: 0.7; margin-top: 1px; }
     .pred-lbl   { font-size: 10px; opacity: 0.72; margin-top: 2px; }
     .conf-bar-wrap { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-    .conf-bar-bg   { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    .conf-bar-bg   { flex: 1; height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden; }
+    body.dark .conf-bar-bg { background: rgba(255,255,255,0.08); }
     .conf-bar      { height: 100%; border-radius: 2px; }
     .conf-pct      { font-size: 9px; font-weight: 700; opacity: 0.6; min-width: 26px; font-family: sans-serif; }
 
-    /* ── Nap banner ── */
-    #nap-banner {
-      margin: 14px 20px 0;
-      background: rgba(110,59,131,0.18);
-      border: 2px solid #7A2E55;
-      border-radius: 14px; padding: 12px 16px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .nap-banner-title { font-size: 14px; font-weight: 700; color: #D898C0; }
-    .nap-banner-sub   { font-size: 12px; color: #A86090; margin-top: 1px; font-weight: 600; }
-    .nap-wake-btn {
-      background: #7A2E55; border: none; border-radius: 10px;
-      color: #fff; font-family: inherit; font-size: 12px; font-weight: 700;
-      padding: 7px 12px; cursor: pointer; flex-shrink: 0;
-    }
-
     /* ── Log buttons ── */
-    #log-section { padding: 18px 20px 0; }
     #log-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px;
     }
@@ -133,13 +147,13 @@
       display: flex; flex-direction: column; align-items: center; gap: 5px;
       padding: 14px 4px 11px; border-radius: 18px; cursor: pointer;
       border: 2.5px solid transparent; font-family: inherit;
-      filter: brightness(0.88);
+      transition: filter 0.3s;
     }
+    body.dark .log-btn { filter: brightness(0.72) saturate(0.55); }
     .btn-emoji { font-size: 24px; line-height: 1; }
     .btn-label { font-size: 10px; font-weight: 700; }
 
     /* ── Timeline ── */
-    #timeline-section { padding: 0 20px 20px; }
     .tl-section-label {
       font-size: 11px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1px; color: var(--text-3); margin-bottom: 12px;
@@ -148,35 +162,35 @@
       display: flex; align-items: center; gap: 12px;
       padding: 11px 14px; background: var(--surface);
       border-radius: 14px; margin-bottom: 8px; border: 1.5px solid;
+      transition: background 0.3s, border-color 0.3s;
     }
     .tl-emoji { font-size: 18px; width: 26px; text-align: center; flex-shrink: 0; }
     .tl-body  { flex: 1; }
-    .tl-label { font-size: 13px; font-weight: 700; }
+    .tl-label { font-size: 13px; font-weight: 700; color: var(--text); }
     .tl-time  { font-size: 11px; color: var(--text-3); font-weight: 600; margin-top: 1px; }
-    .tl-time-value { border-bottom: 1px dashed var(--text-3); }
-    .tl-delete { background: none; border: none; font-size: 18px; color: #6A3050; padding: 4px 6px; cursor: pointer; }
+    .tl-delete { background: none; border: none; font-size: 18px; color: var(--text-4); padding: 4px 6px; cursor: pointer; }
 
     /* ── Bottom nav ── */
     #bottom-nav {
       display: flex; background: var(--surface);
       border-top: 1px solid var(--border);
       padding: 8px 0 10px;
+      transition: background 0.3s, border-color 0.3s;
     }
     .nav-btn {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
       background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit;
     }
     .nav-icon  { font-size: 20px; }
-    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
-    .nav-btn.active .nav-label { color: #D898C0; }
-    .nav-btn.active .nav-icon  { filter: none; }
+    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-3); }
+    .nav-btn.active .nav-label { color: var(--text-2); }
     .nav-btn:not(.active) { opacity: 0.45; }
 
-    /* ── Divider label ── */
-    .preview-note {
-      text-align: center; font-size: 12px; color: #7A2E55;
-      padding: 8px; background: #3D1529;
-      font-weight: 700; letter-spacing: 0.5px;
+    /* ── Label at top ── */
+    #preview-label {
+      text-align: center; padding: 0 0 14px;
+      font-family: sans-serif; font-size: 12px; color: #888;
+      letter-spacing: 0.5px;
     }
   </style>
 </head>
@@ -192,8 +206,8 @@
         <div id="header-subtitle">Puppy Tracker</div>
       </div>
       <div class="header-btns">
+        <button id="dark-btn" onclick="toggleDark()" title="Toggle dark / light mode">🌙</button>
         <button id="a11y-btn">A</button>
-        <button class="edit-name-btn">✏️</button>
       </div>
     </div>
     <div class="date-nav">
@@ -208,139 +222,110 @@
     <div class="summary-pill" style="background:#FFF3D1;color:#C07828">💧 3 waters</div>
     <div class="summary-pill" style="background:#E8F8E8;color:#2E7D32">🍗 2 meals</div>
     <div class="summary-pill" style="background:#F0E8FA;color:#6E3B83">💤 1h 20m nap</div>
-    <div class="summary-pill" style="background:#FDE8EE;color:#B04F6C">💛 4 pees</div>
+    <div class="summary-pill" style="background:#FDE8EE;color:#B04F6C">🌱 4 pees</div>
   </div>
 
   <!-- PREDICTIONS -->
-  <div id="pred-section">
+  <div class="section">
     <div class="section-label">Next up</div>
     <div class="predictions-row">
 
-      <div class="pred-card" style="background:#2A1A0A;border-color:#7A4520;color:#F5D8EC">
-        <div class="pred-emoji">💛</div>
-        <div class="pred-time" style="color:#F89831">2:45 PM</div>
-        <div class="pred-time-small" style="color:#F89831">in 38m</div>
+      <!-- urgent: warm red in dark, bright red in light -->
+      <div class="pred-card" id="pred-urgent">
+        <div class="pred-emoji">🌱</div>
+        <div class="pred-time" id="urg-text">2:45 PM</div>
+        <div class="pred-time-small" id="urg-sub">in 4m</div>
         <div class="pred-lbl">Pee</div>
         <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" style="width:78%;background:#F89831"></div></div>
-          <div class="conf-pct" style="color:#F89831">78%</div>
+          <div class="conf-bar-bg"><div class="conf-bar" id="urg-bar" style="width:88%"></div></div>
+          <div class="conf-pct" id="urg-pct">88%</div>
         </div>
       </div>
 
-      <div class="pred-card" style="background:#1E1A0A;border-color:#5C5020;color:#F5D8EC">
+      <!-- soon: warm amber in dark, neon yellow in light -->
+      <div class="pred-card" id="pred-soon">
         <div class="pred-emoji">💩</div>
-        <div class="pred-time" style="color:#C8A028">4:15 PM</div>
-        <div class="pred-time-small" style="color:#C8A028">in 2h 8m</div>
+        <div class="pred-time" id="soon-text">4:15 PM</div>
+        <div class="pred-time-small" id="soon-sub">in 1h 34m</div>
         <div class="pred-lbl">Poop</div>
         <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" style="width:55%;background:#C8A028"></div></div>
-          <div class="conf-pct" style="color:#C8A028">55%</div>
+          <div class="conf-bar-bg"><div class="conf-bar" id="soon-bar" style="width:55%"></div></div>
+          <div class="conf-pct" id="soon-pct">55%</div>
         </div>
       </div>
 
-      <div class="pred-card" style="background:#0A1A1E;border-color:#204050;color:#F5D8EC">
+      <!-- calm: deep green in dark, bright green in light -->
+      <div class="pred-card" id="pred-calm">
         <div class="pred-emoji">⚡</div>
-        <div class="pred-time" style="color:#4CBBCC">Learning…</div>
+        <div class="pred-time" id="calm-text">Learning…</div>
         <div class="pred-lbl">Zoomies</div>
         <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" style="width:20%;background:#4CBBCC"></div></div>
-          <div class="conf-pct" style="color:#4CBBCC">20%</div>
+          <div class="conf-bar-bg"><div class="conf-bar" id="calm-bar" style="width:20%"></div></div>
+          <div class="conf-pct" id="calm-pct">20%</div>
         </div>
       </div>
 
     </div>
-  </div>
-
-  <!-- NAP BANNER -->
-  <div id="nap-banner">
-    <span style="font-size:22px">💤</span>
-    <div style="flex:1">
-      <div class="nap-banner-title">Napping now</div>
-      <div class="nap-banner-sub">Started 1:10 PM · 54 min ago</div>
-    </div>
-    <button class="nap-wake-btn">Wake up</button>
   </div>
 
   <!-- LOG BUTTONS -->
-  <div id="log-section">
+  <div class="section" style="padding-bottom:0">
     <div class="section-label">Log</div>
     <div id="log-grid">
-      <button class="log-btn" style="background:#FFF8DC;border-color:#F0D860">
-        <span class="btn-emoji">💛</span>
-        <span class="btn-label" style="color:#8A7020">Pee</span>
+      <button class="log-btn" style="background:#E8F5E8;border-color:#A8D8A8">
+        <span class="btn-emoji">🌱</span>
+        <span class="btn-label" style="color:#3D8F3D">Pee</span>
       </button>
-      <button class="log-btn" style="background:#FFF0DC;border-color:#D4A840">
+      <button class="log-btn" style="background:#FDE8EE;border-color:#F0C0D0">
         <span class="btn-emoji">💩</span>
-        <span class="btn-label" style="color:#8A5820">Poop</span>
+        <span class="btn-label" style="color:#B04F6C">Poop</span>
       </button>
-      <button class="log-btn" style="background:#E8F4FE;border-color:#90C8F0">
+      <button class="log-btn" style="background:#E3F0FC;border-color:#B0D4F5">
         <span class="btn-emoji">💧</span>
-        <span class="btn-label" style="color:#1870A0">Water</span>
+        <span class="btn-label" style="color:#5B9ED6">Water</span>
       </button>
-      <button class="log-btn" style="background:#E8F8E8;border-color:#90D890">
-        <span class="btn-emoji">🍗</span>
-        <span class="btn-label" style="color:#207820">Food</span>
+      <button class="log-btn" style="background:#FEF3E0;border-color:#FDDBA0">
+        <span class="btn-emoji">🥩</span>
+        <span class="btn-label" style="color:#F89831">Food</span>
       </button>
-      <button class="log-btn" style="background:#F0E8FA;border-color:#C0A0E0" style="animation:napglow 2.2s infinite">
+      <button class="log-btn" style="background:#F0E8F8;border-color:#D4B8E8">
         <span class="btn-emoji">💤</span>
-        <span class="btn-label" style="color:#6030A0">Nap</span>
+        <span class="btn-label" style="color:#6E3B83">Nap</span>
       </button>
-      <button class="log-btn" style="background:#E0F0FF;border-color:#80B8E8">
-        <span class="btn-emoji">⚡</span>
-        <span class="btn-label" style="color:#204880">Zoomies</span>
+      <button class="log-btn" style="background:#FDEAEA;border-color:#F5B8BC">
+        <span class="btn-emoji">🏎️</span>
+        <span class="btn-label" style="color:#D17078">Zoomies</span>
       </button>
     </div>
   </div>
 
   <!-- TIMELINE -->
-  <div id="timeline-section">
+  <div class="section" style="padding-bottom:20px">
     <div class="tl-section-label">Today's timeline</div>
 
-    <div class="timeline-entry" style="border-color:#5C2040">
-      <span class="tl-emoji">💛</span>
+    <div class="timeline-entry" style="border-color:#A8D8A8">
+      <span class="tl-emoji">🌱</span>
       <div class="tl-body">
         <div class="tl-label">Pee</div>
-        <div class="tl-time"><span class="tl-time-value">1:02 PM</span></div>
+        <div class="tl-time">1:02 PM</div>
       </div>
       <button class="tl-delete">×</button>
     </div>
 
-    <div class="timeline-entry" style="border-color:#7A4520">
-      <span class="tl-emoji">🍗</span>
+    <div class="timeline-entry" style="border-color:#FDDBA0">
+      <span class="tl-emoji">🥩</span>
       <div class="tl-body">
         <div class="tl-label">Food</div>
-        <div class="tl-time"><span class="tl-time-value">12:30 PM</span></div>
+        <div class="tl-time">12:30 PM</div>
       </div>
       <button class="tl-delete">×</button>
     </div>
 
-    <div class="timeline-entry" style="border-color:#5C2040">
-      <span class="tl-emoji">💛</span>
-      <div class="tl-body">
-        <div class="tl-label">Pee</div>
-        <div class="tl-time"><span class="tl-time-value">12:05 PM</span></div>
-      </div>
-      <button class="tl-delete">×</button>
-    </div>
-
-    <div class="timeline-entry" style="border-color:#602870;background:#3A1540">
+    <div class="timeline-entry" style="border-color:#D4B8E8">
       <span class="tl-emoji">💤</span>
       <div class="tl-body">
-        <div class="tl-label">Nap <span style="font-weight:600;font-size:11px;color:#A86090">54 min</span></div>
-        <div class="tl-time">
-          <span class="tl-time-value">11:10 AM</span>
-          <span style="opacity:0.45"> – </span>
-          <span class="tl-time-value">12:04 PM</span>
-        </div>
-      </div>
-      <button class="tl-delete">×</button>
-    </div>
-
-    <div class="timeline-entry" style="border-color:#185888;background:#0E2A3A">
-      <span class="tl-emoji">💧</span>
-      <div class="tl-body">
-        <div class="tl-label">Water</div>
-        <div class="tl-time"><span class="tl-time-value">10:48 AM</span></div>
+        <div class="tl-label">Nap <span style="font-weight:600;font-size:11px;color:#9B8EC4">54 min</span></div>
+        <div class="tl-time">11:10 AM – 12:04 PM</div>
       </div>
       <button class="tl-delete">×</button>
     </div>
@@ -351,19 +336,69 @@
   <div id="bottom-nav">
     <button class="nav-btn active">
       <span class="nav-icon">🏠</span>
-      <span class="nav-label" style="color:#D898C0">Home</span>
+      <span class="nav-label">Home</span>
     </button>
     <button class="nav-btn">
       <span class="nav-icon">📊</span>
-      <span class="nav-label" style="color:#A86090">Patterns</span>
+      <span class="nav-label">Patterns</span>
     </button>
     <button class="nav-btn">
       <span class="nav-icon">🏥</span>
-      <span class="nav-label" style="color:#A86090">Vet</span>
+      <span class="nav-label">Vet</span>
     </button>
   </div>
 
 </div>
 
+<script>
+  // Urgency colour sets
+  const LIGHT = {
+    urgent: { bg:'#FEE2E2', text:'#B91C1C', bar:'#EF4444', border:'#FCA5A5' },
+    soon:   { bg:'#FEF9C3', text:'#854D0E', bar:'#EAB308', border:'#FDE047' },
+    calm:   { bg:'#DCFCE7', text:'#166534', bar:'#22C55E', border:'#86EFAC' },
+  };
+  const DARK = {
+    urgent: { bg:'#3A0E18', text:'#F0B8C0', bar:'#C06070', border:'#6A2030' },
+    soon:   { bg:'#2A1A06', text:'#F0D898', bar:'#B89030', border:'#6A4810' },
+    calm:   { bg:'#0C1E14', text:'#A0C8A8', bar:'#408858', border:'#1A4028' },
+  };
+
+  function applyUrgency(isDark) {
+    const U = isDark ? DARK : LIGHT;
+
+    const pu = document.getElementById('pred-urgent');
+    pu.style.background = U.urgent.bg;
+    pu.style.borderColor = U.urgent.border;
+    document.getElementById('urg-text').style.color = U.urgent.text;
+    document.getElementById('urg-sub').style.color  = U.urgent.text;
+    document.getElementById('urg-bar').style.background = U.urgent.bar;
+    document.getElementById('urg-pct').style.color  = U.urgent.text;
+
+    const ps = document.getElementById('pred-soon');
+    ps.style.background = U.soon.bg;
+    ps.style.borderColor = U.soon.border;
+    document.getElementById('soon-text').style.color = U.soon.text;
+    document.getElementById('soon-sub').style.color  = U.soon.text;
+    document.getElementById('soon-bar').style.background = U.soon.bar;
+    document.getElementById('soon-pct').style.color  = U.soon.text;
+
+    const pc = document.getElementById('pred-calm');
+    pc.style.background = U.calm.bg;
+    pc.style.borderColor = U.calm.border;
+    document.getElementById('calm-text').style.color = U.calm.text;
+    document.getElementById('calm-bar').style.background = U.calm.bar;
+    document.getElementById('calm-pct').style.color  = U.calm.text;
+  }
+
+  function toggleDark() {
+    const going = !document.body.classList.contains('dark');
+    document.body.classList.toggle('dark', going);
+    document.getElementById('dark-btn').textContent = going ? '☀️' : '🌙';
+    applyUrgency(going);
+  }
+
+  // Start in light mode
+  applyUrgency(false);
+</script>
 </body>
 </html>
