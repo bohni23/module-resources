@@ -21,24 +21,30 @@
       color-scheme: light dark;
     }
     body.dark {
-      --bg:#2A0F1E; --surface:#3D1529; --border:#5C2040; --border-2:#7A2E55;
-      --text:#F5D8EC; --text-2:#D898C0; --text-3:#A86090; --text-4:#6A3050;
-      --accent:#F89831; --accent-d:#D17078;
+      --bg:#181b38; --surface:#292f56; --border:#363d6e; --border-2:#464f88;
+      --text:#d8e8f8; --text-2:#7eb8c8; --text-3:#4c7890; --text-4:#2a3f58;
+      --accent:#008780; --accent-d:#005c7f;
     }
-    body.dark #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
-    body.dark .log-btn, body.dark .vet-type-btn { filter: brightness(0.72) saturate(0.55); }
+    body.dark #header-bar { background: #005c7f; }
+    body.dark .log-btn { filter: none; background: #363d70 !important; }
+    body.dark .btn-label { color: #ffffff !important; }
+    body.dark .vet-type-btn { filter: none; background: #1e2445 !important; }
+    body.dark .pred-card { background: var(--surface) !important; border-color: var(--border-2) !important; }
     body.dark .stats-stat-card, body.dark .stats-peaks-card,
-    body.dark .weight-chart-wrap, body.dark .corr-card { background: #2A0A1C; }
+    body.dark .weight-chart-wrap, body.dark .corr-card { background: #1e2445; }
     @media (prefers-color-scheme: dark) {
       body:not(.light) {
-        --bg:#2A0F1E; --surface:#3D1529; --border:#5C2040; --border-2:#7A2E55;
-        --text:#F5D8EC; --text-2:#D898C0; --text-3:#A86090; --text-4:#6A3050;
-        --accent:#F89831; --accent-d:#D17078;
+        --bg:#181b38; --surface:#292f56; --border:#363d6e; --border-2:#464f88;
+        --text:#d8e8f8; --text-2:#7eb8c8; --text-3:#4c7890; --text-4:#2a3f58;
+        --accent:#008780; --accent-d:#005c7f;
       }
-      body:not(.light) #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
-      body:not(.light) .log-btn, body:not(.light) .vet-type-btn { filter: brightness(0.72) saturate(0.55); }
+      body:not(.light) #header-bar { background: #005c7f; }
+      body:not(.light) .log-btn { filter: none; background: #363d70 !important; }
+      body:not(.light) .btn-label { color: #ffffff !important; }
+      body:not(.light) .vet-type-btn { filter: none; background: #1e2445 !important; }
+      body:not(.light) .pred-card { background: var(--surface) !important; border-color: var(--border-2) !important; }
       body:not(.light) .stats-stat-card, body:not(.light) .stats-peaks-card,
-      body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #2A0A1C; }
+      body:not(.light) .weight-chart-wrap, body:not(.light) .corr-card { background: #1e2445; }
     }
 
     /* ── Accessibility mode ── */
@@ -1084,12 +1090,12 @@ function recoverNapState() {
 // F — RENDER FUNCTIONS
 // ============================================================
 const CATS = [
-  { key:'food',    emoji:'🥩', label:'Food',    color:'#F89831', bg:'#FEF3E0', border:'#FDDBA0' },
-  { key:'water',   emoji:'💧', label:'Water',   color:'#5B9ED6', bg:'#E3F0FC', border:'#B0D4F5' },
-  { key:'nap',     emoji:'💤', label:'Nap',     color:'#6E3B83', bg:'#F0E8F8', border:'#D4B8E8' },
-  { key:'pee',     emoji:'🌱', label:'Pee',     color:'#3D8F3D', bg:'#E8F5E8', border:'#A8D8A8' },
-  { key:'poop',    emoji:'💩', label:'Poop',    color:'#B04F6C', bg:'#FDE8EE', border:'#F0C0D0' },
-  { key:'zoomies', emoji:'🏎️', label:'Zoomies', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC' },
+  { key:'food',    emoji:'🥩', label:'Food',    color:'#F89831', bg:'#FEF3E0', border:'#FDDBA0', darkBg:'rgba(200,118,0,0.18)',   darkColor:'#c8a060' },
+  { key:'water',   emoji:'💧', label:'Water',   color:'#5B9ED6', bg:'#E3F0FC', border:'#B0D4F5', darkBg:'rgba(0,92,127,0.25)',    darkColor:'#7eb8d8' },
+  { key:'nap',     emoji:'💤', label:'Nap',     color:'#6E3B83', bg:'#F0E8F8', border:'#D4B8E8', darkBg:'rgba(110,59,131,0.22)',  darkColor:'#a880d0' },
+  { key:'pee',     emoji:'🌱', label:'Pee',     color:'#3D8F3D', bg:'#E8F5E8', border:'#A8D8A8', darkBg:'rgba(61,143,61,0.22)',   darkColor:'#70c070' },
+  { key:'poop',    emoji:'💩', label:'Poop',    color:'#B04F6C', bg:'#FDE8EE', border:'#F0C0D0', darkBg:'rgba(176,79,108,0.22)',  darkColor:'#d090a8' },
+  { key:'zoomies', emoji:'🏎️', label:'Zoomies', color:'#D17078', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#d09098' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
@@ -1123,9 +1129,9 @@ function isDarkMode() {
 }
 function urgency(mins) {
   if (isDarkMode()) {
-    if (mins <= 5)  return { bg:'#3A0E18', text:'#F0B8C0', bar:'#C06070', border:'#6A2030' };
-    if (mins <= 20) return { bg:'#2A1A06', text:'#F0D898', bar:'#B89030', border:'#6A4810' };
-    return               { bg:'#0C1E14', text:'#A0C8A8', bar:'#408858', border:'#1A4028' };
+    if (mins <= 5)  return { bg:'var(--surface)', text:'#e08898', bar:'#9058a0', border:'var(--border-2)' };
+    if (mins <= 20) return { bg:'var(--surface)', text:'#60b0d8', bar:'#005c7f', border:'var(--border-2)' };
+    return               { bg:'var(--surface)', text:'#008780', bar:'#008780', border:'var(--border-2)' };
   }
   if (mins <= 5)  return { bg:'#FEE2E2', text:'#B91C1C', bar:'#EF4444', border:'#FCA5A5' };
   if (mins <= 20) return { bg:'#FEF9C3', text:'#854D0E', bar:'#EAB308', border:'#FDE047' };
@@ -1193,9 +1199,13 @@ function renderSummaryStrip() {
   const start   = startOfDay(state.viewDate);
   const end     = endOfDay(state.viewDate);
   const dayLogs = state.logs.filter(l => l.timestamp >= start && l.timestamp <= end);
+  const dark = isDarkMode();
   document.getElementById('summary-strip').innerHTML = CATS.map(c => {
-    const n = dayLogs.filter(l => l.type === c.key).length;
-    return `<div class="summary-pill" style="background:${c.bg};color:${c.color}">${c.emoji} ${n}×</div>`;
+    const n  = dayLogs.filter(l => l.type === c.key).length;
+    const bg = dark ? c.darkBg : c.bg;
+    const cl = dark ? c.darkColor : c.color;
+    const bd = dark ? `border:1.5px solid ${c.darkColor}50;` : '';
+    return `<div class="summary-pill" style="background:${bg};color:${cl};${bd}">${c.emoji} ${n}×</div>`;
   }).join('');
 }
 
@@ -1395,49 +1405,6 @@ function renderFoodPoopHeatmap() {
   </div>`;
 }
 
-function renderHydrationVsPee() {
-  const waterLogs = state.logs.filter(l=>l.type==='water');
-  const peeLogs   = state.logs.filter(l=>l.type==='pee');
-  if (waterLogs.length < 2 && peeLogs.length < 2) return '';
-
-  const days = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
-    days.push(d);
-  }
-
-  const wCts = days.map(d => state.logs.filter(l=>l.type==='water' && isSameDay(l.timestamp,d)).length);
-  const pCts = days.map(d => state.logs.filter(l=>l.type==='pee'   && isSameDay(l.timestamp,d)).length);
-  const maxW = Math.max(...wCts, 1);
-  const maxP = Math.max(...pCts, 1);
-
-  const cols = days.map((d, i) => {
-    const lbl  = d.toLocaleDateString('en-GB', { weekday:'short' });
-    const wH   = Math.round((wCts[i]/maxW)*60);
-    const pH   = Math.round((pCts[i]/maxP)*60);
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-      <div style="display:flex;align-items:flex-end;height:64px;gap:2px">
-        <div style="width:9px;height:${Math.max(wH,2)}px;background:linear-gradient(to top,${CAT.water.color}60,${CAT.water.color});border-radius:3px 3px 0 0"></div>
-        <div style="width:9px;height:${Math.max(pH,2)}px;background:linear-gradient(to top,${CAT.pee.color}60,${CAT.pee.color});border-radius:3px 3px 0 0"></div>
-      </div>
-      <div style="font-size:8px;color:var(--text-3);font-family:sans-serif">${lbl}</div>
-      <div style="font-size:7px;font-family:sans-serif;color:${CAT.water.color}">${wCts[i]||'·'}</div>
-      <div style="font-size:7px;font-family:sans-serif;color:${CAT.pee.color}">${pCts[i]||'·'}</div>
-    </div>`;
-  }).join('');
-
-  return `<div class="corr-card">
-    <div class="corr-title">💧 Hydration vs 🌱 Pee — 7 days</div>
-    <div style="display:flex;gap:12px;margin-bottom:8px">
-      <span style="font-size:10px;color:${CAT.water.color};font-weight:700">💧 Water (left bar)</span>
-      <span style="font-size:10px;color:${CAT.pee.color};font-weight:700">🌱 Pee (right bar)</span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
-      ${cols}
-    </div>
-    <div style="font-size:9px;color:var(--text-4);margin-top:6px">Each series normalised to its own daily max</div>
-  </div>`;
-}
 
 function exportCSV() {
   const rows = [['Type','Date','Time','Duration(mins)','Notes']];
@@ -1567,7 +1534,6 @@ function renderStatsTab() {
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
     ${mainContent}
     ${renderFoodPoopHeatmap()}
-    ${renderHydrationVsPee()}
     <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
 }
 
@@ -2056,6 +2022,7 @@ document.addEventListener('click', e => {
     document.body.classList.toggle('light', !goingDark);
     document.getElementById('dark-btn').textContent = goingDark ? '☀️' : '🌙';
     try { localStorage.setItem('fulki_dark', goingDark ? '1' : '0'); } catch(e){}
+    render();
   }
 
   if (action === 'delete-vet') {
