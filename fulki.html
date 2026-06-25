@@ -22,14 +22,23 @@
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg:#150A1C; --surface:#1E0F28; --border:#3A1A4A; --border-2:#4A2A5A;
-        --text:#F0D8F8; --text-2:#C8A0D8; --text-3:#9060A0; --text-4:#604070;
+        --bg:#2A0F1E; --surface:#3D1529; --border:#5C2040; --border-2:#7A2E55;
+        --text:#F5D8EC; --text-2:#D898C0; --text-3:#A86090; --text-4:#6A3050;
         --accent:#F89831; --accent-d:#D17078;
       }
-      #header-bar { background: #8A2848; }
-      .log-btn, .vet-type-btn { filter: brightness(0.85); }
-      .stats-stat-card, .stats-peaks-card, .weight-chart-wrap, .corr-card { background: #1A0A24; }
+      #header-bar { background: linear-gradient(135deg, #7A1850, #572649); }
+      .log-btn, .vet-type-btn { filter: brightness(0.88); }
+      .stats-stat-card, .stats-peaks-card, .weight-chart-wrap, .corr-card { background: #2A0A1C; }
     }
+
+    /* ── Accessibility mode ── */
+    body.a11y { font-size: 18px; }
+    body.a11y .log-btn        { padding: 20px 6px 16px; font-size: 16px; }
+    body.a11y .log-btn .btn-emoji { font-size: 34px; }
+    body.a11y .timeline-entry { padding: 14px 16px; min-height: 52px; }
+    body.a11y .tab-btn        { font-size: 12px; padding: 10px 4px 8px; }
+    body.a11y .summary-pill   { font-size: 14px; padding: 7px 14px; }
+    body.a11y #header-title   { font-size: 32px; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -419,14 +428,16 @@
     .vet-note-next.due-soon { color: #854D0E; }
     .vet-note-next.ok       { color: var(--text-3); }
 
-    .vet-note-delete {
+    .vet-note-delete, .vet-note-edit {
       background: none; border: none; color: #D0B090;
-      font-size: 18px; line-height: 1; cursor: pointer;
-      padding: 2px 4px; flex-shrink: 0; min-height: 44px;
-      min-width: 36px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; line-height: 1; cursor: pointer;
+      padding: 2px 4px; flex-shrink: 0;
+      min-height: 36px; min-width: 36px;
+      display: flex; align-items: center; justify-content: center;
       transition: color 0.15s;
     }
     .vet-note-delete:active { color: #B91C1C; }
+    .vet-note-edit:active   { color: #6E3B83; }
 
     /* ── Bottom nav ── */
     #bottom-nav {
@@ -553,6 +564,7 @@
           <div id="header-title">Fulki Log 🐾</div>
           <div id="header-subtitle">Daily puppy tracker</div>
         </div>
+        <button class="edit-name-btn" data-action="toggle-a11y" id="a11y-btn" title="Accessibility mode">👁 A</button>
       </div>
       <div id="date-nav">
         <button class="date-nav-btn" data-action="date-prev">◀</button>
@@ -612,10 +624,11 @@
 <div id="notes-modal">
   <div class="notes-sheet">
     <div class="notes-sheet-title" id="notes-modal-title">Notes</div>
-    <textarea class="notes-textarea" id="notes-textarea" placeholder="Add notes about this category…"></textarea>
+    <div id="notes-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:60px"></div>
+    <textarea class="notes-textarea" id="notes-textarea" placeholder="Add a new note…"></textarea>
     <div class="notes-sheet-actions">
-      <button class="notes-save-btn" data-action="notes-save">Save Note</button>
-      <button class="notes-cancel-btn" data-action="notes-cancel">Cancel</button>
+      <button class="notes-save-btn" data-action="notes-save">Add Note</button>
+      <button class="notes-cancel-btn" data-action="notes-cancel">Close</button>
     </div>
   </div>
 </div>
@@ -692,8 +705,9 @@ const state = {
   selectedStatsCat: 'pee',
   vetFormType:      null,
   vetFormData:      {},
+  vetEditingId:     null,
   viewDate:         new Date(),
-  catNotes:         {},   // { pee: 'text', poop: 'text', … }
+  catNotes:         {},   // { pee: [{id, text, date}], … }
   activeCatNote:    null, // cat key currently being edited
 };
 
@@ -722,7 +736,14 @@ if (!USE_MOCK) {
   firebase.auth().signInAnonymously().catch(e => console.warn('Auth:', e.message));
 
   // Load catNotes from localStorage (no Firestore collection needed)
-  try { state.catNotes = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}'); } catch(e) {}
+  try {
+    const _cn = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}');
+    Object.entries(_cn).forEach(([cat, val]) => {
+      if (typeof val === 'string' && val.trim()) _cn[cat] = [{ id: 'n' + Date.now(), text: val, date: new Date().toISOString() }];
+      else if (!Array.isArray(val)) delete _cn[cat];
+    });
+    state.catNotes = _cn;
+  } catch(e) {}
 
   const toDate = ts => ts?.toDate ? ts.toDate() : ts;
 
@@ -759,7 +780,14 @@ if (!USE_MOCK) {
   state.logs     = [...MOCK.logs].sort((a,b) => b.timestamp - a.timestamp);
   state.settings = { ...MOCK.settings };
   state.vetNotes = [...MOCK.vetNotes];
-  try { state.catNotes = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}'); } catch(e) {}
+  try {
+    const _cn = JSON.parse(localStorage.getItem('fulki_catNotes') || '{}');
+    Object.entries(_cn).forEach(([cat, val]) => {
+      if (typeof val === 'string' && val.trim()) _cn[cat] = [{ id: 'n' + Date.now(), text: val, date: new Date().toISOString() }];
+      else if (!Array.isArray(val)) delete _cn[cat];
+    });
+    state.catNotes = _cn;
+  } catch(e) {}
   recoverNapState();
   computePredictions();
 }
@@ -962,6 +990,7 @@ const VET_TYPES = [
   { id:'flea',        emoji:'🛡️', label:'Flea/Worm', color:'#4CAF50' },
   { id:'vaccination', emoji:'💉', label:'Vaccine',   color:'#9B68C0' },
   { id:'visit',       emoji:'🏥', label:'Vet Visit', color:'#E8A838' },
+  { id:'concern',     emoji:'⚠️', label:'Concern',   color:'#E53935' },
   { id:'note',        emoji:'📝', label:'Note',      color:'#7A8090' },
   { id:'other',       emoji:'📋', label:'Other',     color:'#7A8090' },
 ];
@@ -1076,9 +1105,12 @@ function renderPredictions() {
     let pct  = Math.round((p.conf || 0) * 100);
     let isUrgent = false;
 
+    let clockText = '', countdownText = '';
     if (p.minutesUntil !== null && p.conf >= 0.2) {
-      const m  = Math.round(p.minutesUntil);
-      timeText = minsLabel(m);
+      const m      = Math.round(p.minutesUntil);
+      const target = new Date(Date.now() + m * 60000);
+      clockText     = target.toLocaleTimeString('en-GB', { hour:'numeric', minute:'2-digit', hour12:true }).toUpperCase();
+      countdownText = m <= 0 ? 'now' : 'in ' + minsLabel(m);
       urg      = urgency(m);
       isUrgent = m <= 5;
     }
@@ -1086,7 +1118,8 @@ function renderPredictions() {
     return `<div class="pred-card${isUrgent ? ' urgent' : ''}"
       style="background:${urg.bg};border-color:${urg.border}">
       <div class="pred-emoji">${c.emoji}</div>
-      <div class="pred-time" style="color:${urg.text}">${timeText}</div>
+      <div class="pred-time" style="color:${urg.text}">${clockText || timeText}</div>
+      ${countdownText ? `<div style="font-size:10px;opacity:0.7;color:${urg.text};margin-top:1px">${countdownText}</div>` : ''}
       <div class="pred-lbl" style="color:${urg.text}">${c.label}</div>
       <div class="conf-bar-wrap">
         <div class="conf-bar-bg">
@@ -1208,17 +1241,20 @@ function renderHeatmap(cat) {
   startD.setDate(startD.getDate() - 34);
   startD.setHours(0,0,0,0);
 
+  const counts = [];
   for (let i = 0; i < 35; i++) {
-    const d     = new Date(startD);
-    d.setDate(d.getDate() + i);
-    const count = state.logs.filter(l => l.type === cat && isSameDay(l.timestamp, d)).length;
-    const alpha = count === 0 ? 0.08 : Math.min(0.2 + count * 0.2, 1);
-    const bg    = count === 0 ? 'var(--border)' : c.color;
-    const lbl   = d.getDate();
-    cells.push(`<div class="heatmap-cell" style="background:${bg};opacity:${count?1:0.35}" title="${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${count?' · '+count+'×':''}">
+    const d = new Date(startD); d.setDate(d.getDate() + i);
+    counts.push(state.logs.filter(l => l.type === cat && isSameDay(l.timestamp, d)).length);
+  }
+  const maxCount = Math.max(...counts, 1);
+  counts.forEach((count, i) => {
+    const d       = new Date(startD); d.setDate(d.getDate() + i);
+    const opacity = count === 0 ? 0.3 : 0.25 + (count / maxCount) * 0.75;
+    const bg      = count === 0 ? 'var(--border)' : c.color;
+    cells.push(`<div class="heatmap-cell" style="background:${bg};opacity:${opacity}" title="${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}${count?' · '+count+'×':''}">
       ${count > 0 ? count : ''}
     </div>`);
-  }
+  });
 
   const dayNames = ['M','T','W','T','F','S','S'];
   return `
@@ -1308,16 +1344,21 @@ function renderStatsTab() {
 
   const pills = CATS.map(c => {
     const active = c.key === sel;
-    const hasNote = !!state.catNotes[c.key];
+    const hasNote = !!(state.catNotes[c.key] || []).length;
     return `<button class="stats-pill" data-action="select-stats-cat" data-cat="${c.key}"
       style="border-color:${c.border};background:${active?c.color:c.bg};color:${active?'#fff':c.color}">
       ${c.emoji} ${c.label}${hasNote?' 📝':''}
     </button>`;
   }).join('');
 
-  const noteText = state.catNotes[sel] || '';
-  const noteHtml = noteText ? `<div style="background:${cat.bg};border:1.5px solid ${cat.border};border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:${cat.color}">📝 ${noteText}</div>` : '';
-  const noteBtnLabel = noteText ? '📝 Edit note' : '📝 Add note';
+  const catNotesList = state.catNotes[sel] || [];
+  const noteHtml = catNotesList.length === 0 ? '' : catNotesList.map(n => {
+    const nd = new Date(n.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    return `<div style="background:${cat.bg};border:1.5px solid ${cat.border};border-radius:10px;padding:8px 12px;margin-bottom:6px;font-size:12px;color:${cat.color}">
+      <div style="font-size:10px;opacity:0.7;margin-bottom:2px">${nd}</div>${n.text}
+    </div>`;
+  }).join('');
+  const noteBtnLabel = catNotesList.length > 0 ? '📝 View / add notes' : '📝 Add note';
 
   const statsRow = [
     ['Last 7 days', totalLast7+'×'],
@@ -1436,11 +1477,18 @@ function renderVetTab() {
       <textarea class="vet-input vet-textarea" id="vet-value"
         placeholder="Anything worth remembering…">${form.value||''}</textarea>
     </div>`;
+  } else if (adding === 'concern') {
+    extraFields = `<div class="vet-field">
+      <div class="vet-field-lbl">Concern / symptom</div>
+      <textarea class="vet-input vet-textarea" id="vet-value"
+        placeholder="Describe what you noticed…">${form.value||''}</textarea>
+    </div>`;
   }
 
+  const editing  = !!state.vetEditingId;
   const formHtml = adding ? `
     <div class="vet-form-card">
-      <div class="vet-form-title">${vtFind(adding).emoji} Add ${vtFind(adding).label}</div>
+      <div class="vet-form-title">${vtFind(adding).emoji} ${editing ? 'Edit' : 'Add'} ${vtFind(adding).label}</div>
       <div class="vet-field">
         <div class="vet-field-lbl">Date</div>
         <input type="date" class="vet-input" id="vet-date" value="${form.date||today}">
@@ -1472,7 +1520,10 @@ function renderVetTab() {
             </div>
             ${ndHtml}
           </div>
-          <button class="vet-note-delete" data-action="delete-vet" data-id="${n.id}">×</button>
+          <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+            <button class="vet-note-edit"   data-action="edit-vet"   data-id="${n.id}">✏️</button>
+            <button class="vet-note-delete" data-action="delete-vet" data-id="${n.id}">×</button>
+          </div>
         </div>`;
       }).join('')}</div>`;
 
@@ -1594,37 +1645,70 @@ document.addEventListener('click', e => {
   }
 
   if (action === 'open-vet-form') {
-    state.vetFormType = el.dataset.type;
-    state.vetFormData = { date: new Date().toISOString().slice(0,10) };
+    state.vetFormType  = el.dataset.type;
+    state.vetEditingId = null;
+    state.vetFormData  = { date: new Date().toISOString().slice(0,10) };
     renderVetTab();
   }
 
   if (action === 'cancel-vet') {
-    state.vetFormType = null;
-    state.vetFormData = {};
+    state.vetFormType  = null;
+    state.vetEditingId = null;
+    state.vetFormData  = {};
     renderVetTab();
   }
 
+  if (action === 'edit-vet') {
+    const note = state.vetNotes.find(n => n.id === el.dataset.id);
+    if (!note) return;
+    state.vetEditingId = note.id;
+    state.vetFormType  = note.category;
+    state.vetFormData  = {
+      date:    note.date instanceof Date ? note.date.toISOString().slice(0,10) : String(note.date).slice(0,10),
+      value:   note.value   || '',
+      notes:   note.notes   || '',
+      nextDue: note.nextDue || '',
+    };
+    renderVetTab();
+    document.getElementById('vet-date').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
   if (action === 'save-vet') {
-    const type     = state.vetFormType;
+    const type      = state.vetFormType;
     if (!type) return;
-    const dateEl   = document.getElementById('vet-date');
-    const valueEl  = document.getElementById('vet-value');
-    const nextDueEl= document.getElementById('vet-nextdue');
-    const dateStr  = dateEl?.value;
-    const value    = valueEl?.value?.trim() || '';
-    const nextDue  = nextDueEl?.value || null;
+    const dateEl    = document.getElementById('vet-date');
+    const valueEl   = document.getElementById('vet-value');
+    const nextDueEl = document.getElementById('vet-nextdue');
+    const dateStr   = dateEl?.value;
+    const value     = valueEl?.value?.trim() || '';
+    const nextDue   = nextDueEl?.value || null;
     if (!dateStr) { alert('Please enter a date.'); return; }
-    saveVetNote({
+    const entry = {
       category: type,
       value,
       notes: '',
       date: new Date(dateStr + 'T12:00:00'),
       ...(nextDue && { nextDue }),
-    });
-    state.vetFormType = null;
-    state.vetFormData = {};
-    showToast('Record saved');
+    };
+    if (state.vetEditingId) {
+      const id = state.vetEditingId;
+      if (USE_MOCK) {
+        const idx = state.vetNotes.findIndex(n => n.id === id);
+        if (idx > -1) state.vetNotes[idx] = { ...state.vetNotes[idx], ...entry };
+        renderVetTab();
+      } else {
+        const fsEntry = { ...entry, date: firebase.firestore.Timestamp.fromDate(entry.date) };
+        if (nextDue) fsEntry.nextDue = nextDue;
+        db.collection('vetNotes').doc(id).update(fsEntry).catch(e => showToast('⚠️ ' + e.message));
+      }
+      showToast('Record updated');
+    } else {
+      saveVetNote(entry);
+      showToast('Record saved');
+    }
+    state.vetFormType  = null;
+    state.vetEditingId = null;
+    state.vetFormData  = {};
   }
 
   if (action === 'edit-time') {
@@ -1695,11 +1779,12 @@ document.addEventListener('click', e => {
   }
 
   if (action === 'notes-open') {
-    const cat = el.dataset.cat;
-    state.activeCatNote = cat;
+    const cat     = el.dataset.cat;
     const catInfo = CAT[cat];
+    state.activeCatNote = cat;
     document.getElementById('notes-modal-title').textContent = `${catInfo.emoji} ${catInfo.label} — Notes`;
-    document.getElementById('notes-textarea').value = state.catNotes[cat] || '';
+    document.getElementById('notes-textarea').value = '';
+    renderNotesList(cat);
     document.getElementById('notes-modal').classList.add('open');
   }
 
@@ -1711,15 +1796,42 @@ document.addEventListener('click', e => {
   if (action === 'notes-save') {
     const cat  = state.activeCatNote;
     const text = document.getElementById('notes-textarea').value.trim();
-    if (cat) {
-      if (text) state.catNotes[cat] = text;
-      else delete state.catNotes[cat];
+    if (cat && text) {
+      if (!state.catNotes[cat]) state.catNotes[cat] = [];
+      state.catNotes[cat].unshift({ id: 'n' + Date.now(), text, date: new Date().toISOString() });
       try { localStorage.setItem('fulki_catNotes', JSON.stringify(state.catNotes)); } catch(e){}
+      document.getElementById('notes-textarea').value = '';
+      renderNotesList(cat);
+      showToast('Note added');
+      if (state.tab === 'stats') renderStatsTab();
     }
-    document.getElementById('notes-modal').classList.remove('open');
-    state.activeCatNote = null;
-    if (state.tab === 'stats') renderStatsTab();
-    showToast('Note saved');
+  }
+
+  if (action === 'notes-delete') {
+    const cat = state.activeCatNote;
+    const id  = el.dataset.id;
+    if (cat && id) {
+      state.catNotes[cat] = (state.catNotes[cat] || []).filter(n => n.id !== id);
+      if (!state.catNotes[cat].length) delete state.catNotes[cat];
+      try { localStorage.setItem('fulki_catNotes', JSON.stringify(state.catNotes)); } catch(e){}
+      renderNotesList(cat);
+      if (state.tab === 'stats') renderStatsTab();
+    }
+  }
+
+  if (action === 'notes-edit') {
+    const cat  = state.activeCatNote;
+    const id   = el.dataset.id;
+    const note = (state.catNotes[cat] || []).find(n => n.id === id);
+    if (!note) return;
+    document.getElementById('notes-textarea').value = note.text;
+    state.catNotes[cat] = (state.catNotes[cat] || []).filter(n => n.id !== id);
+    renderNotesList(cat);
+  }
+
+  if (action === 'toggle-a11y') {
+    const on = document.body.classList.toggle('a11y');
+    try { localStorage.setItem('fulki_a11y', on ? '1' : '0'); } catch(e){}
   }
 
   if (action === 'delete-vet') {
@@ -1758,6 +1870,29 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+function renderNotesList(cat) {
+  const list  = document.getElementById('notes-list');
+  if (!list) return;
+  const notes = state.catNotes[cat] || [];
+  if (notes.length === 0) {
+    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:10px">No notes yet — add one below</div>';
+    return;
+  }
+  list.innerHTML = notes.map(n => {
+    const ds = new Date(n.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px">
+      <div style="font-size:10px;color:var(--text-3);margin-bottom:3px">${ds}</div>
+      <div style="font-size:13px;color:var(--text);white-space:pre-wrap">${n.text}</div>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button style="font-size:11px;padding:3px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--bg);color:var(--text-2);cursor:pointer;font-family:inherit"
+          data-action="notes-edit" data-id="${n.id}">✏️ Edit</button>
+        <button style="font-size:11px;padding:3px 8px;border:1px solid #F0C0D0;border-radius:6px;background:#FDE8EE;color:#B04F6C;cursor:pointer;font-family:inherit"
+          data-action="notes-delete" data-id="${n.id}">× Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // Refresh predictions + nap elapsed timer every 30s
 setInterval(() => {
   computePredictions();
@@ -1766,6 +1901,7 @@ setInterval(() => {
 }, 30000);
 
 // ── Initial render ──
+if (localStorage.getItem('fulki_a11y') === '1') document.body.classList.add('a11y');
 render();
 
 // ── PWA Service Worker ──
