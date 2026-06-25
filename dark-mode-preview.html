@@ -18,184 +18,164 @@
       --accent:  #F89831;
     }
 
-    /* ── Dark palette ── */
+    /* ── Dark palette — navy/teal ── */
     body.dark {
-      --bg:      #2A0F1E;
-      --surface: #3D1529;
-      --border:  #5C2040;
-      --border-2:#7A2E55;
-      --text:    #F5D8EC;
-      --text-2:  #D898C0;
-      --text-3:  #A86090;
-      --text-4:  #6A3050;
-      --accent:  #F89831;
+      --bg:      #181b38;
+      --surface: #292f56;
+      --border:  #363d6e;
+      --border-2:#464f88;
+      --text:    #d8e8f8;
+      --text-2:  #7eb8c8;
+      --text-3:  #4c7890;
+      --text-4:  #2a3f58;
+      --accent:  #008780;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Cochin', 'Palatino Linotype', Georgia, serif;
-      background: #111;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px 16px 40px;
-      transition: background 0.3s;
+      display: flex; justify-content: center;
+      min-height: 100vh; padding: 24px 16px 40px;
+      transition: background 0.35s;
     }
-    body:not(.dark) { background: #E8E0F0; }
+    body:not(.dark) { background: #e8e0f0; }
+    body.dark       { background: #0e1028; }
 
     #card {
-      width: 100%;
-      max-width: 390px;
+      width: 100%; max-width: 390px;
       background: var(--bg);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-      transition: background 0.3s;
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+      transition: background 0.35s;
     }
 
     /* ── Header ── */
     #header-bar {
-      background: #B04F6C;
-      color: #fff;
-      padding: 22px 20px 16px;
-      transition: background 0.3s;
+      color: #fff; padding: 22px 20px 16px;
+      transition: background 0.35s;
     }
-    body.dark #header-bar {
-      background: linear-gradient(135deg, #7A1850, #572649);
-    }
+    body:not(.dark) #header-bar { background: #B04F6C; }
+    body.dark       #header-bar { background: linear-gradient(135deg, #005c7f, #292f56); }
+
     #header-top { display: flex; align-items: flex-start; justify-content: space-between; }
     #header-title    { font-size: 26px; font-weight: 700; line-height: 1.1; }
-    #header-subtitle { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 3px; letter-spacing: 0.8px; text-transform: uppercase; }
+    #header-subtitle { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 3px;
+                       letter-spacing: 0.8px; text-transform: uppercase; }
 
     .header-btns { display: flex; gap: 7px; align-items: center; }
 
-    #dark-btn {
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,0.5);
+    #dark-btn, #a11y-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.45);
       border-radius: 10px; color: #fff;
-      font-family: inherit; font-size: 14px;
-      padding: 6px 10px; cursor: pointer;
-      min-height: 36px; min-width: 36px;
-      transition: background 0.25s, border-color 0.25s;
-      line-height: 1;
-    }
-    #dark-btn:active { opacity: 0.75; }
-
-    #a11y-btn {
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,0.5);
-      border-radius: 10px; color: #fff;
-      font-family: inherit; font-size: 12px; font-weight: 700;
-      padding: 6px 12px; cursor: pointer;
-      min-height: 36px;
+      font-family: inherit; padding: 6px 11px;
+      cursor: pointer; min-height: 36px;
       transition: background 0.25s;
     }
+    #dark-btn   { font-size: 15px; line-height: 1; }
+    #a11y-btn   { font-size: 12px; font-weight: 700; }
 
     .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-    .nav-arrow {
-      background: rgba(255,255,255,0.18); border: none; border-radius: 8px;
-      color: #fff; font-size: 16px; padding: 4px 10px; cursor: pointer;
-    }
-    .date-nav span { font-size: 13px; font-weight: 600; opacity: 0.9; flex: 1; text-align: center; }
+    .nav-arrow { background: rgba(255,255,255,0.18); border: none; border-radius: 8px;
+                 color: #fff; font-size: 16px; padding: 4px 10px; cursor: pointer; }
+    .date-nav span { font-size: 13px; font-weight: 600; opacity: 0.9;
+                     flex: 1; text-align: center; }
 
     /* ── Summary strip ── */
     #summary-strip {
       display: flex; gap: 8px; padding: 12px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      overflow-x: auto;
-      transition: background 0.3s, border-color 0.3s;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      overflow-x: auto; transition: background 0.35s, border-color 0.35s;
     }
     .summary-pill {
       display: flex; align-items: center; gap: 5px;
       padding: 5px 12px; border-radius: 20px;
       font-size: 12px; font-weight: 700; white-space: nowrap;
-      transition: filter 0.3s;
+      transition: filter 0.35s;
     }
-    body.dark .summary-pill { filter: brightness(0.72) saturate(0.6); }
+    body.dark .summary-pill { filter: brightness(0.68) saturate(0.55); }
 
-    /* ── Predictions ── */
+    /* ── Section label ── */
     .section { padding: 18px 20px 0; }
     .section-label {
       font-size: 11px; font-weight: 700; letter-spacing: 1px;
       text-transform: uppercase; color: var(--text-3); margin-bottom: 10px;
     }
+
+    /* ── Prediction cards ── */
     .predictions-row {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 6px;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 6px;
     }
     .pred-card {
       border-radius: 16px; padding: 13px 8px 11px;
       text-align: center; border: 1.5px solid;
-      transition: background 0.3s, border-color 0.3s;
+      transition: background 0.35s, border-color 0.35s;
     }
     .pred-emoji { font-size: 22px; margin-bottom: 3px; }
     .pred-time  { font-size: 16px; font-weight: 700; line-height: 1.2; }
-    .pred-time-small { font-size: 10px; opacity: 0.7; margin-top: 1px; }
+    .pred-sub   { font-size: 10px; opacity: 0.75; margin-top: 1px; }
     .pred-lbl   { font-size: 10px; opacity: 0.72; margin-top: 2px; }
-    .conf-bar-wrap { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
-    .conf-bar-bg   { flex: 1; height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden; }
-    body.dark .conf-bar-bg { background: rgba(255,255,255,0.08); }
-    .conf-bar      { height: 100%; border-radius: 2px; }
-    .conf-pct      { font-size: 9px; font-weight: 700; opacity: 0.6; min-width: 26px; font-family: sans-serif; }
+    .conf-wrap  { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+    .conf-bg    { flex: 1; height: 4px; border-radius: 2px; overflow: hidden;
+                  background: rgba(0,0,0,0.08); }
+    body.dark .conf-bg { background: rgba(255,255,255,0.1); }
+    .conf-fill  { height: 100%; border-radius: 2px; }
+    .conf-pct   { font-size: 9px; font-weight: 700; opacity: 0.65;
+                  min-width: 26px; font-family: sans-serif; }
 
     /* ── Log buttons ── */
     #log-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 18px;
     }
     .log-btn {
       display: flex; flex-direction: column; align-items: center; gap: 5px;
       padding: 14px 4px 11px; border-radius: 18px; cursor: pointer;
       border: 2.5px solid transparent; font-family: inherit;
-      transition: filter 0.3s;
+      transition: filter 0.35s;
     }
-    body.dark .log-btn { filter: brightness(0.72) saturate(0.55); }
+    body.dark .log-btn { filter: brightness(0.7) saturate(0.5); }
     .btn-emoji { font-size: 24px; line-height: 1; }
     .btn-label { font-size: 10px; font-weight: 700; }
 
     /* ── Timeline ── */
-    .tl-section-label {
+    .tl-label-row {
       font-size: 11px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 1px; color: var(--text-3); margin-bottom: 12px;
     }
-    .timeline-entry {
+    .tl-entry {
       display: flex; align-items: center; gap: 12px;
       padding: 11px 14px; background: var(--surface);
       border-radius: 14px; margin-bottom: 8px; border: 1.5px solid;
-      transition: background 0.3s, border-color 0.3s;
+      transition: background 0.35s, border-color 0.35s;
     }
     .tl-emoji { font-size: 18px; width: 26px; text-align: center; flex-shrink: 0; }
     .tl-body  { flex: 1; }
-    .tl-label { font-size: 13px; font-weight: 700; color: var(--text); }
+    .tl-name  { font-size: 13px; font-weight: 700; color: var(--text); }
     .tl-time  { font-size: 11px; color: var(--text-3); font-weight: 600; margin-top: 1px; }
-    .tl-delete { background: none; border: none; font-size: 18px; color: var(--text-4); padding: 4px 6px; cursor: pointer; }
+    .tl-del   { background: none; border: none; font-size: 18px;
+                color: var(--text-4); padding: 4px 6px; cursor: pointer; }
 
     /* ── Bottom nav ── */
     #bottom-nav {
       display: flex; background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 8px 0 10px;
-      transition: background 0.3s, border-color 0.3s;
+      border-top: 1px solid var(--border); padding: 8px 0 10px;
+      transition: background 0.35s, border-color 0.35s;
     }
     .nav-btn {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
       background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit;
     }
     .nav-icon  { font-size: 20px; }
-    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-3); }
-    .nav-btn.active .nav-label { color: var(--text-2); }
-    .nav-btn:not(.active) { opacity: 0.45; }
-
-    /* ── Label at top ── */
-    #preview-label {
-      text-align: center; padding: 0 0 14px;
-      font-family: sans-serif; font-size: 12px; color: #888;
-      letter-spacing: 0.5px;
-    }
+    .nav-lbl   { font-size: 9px; font-weight: 700; text-transform: uppercase;
+                 letter-spacing: 0.6px; color: var(--text-3); }
+    .nav-btn.active .nav-lbl { color: var(--text-2); }
+    .nav-btn:not(.active) { opacity: 0.4; }
   </style>
 </head>
 <body>
-
 <div id="card">
 
   <!-- HEADER -->
@@ -206,7 +186,7 @@
         <div id="header-subtitle">Puppy Tracker</div>
       </div>
       <div class="header-btns">
-        <button id="dark-btn" onclick="toggleDark()" title="Toggle dark / light mode">🌙</button>
+        <button id="dark-btn" onclick="toggleDark()">🌙</button>
         <button id="a11y-btn">A</button>
       </div>
     </div>
@@ -230,38 +210,35 @@
     <div class="section-label">Next up</div>
     <div class="predictions-row">
 
-      <!-- urgent: warm red in dark, bright red in light -->
-      <div class="pred-card" id="pred-urgent">
+      <div class="pred-card" id="pred-a">
         <div class="pred-emoji">🌱</div>
-        <div class="pred-time" id="urg-text">2:45 PM</div>
-        <div class="pred-time-small" id="urg-sub">in 4m</div>
+        <div class="pred-time" id="pa-time">2:45 PM</div>
+        <div class="pred-sub"  id="pa-sub">in 4m</div>
         <div class="pred-lbl">Pee</div>
-        <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" id="urg-bar" style="width:88%"></div></div>
-          <div class="conf-pct" id="urg-pct">88%</div>
+        <div class="conf-wrap">
+          <div class="conf-bg"><div class="conf-fill" id="pa-bar" style="width:88%"></div></div>
+          <div class="conf-pct" id="pa-pct">88%</div>
         </div>
       </div>
 
-      <!-- soon: warm amber in dark, neon yellow in light -->
-      <div class="pred-card" id="pred-soon">
+      <div class="pred-card" id="pred-b">
         <div class="pred-emoji">💩</div>
-        <div class="pred-time" id="soon-text">4:15 PM</div>
-        <div class="pred-time-small" id="soon-sub">in 1h 34m</div>
+        <div class="pred-time" id="pb-time">4:15 PM</div>
+        <div class="pred-sub"  id="pb-sub">in 1h 34m</div>
         <div class="pred-lbl">Poop</div>
-        <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" id="soon-bar" style="width:55%"></div></div>
-          <div class="conf-pct" id="soon-pct">55%</div>
+        <div class="conf-wrap">
+          <div class="conf-bg"><div class="conf-fill" id="pb-bar" style="width:55%"></div></div>
+          <div class="conf-pct" id="pb-pct">55%</div>
         </div>
       </div>
 
-      <!-- calm: deep green in dark, bright green in light -->
-      <div class="pred-card" id="pred-calm">
+      <div class="pred-card" id="pred-c">
         <div class="pred-emoji">⚡</div>
-        <div class="pred-time" id="calm-text">Learning…</div>
+        <div class="pred-time" id="pc-time">Learning…</div>
         <div class="pred-lbl">Zoomies</div>
-        <div class="conf-bar-wrap">
-          <div class="conf-bar-bg"><div class="conf-bar" id="calm-bar" style="width:20%"></div></div>
-          <div class="conf-pct" id="calm-pct">20%</div>
+        <div class="conf-wrap">
+          <div class="conf-bg"><div class="conf-fill" id="pc-bar" style="width:20%"></div></div>
+          <div class="conf-pct" id="pc-pct">20%</div>
         </div>
       </div>
 
@@ -286,7 +263,7 @@
       </button>
       <button class="log-btn" style="background:#FEF3E0;border-color:#FDDBA0">
         <span class="btn-emoji">🥩</span>
-        <span class="btn-label" style="color:#F89831">Food</span>
+        <span class="btn-label" style="color:#C07020">Food</span>
       </button>
       <button class="log-btn" style="background:#F0E8F8;border-color:#D4B8E8">
         <span class="btn-emoji">💤</span>
@@ -301,104 +278,99 @@
 
   <!-- TIMELINE -->
   <div class="section" style="padding-bottom:20px">
-    <div class="tl-section-label">Today's timeline</div>
+    <div class="tl-label-row">Today's timeline</div>
 
-    <div class="timeline-entry" style="border-color:#A8D8A8">
+    <div class="tl-entry" style="border-color:#A8D8A8">
       <span class="tl-emoji">🌱</span>
       <div class="tl-body">
-        <div class="tl-label">Pee</div>
+        <div class="tl-name">Pee</div>
         <div class="tl-time">1:02 PM</div>
       </div>
-      <button class="tl-delete">×</button>
+      <button class="tl-del">×</button>
     </div>
 
-    <div class="timeline-entry" style="border-color:#FDDBA0">
+    <div class="tl-entry" style="border-color:#FDDBA0">
       <span class="tl-emoji">🥩</span>
       <div class="tl-body">
-        <div class="tl-label">Food</div>
+        <div class="tl-name">Food</div>
         <div class="tl-time">12:30 PM</div>
       </div>
-      <button class="tl-delete">×</button>
+      <button class="tl-del">×</button>
     </div>
 
-    <div class="timeline-entry" style="border-color:#D4B8E8">
+    <div class="tl-entry" style="border-color:#D4B8E8">
       <span class="tl-emoji">💤</span>
       <div class="tl-body">
-        <div class="tl-label">Nap <span style="font-weight:600;font-size:11px;color:#9B8EC4">54 min</span></div>
+        <div class="tl-name">Nap <span style="font-size:11px;font-weight:600;color:#9B8EC4">54 min</span></div>
         <div class="tl-time">11:10 AM – 12:04 PM</div>
       </div>
-      <button class="tl-delete">×</button>
+      <button class="tl-del">×</button>
     </div>
 
+    <div class="tl-entry" style="border-color:#B0D4F5">
+      <span class="tl-emoji">💧</span>
+      <div class="tl-body">
+        <div class="tl-name">Water</div>
+        <div class="tl-time">10:48 AM</div>
+      </div>
+      <button class="tl-del">×</button>
+    </div>
   </div>
 
   <!-- BOTTOM NAV -->
   <div id="bottom-nav">
     <button class="nav-btn active">
       <span class="nav-icon">🏠</span>
-      <span class="nav-label">Home</span>
+      <span class="nav-lbl">Home</span>
     </button>
     <button class="nav-btn">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">Patterns</span>
+      <span class="nav-lbl">Patterns</span>
     </button>
     <button class="nav-btn">
       <span class="nav-icon">🏥</span>
-      <span class="nav-label">Vet</span>
+      <span class="nav-lbl">Vet</span>
     </button>
   </div>
 
 </div>
-
 <script>
-  // Urgency colour sets
+  /* Urgency colour palettes */
   const LIGHT = {
-    urgent: { bg:'#FEE2E2', text:'#B91C1C', bar:'#EF4444', border:'#FCA5A5' },
-    soon:   { bg:'#FEF9C3', text:'#854D0E', bar:'#EAB308', border:'#FDE047' },
-    calm:   { bg:'#DCFCE7', text:'#166534', bar:'#22C55E', border:'#86EFAC' },
+    a: { bg:'#FEE2E2', border:'#FCA5A5', text:'#B91C1C', bar:'#EF4444' },
+    b: { bg:'#FEF9C3', border:'#FDE047', text:'#854D0E', bar:'#EAB308' },
+    c: { bg:'#DCFCE7', border:'#86EFAC', text:'#166534', bar:'#22C55E' },
   };
   const DARK = {
-    urgent: { bg:'#3A0E18', text:'#F0B8C0', bar:'#C06070', border:'#6A2030' },
-    soon:   { bg:'#2A1A06', text:'#F0D898', bar:'#B89030', border:'#6A4810' },
-    calm:   { bg:'#0C1E14', text:'#A0C8A8', bar:'#408858', border:'#1A4028' },
+    /* urgent — muted rose */
+    a: { bg:'#1e1428', border:'#4a2848', text:'#d8a8c8', bar:'#9058a0' },
+    /* soon — muted teal-blue (accent #005c7f) */
+    b: { bg:'#0c1e2a', border:'#1a4060', text:'#78b8d8', bar:'#005c7f' },
+    /* calm — teal-green (accent #008780) */
+    c: { bg:'#0a1e1e', border:'#1a4840', text:'#68c0b8', bar:'#008780' },
   };
 
-  function applyUrgency(isDark) {
-    const U = isDark ? DARK : LIGHT;
-
-    const pu = document.getElementById('pred-urgent');
-    pu.style.background = U.urgent.bg;
-    pu.style.borderColor = U.urgent.border;
-    document.getElementById('urg-text').style.color = U.urgent.text;
-    document.getElementById('urg-sub').style.color  = U.urgent.text;
-    document.getElementById('urg-bar').style.background = U.urgent.bar;
-    document.getElementById('urg-pct').style.color  = U.urgent.text;
-
-    const ps = document.getElementById('pred-soon');
-    ps.style.background = U.soon.bg;
-    ps.style.borderColor = U.soon.border;
-    document.getElementById('soon-text').style.color = U.soon.text;
-    document.getElementById('soon-sub').style.color  = U.soon.text;
-    document.getElementById('soon-bar').style.background = U.soon.bar;
-    document.getElementById('soon-pct').style.color  = U.soon.text;
-
-    const pc = document.getElementById('pred-calm');
-    pc.style.background = U.calm.bg;
-    pc.style.borderColor = U.calm.border;
-    document.getElementById('calm-text').style.color = U.calm.text;
-    document.getElementById('calm-bar').style.background = U.calm.bar;
-    document.getElementById('calm-pct').style.color  = U.calm.text;
+  function applyColors(dark) {
+    const P = dark ? DARK : LIGHT;
+    ['a','b','c'].forEach(k => {
+      const card = document.getElementById('pred-' + k);
+      card.style.background  = P[k].bg;
+      card.style.borderColor = P[k].border;
+      ['time','sub','pct'].forEach(p => {
+        const el = document.getElementById('p' + k + '-' + p);
+        if (el) el.style.color = P[k].text;
+      });
+      document.getElementById('p' + k + '-bar').style.background = P[k].bar;
+    });
   }
 
   function toggleDark() {
-    const going = !document.body.classList.contains('dark');
-    document.body.classList.toggle('dark', going);
-    document.getElementById('dark-btn').textContent = going ? '☀️' : '🌙';
-    applyUrgency(going);
+    const on = document.body.classList.toggle('dark');
+    document.getElementById('dark-btn').textContent = on ? '☀️' : '🌙';
+    applyColors(on);
   }
 
-  // Start in light mode
-  applyUrgency(false);
+  applyColors(false);
 </script>
 </body>
 </html>
