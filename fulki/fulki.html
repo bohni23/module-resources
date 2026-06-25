@@ -83,9 +83,11 @@
     body.a11y .tl-label        { font-size: 32px; }
     body.a11y .tl-time         { font-size: 26px; }
     body.a11y .summary-pill    { font-size: 28px; padding: 10px 16px; }
-    body.a11y .pred-time       { font-size: 44px; }
-    body.a11y .pred-lbl        { font-size: 26px; }
-    body.a11y .pred-emoji      { font-size: 62px; }
+    body.a11y .pred-time       { font-size: 32px; }
+    body.a11y .pred-lbl        { font-size: 20px; }
+    body.a11y .pred-emoji      { font-size: 48px; }
+    body.a11y .predictions-row { grid-template-columns: repeat(2, 1fr) !important; }
+    body.a11y #log-buttons-grid { gap: 6px; }
     body.a11y .gr-fact-card    { padding: 20px; }
     body.a11y .gr-fact-label   { font-size: 22px !important; }
     body.a11y .gr-fact-text    { font-size: 28px !important; line-height: 1.5; }
@@ -165,6 +167,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
+      overflow-x: hidden;
     }
 
     /* ── Header ── */
@@ -465,11 +468,14 @@
     }
     .chart-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .chart-bar-wrap {
-      width: 100%; height: 50px; background: var(--border);
-      border-radius: 4px; overflow: hidden;
-      display: flex; align-items: stretch;
+      width: 100%; height: 54px; position: relative;
+      display: flex; flex-direction: column; justify-content: flex-end;
     }
-    .chart-bar { width: 100%; border-radius: 4px; transition: opacity 0.4s; }
+    .chart-bar-val {
+      font-size: 7px; text-align: center; color: var(--text-3);
+      position: absolute; top: 0; left: 0; right: 0; font-weight: 800;
+    }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; }
     .chart-hr-lbl { font-size: 7px; color: var(--text-3); font-family: sans-serif; }
     .chart-ct     { font-size: 8px; font-weight: 800; font-family: sans-serif; }
 
@@ -700,6 +706,11 @@
       background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
     }
     #food-size-modal.open { display:flex; }
+    #nap-type-modal {
+      display:none; position:fixed; inset:0; z-index:300;
+      background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
+    }
+    #nap-type-modal.open { display:flex; }
     .water-size-sheet {
       background:var(--bg); border-radius:20px 20px 0 0;
       padding:20px; width:100%; max-width:480px;
@@ -759,8 +770,8 @@
 
       <div id="home-tab" class="tab-panel active">
         <div id="home-inner">
-          <div id="prediction-section"></div>
           <div id="log-section"></div>
+          <div id="prediction-section"></div>
           <div id="timeline-section">
             <div class="tl-section-label">Today's log</div>
             <div id="timeline"></div>
@@ -852,6 +863,25 @@
       </button>
     </div>
     <button class="water-size-cancel" data-action="food-type-cancel">Cancel</button>
+  </div>
+</div>
+
+<div id="nap-type-modal">
+  <div class="water-size-sheet">
+    <div class="water-size-title">💤 What kind of rest?</div>
+    <div class="water-size-btns">
+      <button class="water-size-btn" data-action="nap-type" data-type="nap">
+        <span class="water-size-emoji">💤</span>
+        <span class="water-size-lbl">Nap</span>
+        <span class="water-size-ml">Daytime</span>
+      </button>
+      <button class="water-size-btn" data-action="nap-type" data-type="sleep">
+        <span class="water-size-emoji">🌙</span>
+        <span class="water-size-lbl">Sleep</span>
+        <span class="water-size-ml">Overnight</span>
+      </button>
+    </div>
+    <button class="water-size-cancel" data-action="nap-type-cancel">Cancel</button>
   </div>
 </div>
 
@@ -1426,7 +1456,6 @@ const CATS = [
   { key:'pee',     emoji:'🌱', label:'Pee',         color:'#0A420A', bg:'#E8F5E8', border:'#A8D8A8', darkBg:'rgba(61,143,61,0.22)',   darkColor:'#78C078' },
   { key:'poop',    emoji:'💩', label:'Poop',        color:'#600A28', bg:'#FDE8EE', border:'#F0C0D0', darkBg:'rgba(176,79,108,0.22)',  darkColor:'#D090A8' },
   { key:'zoomies', emoji:'🎾', label:'Active Play', color:'#6A0E18', bg:'#FDEAEA', border:'#F5B8BC', darkBg:'rgba(209,112,120,0.2)', darkColor:'#E88890' },
-  { key:'sleep',   emoji:'🌙', label:'Sleep',       color:'#1A1058', bg:'#E8E8F8', border:'#9898D8', darkBg:'rgba(26,16,88,0.4)',    darkColor:'#A0A0F0' },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.key, c]));
 
@@ -1601,10 +1630,10 @@ function renderPredictions() {
 
   document.getElementById('prediction-section').innerHTML =
     stageBanner +
-    factCardHtml() +
     `<div class="section-label">Next predictions 🔮</div>` +
     `<div class="predictions-row">${cards}</div>` +
-    `<div class="pred-note">Accuracy grows as more events are logged</div>`;
+    `<div class="pred-note">Accuracy grows as more events are logged</div>` +
+    factCardHtml();
 }
 
 function renderLogButtons() {
@@ -1943,15 +1972,16 @@ function renderStatsTab() {
   </div>`).join('');
 
   function barCol(val, h) {
-    const opacity = val === 0 ? 0.08 : 0.18 + (val / max) * 0.82;
-    const label   = sel === 'water' && val > 0 ? val + 'ml' : (val > 0 ? val : '');
-    const ctHtml  = val > 0 ? `<div class="chart-ct" style="color:${cat.color}">${label}</div>` : '';
+    const pct    = max > 0 ? val / max : 0;
+    const barH   = Math.max(val > 0 ? 4 : 0, Math.round(pct * 50));
+    const label  = sel === 'water' && val > 0 ? val + 'ml' : (val > 0 ? String(val) : '');
+    const valHtml = val > 0 ? `<div class="chart-bar-val">${label}</div>` : '';
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-bar" style="height:100%;background:${cat.color};opacity:${opacity.toFixed(2)}"></div>
+        ${valHtml}
+        <div class="chart-bar" style="height:${barH}px;background:${cat.color}"></div>
       </div>
       <div class="chart-hr-lbl">${hrLabel(h)}</div>
-      ${ctHtml}
     </div>`;
   }
 
@@ -2246,21 +2276,46 @@ function renderStatsTab() {
     const px = h => padL + (h / 23) * cW;
     const py = v => padT + (1 - v / globalMax) * cH;
 
+    // Background and grid
+    const gridLines = [0.25, 0.5, 0.75, 1].map(frac => {
+      const yg = py(globalMax * frac);
+      const yVal = (globalMax * frac).toFixed(1);
+      return `<line x1="${padL}" y1="${yg}" x2="${W - padR}" y2="${yg}" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>
+              <text x="${padL - 3}" y="${yg + 2.5}" font-size="6" text-anchor="end" fill="var(--text-3)" font-family="sans-serif">${yVal}</text>`;
+    }).join('');
+
     // X-axis labels every 3h
     const xLabels = [0,3,6,9,12,15,18,21].map(h =>
-      `<text x="${px(h)}" y="${H}" font-size="7" text-anchor="middle" fill="var(--text-3)" font-family="sans-serif">${hrLabel(h)}</text>`
+      `<text x="${px(h)}" y="${H - 2}" font-size="7" text-anchor="middle" fill="var(--text-3)" font-family="sans-serif">${hrLabel(h)}</text>`
     ).join('');
 
-    // Lines and square markers
+    // Gradient defs + area fills + glow + lines + circle markers
+    let defsHtml = '<defs>';
+    LINE_CATS.forEach(lc => {
+      defsHtml += `<linearGradient id="lg-${lc.key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lc.color}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${lc.color}" stop-opacity="0"/>
+      </linearGradient>`;
+    });
+    defsHtml += '</defs>';
+
     let linesHtml = '';
     const crossings = [];
     LINE_CATS.forEach(lc => {
       const vals = data[lc.key];
-      const pts  = vals.map((v,h) => `${px(h)},${py(v)}`).join(' ');
-      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>`;
+      const pts  = vals.map((v,h) => `${px(h).toFixed(1)},${py(v).toFixed(1)}`).join(' ');
+      const baseline = py(0).toFixed(1);
+      const areaPoints = `${px(0).toFixed(1)},${baseline} ${pts} ${px(23).toFixed(1)},${baseline}`;
+      // Area fill
+      linesHtml += `<polygon points="${areaPoints}" fill="url(#lg-${lc.key})"/>`;
+      // Glow line
+      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.1"/>`;
+      // Main line
+      linesHtml += `<polyline points="${pts}" fill="none" stroke="${lc.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+      // Circle markers
       vals.forEach((v,h) => {
-        const x = px(h), y = py(v);
-        linesHtml += `<rect x="${x-4}" y="${y-4}" width="8" height="8" fill="${lc.color}" rx="1" data-cat="${lc.key}" data-hr="${h}" data-avg="${v.toFixed(2)}" style="cursor:pointer"/>`;
+        const x = px(h).toFixed(1), y = py(v).toFixed(1);
+        linesHtml += `<circle cx="${x}" cy="${y}" r="3.5" fill="${lc.color}" stroke="#fff" stroke-width="1.2" data-cat="${lc.key}" data-hr="${h}" data-avg="${v.toFixed(2)}" style="cursor:pointer"/>`;
       });
     });
 
@@ -2313,7 +2368,10 @@ function renderStatsTab() {
 
     return `<div class="weight-chart-wrap" style="margin-bottom:14px;position:relative">
       <div class="weight-chart-title">📈 Average activity by hour of day</div>
-      <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="100%" style="overflow:visible;display:block">
+      <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
+        ${defsHtml}
+        <rect x="${padL}" y="${padT}" width="${cW}" height="${cH}" fill="var(--surface)" rx="4" opacity="0.6"/>
+        ${gridLines}
         ${xLabels}
         ${linesHtml}
       </svg>
@@ -2358,7 +2416,7 @@ function renderStatsTab() {
     const tip = document.getElementById('line-tooltip');
     if (svg && tip) {
       svg.addEventListener('click', ev => {
-        const rect = ev.target.closest('rect[data-cat]');
+        const rect = ev.target.closest('circle[data-cat]');
         if (!rect) { tip.style.display = 'none'; return; }
         const catKey = rect.dataset.cat;
         const hr     = parseInt(rect.dataset.hr, 10);
@@ -2607,11 +2665,11 @@ document.addEventListener('click', e => {
     const type = el.dataset.type;
     if (type === 'nap') {
       if (state.napInProgress) {
-        endNap();
-        showToast('💤 Nap ended');
+        endNap(); showToast('💤 Nap ended');
+      } else if (state.sleepInProgress) {
+        endSleep(); showToast('🌙 Sleep ended');
       } else {
-        startNap();
-        showToast('💤 Nap started');
+        document.getElementById('nap-type-modal').classList.add('open');
       }
     } else if (type === 'water') {
       state.waterSizePending = true;
@@ -2622,9 +2680,6 @@ document.addEventListener('click', e => {
     } else if (type === 'zoomies') {
       if (state.playInProgress) { endPlay(); showToast('🎾 Play ended'); }
       else { startPlay(); showToast('🎾 Play started'); }
-    } else if (type === 'sleep') {
-      if (state.sleepInProgress) { endSleep(); showToast('🌙 Sleep ended'); }
-      else { startSleep(); showToast('🌙 Sleep started'); }
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
@@ -2657,6 +2712,17 @@ document.addEventListener('click', e => {
   if (action === 'food-type-cancel') {
     document.getElementById('food-size-modal').classList.remove('open');
     state.foodTypePending = false;
+  }
+
+  if (action === 'nap-type') {
+    const napOrSleep = el.dataset.type;
+    document.getElementById('nap-type-modal').classList.remove('open');
+    if (napOrSleep === 'sleep') { startSleep(); showToast('🌙 Sleep started'); }
+    else { startNap(); showToast('💤 Nap started'); }
+  }
+
+  if (action === 'nap-type-cancel') {
+    document.getElementById('nap-type-modal').classList.remove('open');
   }
 
   if (action === 'walkies') {
