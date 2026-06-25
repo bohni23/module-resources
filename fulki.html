@@ -1628,8 +1628,32 @@ function renderStatsTab() {
        <div class="chart-grid">${pmBars}</div>
        ${peaksHtml}`;
 
-  // ── Water-specific volume section ──
-  let waterSection = '';
+  // ── Per-category insights ──
+  const fmtDur = ms => {
+    const h = Math.floor(ms / 3600e3), m = Math.round((ms % 3600e3) / 60000);
+    return h > 0 ? `${h}h${m > 0 ? m + 'm' : ''}` : `${m}m`;
+  };
+  const activeDaysIn7 = type => {
+    let n = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      if (state.logs.some(l => l.type === type && isSameDay(l.timestamp, d))) n++;
+    }
+    return n;
+  };
+  const msAgoSinceLast = type => {
+    const l = state.logs.filter(x => x.type === type).sort((a,b) => b.timestamp - a.timestamp)[0];
+    return l ? Date.now() - l.timestamp : null;
+  };
+  const insightCard = (emoji, title, rows) => {
+    const html = rows.filter(Boolean).join('');
+    return html ? `<div class="corr-card" style="margin-bottom:14px">
+      <div class="corr-title">${emoji} ${title}</div>${html}</div>` : '';
+  };
+  const irow  = (txt, last) => `<div style="font-size:12px;color:var(--text-2);margin-bottom:${last?0:6}px">${txt}</div>`;
+
+  let categorySection = '';
+
   if (sel === 'water') {
     const dailyMls = [];
     for (let i = 6; i >= 0; i--) {
@@ -1671,32 +1695,110 @@ function renderStatsTab() {
 
     const zoomiesLogs = state.logs.filter(l => l.type === 'zoomies' && +l.timestamp > sevenAgo);
     const hydratedCount = zoomiesLogs.filter(z => {
-      const window = +z.timestamp + 30 * 60000;
-      return state.logs.some(w => w.type === 'water' && +w.timestamp > +z.timestamp && +w.timestamp <= window);
+      const win = +z.timestamp + 30 * 60000;
+      return state.logs.some(w => w.type === 'water' && +w.timestamp > +z.timestamp && +w.timestamp <= win);
     }).length;
     const zoomiesCount = zoomiesLogs.length;
     const hydratedPct  = zoomiesCount > 0 ? Math.round((hydratedCount / zoomiesCount) * 100) : null;
     const allWaterMl   = state.logs.filter(l => l.type === 'water' && l.ml);
     const largestDrink = allWaterMl.length > 0 ? Math.max(...allWaterMl.map(l => l.ml)) : 0;
 
-    const insightRows = [
-      todayVsAvg !== null ? `<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">
-        Today vs 7-day avg: <strong style="color:${todayVsAvg >= 90 ? '#3D8F3D' : '#D17078'}">${todayVsAvg}%</strong>
-        ${todayVsAvg >= 110 ? ' 🌊 drinking well!' : todayVsAvg < 80 ? ' ⚠️ below usual' : ' ✓ on track'}
-      </div>` : '',
-      hydratedPct !== null ? `<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">
-        Post-zoomies hydration: <strong>${hydratedPct}%</strong> (${hydratedCount}/${zoomiesCount} sessions)
-        ${hydratedPct === 100 ? ' ✅' : hydratedPct >= 50 ? ' 👍' : ' 💡 try water after play!'}
-      </div>` : '',
-      largestDrink > 0 ? `<div style="font-size:12px;color:var(--text-3)">Biggest single drink recorded: ${largestDrink}ml</div>` : '',
-    ].filter(Boolean).join('');
+    categorySection = volCards + dailyChart + insightCard('💡', 'Hydration insights', [
+      todayVsAvg !== null ? irow(`Today vs 7-day avg: <strong style="color:${todayVsAvg >= 90 ? '#3D8F3D' : '#D17078'}">${todayVsAvg}%</strong>${todayVsAvg >= 110 ? ' 🌊 drinking well!' : todayVsAvg < 80 ? ' ⚠️ below usual' : ' ✓ on track'}`) : '',
+      hydratedPct !== null ? irow(`Post-zoomies hydration: <strong>${hydratedPct}%</strong> (${hydratedCount}/${zoomiesCount} sessions) ${hydratedPct === 100 ? '✅' : hydratedPct >= 50 ? '👍' : '💡 try water after play!'}`) : '',
+      largestDrink > 0 ? irow(`Biggest single drink recorded: <strong>${largestDrink}ml</strong>`, true) : '',
+    ]);
+  }
 
-    const insightsCard = insightRows ? `<div class="corr-card" style="margin-bottom:14px">
-      <div class="corr-title">💡 Hydration insights</div>
-      ${insightRows}
-    </div>` : '';
+  if (sel === 'food') {
+    const foodToday = state.logs.filter(l => l.type === 'food' && isSameDay(l.timestamp, new Date()))
+                                .sort((a,b) => a.timestamp - b.timestamp);
+    const sinceMs   = msAgoSinceLast('food');
+    const activeDays = activeDaysIn7('food');
+    let maxGapStr = null;
+    if (foodToday.length >= 2) {
+      let mx = 0;
+      for (let i = 1; i < foodToday.length; i++) mx = Math.max(mx, foodToday[i].timestamp - foodToday[i-1].timestamp);
+      maxGapStr = fmtDur(mx);
+    }
+    categorySection = insightCard('💡', 'Meal insights', [
+      irow(`Meals today: <strong style="color:${cat.color}">${foodToday.length}</strong> · avg ${(totalLast7/7).toFixed(1)}/day this week`),
+      sinceMs !== null ? irow(`Last meal: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 8*3600e3 ? ' ⚠️ feeding time soon?' : ' ✓'}`) : '',
+      maxGapStr ? irow(`Longest gap between meals today: <strong>${maxGapStr}</strong>`) : '',
+      irow(`Meal days this week: <strong>${activeDays}/7</strong> ${activeDays >= 6 ? '✅ very consistent' : activeDays >= 4 ? '👍 mostly regular' : '💡 try to feed daily'}`, true),
+    ]);
+  }
 
-    waterSection = volCards + dailyChart + insightsCard;
+  if (sel === 'nap') {
+    const napDurs    = allOfType.filter(l => l.duration).map(l => l.duration);
+    const avgNap     = napDurs.length ? Math.round(napDurs.reduce((a,b) => a+b, 0) / napDurs.length) : null;
+    const maxNap     = napDurs.length ? Math.max(...napDurs) : null;
+    const todayNapMs = state.logs.filter(l => l.type === 'nap' && isSameDay(l.timestamp, new Date()) && l.duration)
+                                 .reduce((s, l) => s + l.duration, 0);
+    const activeDays = activeDaysIn7('nap');
+    categorySection = insightCard('💡', 'Nap insights', [
+      avgNap ? irow(`Avg nap length: <strong style="color:${cat.color}">${avgNap}m</strong>`) : '',
+      maxNap ? irow(`Longest nap recorded: <strong>${maxNap}m</strong>`) : '',
+      todayNapMs > 0 ? irow(`Total nap time today: <strong>${todayNapMs}m</strong>`) : '',
+      irow(`Nap days this week: <strong>${activeDays}/7</strong> ${activeDays >= 5 ? '✅ great sleep routine' : activeDays >= 3 ? '👍 decent rest' : '💡 naps aid development'}`, true),
+    ]);
+  }
+
+  if (sel === 'pee') {
+    const peeToday   = state.logs.filter(l => l.type === 'pee' && isSameDay(l.timestamp, new Date())).length;
+    const sinceMs    = msAgoSinceLast('pee');
+    const activeDays = activeDaysIn7('pee');
+    const sorted7    = [...recent].sort((a,b) => a.timestamp - b.timestamp);
+    let longestGap = null;
+    if (sorted7.length >= 2) {
+      let mx = 0;
+      for (let i = 1; i < sorted7.length; i++) mx = Math.max(mx, sorted7[i].timestamp - sorted7[i-1].timestamp);
+      longestGap = fmtDur(mx);
+    }
+    categorySection = insightCard('💡', 'Pee insights', [
+      irow(`Pees today: <strong style="color:${cat.color}">${peeToday}</strong> · avg ${(totalLast7/7).toFixed(1)}/day this week${peeToday === 0 ? ' ⚠️ none yet!' : ''}`),
+      sinceMs !== null ? irow(`Last pee: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 4*3600e3 ? ' ⚠️ might need a trip out' : ' ✓'}`) : '',
+      longestGap ? irow(`Longest gap this week: <strong>${longestGap}</strong>`) : '',
+      irow(`Logged days this week: <strong>${activeDays}/7</strong>`, true),
+    ]);
+  }
+
+  if (sel === 'poop') {
+    const poopToday  = state.logs.filter(l => l.type === 'poop' && isSameDay(l.timestamp, new Date())).length;
+    const sinceMs    = msAgoSinceLast('poop');
+    const activeDays = activeDaysIn7('poop');
+    const foodLgs    = state.logs.filter(l => l.type === 'food').sort((a,b) => a.timestamp - b.timestamp);
+    const lags       = state.logs.filter(l => l.type === 'poop').map(p => {
+      const lf = foodLgs.filter(f => f.timestamp < p.timestamp).slice(-1)[0];
+      if (!lf) return null;
+      const lag = p.timestamp - lf.timestamp;
+      return lag > 0 && lag < 24*3600e3 ? lag : null;
+    }).filter(Boolean);
+    const avgLag     = lags.length ? fmtDur(lags.reduce((a,b) => a+b, 0) / lags.length) : null;
+    const daysWithout = 7 - activeDays;
+    categorySection = insightCard('💡', 'Poop insights', [
+      irow(`Poops today: <strong style="color:${cat.color}">${poopToday}</strong> · avg ${(totalLast7/7).toFixed(1)}/day this week`),
+      sinceMs !== null ? irow(`Last poop: <strong>${fmtDur(sinceMs)} ago</strong>${sinceMs > 18*3600e3 ? ' ⚠️ overdue?' : ' ✓'}`) : '',
+      avgLag ? irow(`Avg time after eating: <strong>${avgLag}</strong>`) : '',
+      irow(`Days without poop this week: <strong>${daysWithout}</strong>${daysWithout >= 2 ? ' ⚠️ keep an eye on this' : ' ✅ very regular'}`, true),
+    ]);
+  }
+
+  if (sel === 'zoomies') {
+    const zoomsToday  = state.logs.filter(l => l.type === 'zoomies' && isSameDay(l.timestamp, new Date())).length;
+    const sinceMs     = msAgoSinceLast('zoomies');
+    const activeDays  = activeDaysIn7('zoomies');
+    const hydrated    = recent.filter(z => {
+      const win = +z.timestamp + 30 * 60000;
+      return state.logs.some(w => w.type === 'water' && +w.timestamp > +z.timestamp && +w.timestamp <= win);
+    }).length;
+    const hydratedPct = recent.length > 0 ? Math.round((hydrated / recent.length) * 100) : null;
+    categorySection = insightCard('💡', 'Zoomies insights', [
+      irow(`Sessions today: <strong style="color:${cat.color}">${zoomsToday}</strong> · avg ${(totalLast7/7).toFixed(1)}/day this week`),
+      sinceMs !== null ? irow(`Last play session: <strong>${fmtDur(sinceMs)} ago</strong>`) : '',
+      hydratedPct !== null ? irow(`Post-play hydration: <strong>${hydratedPct}%</strong> (${hydrated}/${recent.length} sessions with water within 30m) ${hydratedPct === 100 ? '✅' : hydratedPct >= 50 ? '👍' : '💡 try water after play!'}`) : '',
+      irow(`Active days this week: <strong>${activeDays}/7</strong> ${activeDays >= 5 ? '🏅 very active!' : activeDays >= 3 ? '👍 good activity' : '💡 more play helps development'}`, true),
+    ]);
   }
 
   tab.innerHTML = `
@@ -1708,7 +1810,7 @@ function renderStatsTab() {
       ${noteBtnLabel}
     </button>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
-    ${waterSection}
+    ${categorySection}
     ${mainContent}
     ${renderFoodPoopHeatmap()}
     <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
