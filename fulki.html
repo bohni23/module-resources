@@ -626,6 +626,34 @@
       padding:10px 16px; background:var(--surface); border:1.5px solid var(--border-2);
       border-radius:10px; color:var(--text-2); font-family:inherit; font-size:13px; cursor:pointer;
     }
+
+    /* ── Water size picker modal ── */
+    #water-size-modal {
+      display:none; position:fixed; inset:0; z-index:300;
+      background:rgba(0,0,0,0.45); align-items:flex-end; justify-content:center;
+    }
+    #water-size-modal.open { display:flex; }
+    .water-size-sheet {
+      background:var(--bg); border-radius:20px 20px 0 0;
+      padding:20px; width:100%; max-width:480px;
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .water-size-title { font-size:16px; font-weight:700; color:var(--text); text-align:center; }
+    .water-size-btns  { display:flex; gap:10px; }
+    .water-size-btn {
+      flex:1; background:var(--surface); border:1.5px solid var(--border-2);
+      border-radius:14px; padding:14px 8px; cursor:pointer; font-family:inherit;
+      display:flex; flex-direction:column; align-items:center; gap:4px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .water-size-btn:active { background:#E3F0FC; border-color:#5B9ED6; }
+    .water-size-emoji { font-size:22px; line-height:1; }
+    .water-size-lbl   { font-size:13px; font-weight:700; color:var(--text); }
+    .water-size-ml    { font-size:10px; color:var(--text-3); font-family:sans-serif; }
+    .water-size-cancel {
+      width:100%; padding:10px; background:var(--surface); border:1.5px solid var(--border-2);
+      border-radius:10px; color:var(--text-2); font-family:inherit; font-size:13px; cursor:pointer;
+    }
   </style>
 </head>
 <body>
@@ -711,6 +739,31 @@
   </div>
 </div>
 
+<!-- Water size picker -->
+<div id="water-size-modal">
+  <div class="water-size-sheet">
+    <div class="water-size-title">💧 How much did Fulki drink?</div>
+    <div class="water-size-btns">
+      <button class="water-size-btn" data-action="water-size" data-size="S" data-ml="50">
+        <span class="water-size-emoji">💧</span>
+        <span class="water-size-lbl">Small</span>
+        <span class="water-size-ml">~50 ml</span>
+      </button>
+      <button class="water-size-btn" data-action="water-size" data-size="M" data-ml="100">
+        <span class="water-size-emoji">💧💧</span>
+        <span class="water-size-lbl">Medium</span>
+        <span class="water-size-ml">~100 ml</span>
+      </button>
+      <button class="water-size-btn" data-action="water-size" data-size="L" data-ml="200">
+        <span class="water-size-emoji">💧💧💧</span>
+        <span class="water-size-lbl">Large</span>
+        <span class="water-size-ml">~200 ml</span>
+      </button>
+    </div>
+    <button class="water-size-cancel" data-action="water-size-cancel">Cancel</button>
+  </div>
+</div>
+
 <!-- Firebase 9 compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -787,6 +840,7 @@ const state = {
   viewDate:         new Date(),
   catNotes:         {},   // { pee: [{id, text, date}], … }
   activeCatNote:    null, // cat key currently being edited
+  waterSizePending: false,
 };
 
 function isSameDay(a, b) {
@@ -832,6 +886,8 @@ if (!USE_MOCK) {
       timestamp: toDate(d.data().timestamp),
       napEnd:    toDate(d.data().napEnd) || null,
       duration:  d.data().duration || null,
+      size:      d.data().size  || null,
+      ml:        d.data().ml    || null,
     }));
     recoverNapState();
     computePredictions();
@@ -1342,10 +1398,14 @@ function renderTimeline() {
       }
     }
 
+    const sizeBadge = (log.type === 'water' && log.size)
+      ? `<span style="font-size:9px;font-family:sans-serif;background:#E3F0FC;color:#3A7EC8;border-radius:6px;padding:2px 6px;font-weight:700;margin-left:4px">${log.size} · ${log.ml}ml</span>`
+      : '';
+
     return `<div class="timeline-entry" data-id="${log.id}" style="border-color:${c.border}">
       <span class="tl-emoji">${c.emoji}</span>
       <div class="tl-body">
-        <div class="tl-label" style="color:${c.color}">${c.label}${durHtml}</div>
+        <div class="tl-label" style="color:${c.color}">${c.label}${durHtml}${sizeBadge}</div>
         <div class="tl-time">${timeHtml}</div>
       </div>
       <button class="tl-delete" data-action="delete" data-id="${log.id}" aria-label="Delete">×</button>
@@ -1425,6 +1485,10 @@ function exportCSV() {
   a.click();
 }
 
+function waterMl(logs) {
+  return logs.filter(l => l.type === 'water').reduce((s, l) => s + (l.ml || 100), 0);
+}
+
 function renderStatsTab() {
   const tab = document.getElementById('stats-tab');
   const sel = state.selectedStatsCat || 'pee';
@@ -1434,8 +1498,13 @@ function renderStatsTab() {
   const recent     = state.logs.filter(l => l.type === sel && +l.timestamp > sevenAgo);
   const allOfType  = state.logs.filter(l => l.type === sel);
   const hourCounts = Array(24).fill(0);
-  recent.forEach(l => { hourCounts[l.timestamp.getHours()]++; });
-  const max = Math.max(...hourCounts, 1);
+  const hourMls    = Array(24).fill(0);
+  recent.forEach(l => {
+    hourCounts[l.timestamp.getHours()]++;
+    if (sel === 'water') hourMls[l.timestamp.getHours()] += (l.ml || 100);
+  });
+  const chartVals = sel === 'water' ? hourMls : hourCounts;
+  const max = Math.max(...chartVals, 1);
 
   const totalLast7 = recent.length;
   const avgPerDay  = totalLast7 > 0 ? (totalLast7 / 7).toFixed(1) : '—';
@@ -1485,20 +1554,21 @@ function renderStatsTab() {
     <div class="stats-stat-lbl">${k}</div>
   </div>`).join('');
 
-  function barCol(count, h) {
-    const pct    = Math.round((count / max) * 100);
-    const ctHtml = count > 0 ? `<div class="chart-ct" style="color:${cat.color}">${count}</div>` : '';
+  function barCol(val, h) {
+    const pct    = Math.round((val / max) * 100);
+    const label  = sel === 'water' && val > 0 ? val + 'ml' : (val > 0 ? val : '');
+    const ctHtml = val > 0 ? `<div class="chart-ct" style="color:${cat.color}">${label}</div>` : '';
     return `<div class="chart-col">
       <div class="chart-bar-wrap">
-        <div class="chart-bar" style="height:${pct}%;background:${count>0?`linear-gradient(to top,${cat.color}50,${cat.color})`:'transparent'}"></div>
+        <div class="chart-bar" style="height:${pct}%;background:${val>0?`linear-gradient(to top,${cat.color}50,${cat.color})`:'transparent'}"></div>
       </div>
       <div class="chart-hr-lbl">${hrLabel(h)}</div>
       ${ctHtml}
     </div>`;
   }
 
-  const amBars = hourCounts.slice(0,12).map((c,i) => barCol(c,i)).join('');
-  const pmBars = hourCounts.slice(12).map((c,i) => barCol(c,i+12)).join('');
+  const amBars = chartVals.slice(0,12).map((v,i) => barCol(v,i)).join('');
+  const pmBars = chartVals.slice(12).map((v,i) => barCol(v,i+12)).join('');
 
   const peaksHtml = peaks.length > 0 ? `
     <div class="stats-peaks-card">
@@ -1517,11 +1587,82 @@ function renderStatsTab() {
   const mainContent = recent.length === 0
     ? `<div class="empty-state">No ${cat.label.toLowerCase()} events in the past 7 days yet.<br>
        <span class="sub">Patterns appear here as you log.</span></div>`
-    : `<div class="chart-half-label">AM</div>
+    : `<div class="chart-half-label">${sel === 'water' ? 'AM · ml per hour' : 'AM'}</div>
        <div class="chart-grid">${amBars}</div>
-       <div class="chart-half-label">PM</div>
+       <div class="chart-half-label">${sel === 'water' ? 'PM · ml per hour' : 'PM'}</div>
        <div class="chart-grid">${pmBars}</div>
        ${peaksHtml}`;
+
+  // ── Water-specific volume section ──
+  let waterSection = '';
+  if (sel === 'water') {
+    const dailyMls = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const dayLogs = state.logs.filter(l => l.type === 'water' && isSameDay(l.timestamp, d));
+      dailyMls.push({ date: d, ml: waterMl(dayLogs) });
+    }
+    const avgDailyMl = Math.round(dailyMls.reduce((s, d) => s + d.ml, 0) / 7);
+    const todayMl    = dailyMls[6].ml;
+    const todayVsAvg = avgDailyMl > 0 ? Math.round((todayMl / avgDailyMl) * 100) : null;
+
+    const volCards = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="stats-stat-card">
+        <div class="stats-stat-val" style="color:#5B9ED6">${todayMl}ml</div>
+        <div class="stats-stat-lbl">Today</div>
+      </div>
+      <div class="stats-stat-card">
+        <div class="stats-stat-val" style="color:#5B9ED6">${avgDailyMl}ml</div>
+        <div class="stats-stat-lbl">Daily avg (7d)</div>
+      </div>
+    </div>`;
+
+    const maxMl = Math.max(...dailyMls.map(d => d.ml), 1);
+    const bars  = dailyMls.map(d => {
+      const h   = Math.max(4, Math.round((d.ml / maxMl) * 52));
+      const day = d.date.toLocaleDateString('en-GB', { weekday:'short' });
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+        <div style="font-size:8px;font-family:sans-serif;color:var(--text-3);font-weight:700">${d.ml > 0 ? d.ml : ''}</div>
+        <div style="height:52px;display:flex;align-items:flex-end">
+          <div style="width:20px;height:${h}px;background:#5B9ED6;border-radius:4px 4px 0 0;opacity:${d.ml > 0 ? 1 : 0.2}"></div>
+        </div>
+        <div style="font-size:8px;font-family:sans-serif;color:var(--text-3)">${day}</div>
+      </div>`;
+    }).join('');
+    const dailyChart = `<div class="weight-chart-wrap" style="margin-bottom:14px">
+      <div class="weight-chart-title">💧 Daily intake (ml) — last 7 days</div>
+      <div style="display:flex;gap:2px;align-items:flex-end">${bars}</div>
+    </div>`;
+
+    const zoomiesLogs = state.logs.filter(l => l.type === 'zoomies' && +l.timestamp > sevenAgo);
+    const hydratedCount = zoomiesLogs.filter(z => {
+      const window = +z.timestamp + 30 * 60000;
+      return state.logs.some(w => w.type === 'water' && +w.timestamp > +z.timestamp && +w.timestamp <= window);
+    }).length;
+    const zoomiesCount = zoomiesLogs.length;
+    const hydratedPct  = zoomiesCount > 0 ? Math.round((hydratedCount / zoomiesCount) * 100) : null;
+    const allWaterMl   = state.logs.filter(l => l.type === 'water' && l.ml);
+    const largestDrink = allWaterMl.length > 0 ? Math.max(...allWaterMl.map(l => l.ml)) : 0;
+
+    const insightRows = [
+      todayVsAvg !== null ? `<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">
+        Today vs 7-day avg: <strong style="color:${todayVsAvg >= 90 ? '#3D8F3D' : '#D17078'}">${todayVsAvg}%</strong>
+        ${todayVsAvg >= 110 ? ' 🌊 drinking well!' : todayVsAvg < 80 ? ' ⚠️ below usual' : ' ✓ on track'}
+      </div>` : '',
+      hydratedPct !== null ? `<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">
+        Post-zoomies hydration: <strong>${hydratedPct}%</strong> (${hydratedCount}/${zoomiesCount} sessions)
+        ${hydratedPct === 100 ? ' ✅' : hydratedPct >= 50 ? ' 👍' : ' 💡 try water after play!'}
+      </div>` : '',
+      largestDrink > 0 ? `<div style="font-size:12px;color:var(--text-3)">Biggest single drink recorded: ${largestDrink}ml</div>` : '',
+    ].filter(Boolean).join('');
+
+    const insightsCard = insightRows ? `<div class="corr-card" style="margin-bottom:14px">
+      <div class="corr-title">💡 Hydration insights</div>
+      ${insightRows}
+    </div>` : '';
+
+    waterSection = volCards + dailyChart + insightsCard;
+  }
 
   tab.innerHTML = `
     <div class="section-label">Hourly patterns · past 7 days</div>
@@ -1532,6 +1673,7 @@ function renderStatsTab() {
       ${noteBtnLabel}
     </button>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">${statsRow}</div>
+    ${waterSection}
     ${mainContent}
     ${renderFoodPoopHeatmap()}
     <button class="export-btn" data-action="export-csv">📥 Export all logs as CSV</button>`;
@@ -1741,10 +1883,27 @@ document.addEventListener('click', e => {
         startNap();
         showToast('💤 Nap started');
       }
+    } else if (type === 'water') {
+      state.waterSizePending = true;
+      document.getElementById('water-size-modal').classList.add('open');
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
     }
+  }
+
+  if (action === 'water-size') {
+    const size = el.dataset.size;
+    const ml   = parseInt(el.dataset.ml, 10);
+    addLog('water', null, { size, ml });
+    showToast(`💧 Water logged (${size} · ${ml}ml)`);
+    document.getElementById('water-size-modal').classList.remove('open');
+    state.waterSizePending = false;
+  }
+
+  if (action === 'water-size-cancel') {
+    document.getElementById('water-size-modal').classList.remove('open');
+    state.waterSizePending = false;
   }
 
   if (action === 'walkies') {
