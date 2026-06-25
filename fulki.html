@@ -553,7 +553,6 @@
           <div id="header-title">🐾 Fulki's Log</div>
           <div id="header-subtitle">Daily puppy tracker</div>
         </div>
-        <button class="edit-name-btn" data-action="toggle-name-edit">✏️ Name</button>
       </div>
       <div id="date-nav">
         <button class="date-nav-btn" data-action="date-prev">◀</button>
@@ -1022,7 +1021,7 @@ function render() {
 function renderHeader() {
   const name = state.settings.puppyName || 'Fulki';
   const el   = document.getElementById('header-title');
-  if (el) el.textContent = `🐾 ${name}'s Log`;
+  if (el) el.textContent = `${name} Log 🐾`;
 
   const today   = new Date();
   const isToday = isSameDay(state.viewDate, today);
