@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Fulki — Theme Preview</title>
+  <style>
+    :root {
+      --bg:      #FAF5FC;
+      --surface: #FFFFFF;
+      --border:  #EDD8EE;
+      --border-2:#DFC4E0;
+      --text:    #3D1A4A;
+      --text-2:  #6E3B83;
+      --text-3:  #B56AB2;
+      --text-4:  #D4A0D5;
+    }
+    body.dark {
+      --bg:      #181b38;
+      --surface: #292f56;
+      --border:  #363d6e;
+      --border-2:#464f88;
+      --text:    #d8e8f8;
+      --text-2:  #7eb8c8;
+      --text-3:  #4c7890;
+      --text-4:  #2a3f58;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cochin','Palatino Linotype',Georgia,serif;
+      display: flex; justify-content: center;
+      min-height: 100vh; padding: 24px 16px 40px;
+      transition: background 0.3s;
+    }
+    body:not(.dark) { background: #e8e0f0; }
+    body.dark       { background: #0e1028; }
+
+    #card {
+      width: 100%; max-width: 390px;
+      background: var(--bg); border-radius: 24px; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+      display: flex; flex-direction: column;
+      transition: background 0.3s;
+    }
+
+    /* ── Header ── */
+    #header-bar {
+      color: #fff; padding: 22px 20px 16px; flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    body:not(.dark) #header-bar { background: #B04F6C; }
+    body.dark       #header-bar { background: #005c7f; }
+
+    #header-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    #header-title    { font-size: 26px; font-weight: 700; }
+    #header-subtitle { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 3px;
+                       letter-spacing: 0.8px; text-transform: uppercase; }
+    .hbtns { display: flex; gap: 7px; align-items: center; }
+    .hbtn {
+      background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.4);
+      border-radius: 10px; color: #fff; font-family: inherit;
+      padding: 6px 11px; cursor: pointer; min-height: 36px;
+    }
+    #dark-btn { font-size: 15px; }
+    #a11y-btn { font-size: 12px; font-weight: 700; }
+    .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .nav-arrow { background: rgba(255,255,255,0.18); border: none; border-radius: 8px;
+                 color: #fff; font-size: 16px; padding: 4px 10px; cursor: pointer; }
+    .date-nav span { font-size: 13px; font-weight: 600; opacity: 0.9; flex: 1; text-align: center; }
+
+    /* ── Summary strip ── */
+    #summary-strip {
+      display: flex; gap: 8px; padding: 12px 20px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      overflow-x: auto; flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .summary-pill {
+      display: flex; align-items: center; gap: 5px; padding: 5px 12px;
+      border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap;
+      border: 1.5px solid transparent;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    /* ── Tabs ── */
+    .tab-panel { display: none; overflow-y: auto; padding-bottom: 4px; }
+    .tab-panel.active { display: block; }
+    .section { padding: 18px 20px 0; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 10px;
+    }
+
+    /* ── HOME: Predictions ── */
+    .pred-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 6px; }
+    .pred-card {
+      border-radius: 16px; padding: 13px 8px 11px; text-align: center;
+      border: 1.5px solid; transition: background 0.3s, border-color 0.3s;
+    }
+    body.dark .pred-card { background: var(--surface) !important; border-color: var(--border-2) !important; }
+    .pred-emoji { font-size: 22px; margin-bottom: 4px; }
+    .pred-time  { font-size: 16px; font-weight: 700; }
+    .pred-sub   { font-size: 10px; opacity: 0.78; margin-top: 2px; }
+    .pred-lbl   { font-size: 10px; margin-top: 3px; color: var(--text-3); }
+    .conf-wrap  { display: flex; align-items: center; gap: 5px; margin-top: 6px; }
+    .conf-bg    { flex:1; height: 4px; border-radius: 2px; overflow: hidden;
+                  background: rgba(0,0,0,0.08); }
+    body.dark .conf-bg { background: rgba(255,255,255,0.1); }
+    .conf-fill  { height: 100%; border-radius: 2px; }
+    .conf-pct   { font-size: 9px; font-weight: 700; opacity: 0.65; min-width: 26px; font-family: sans-serif; }
+
+    /* ── HOME: Log buttons ── */
+    #log-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+    .log-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 4px 12px; border-radius: 18px; cursor: pointer;
+      border: 2px solid; font-family: inherit;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    body.dark .log-btn { background: #363d70 !important; }
+    .btn-emoji { font-size: 26px; line-height: 1; }
+    .btn-label { font-size: 10px; font-weight: 700; transition: color 0.3s; }
+    body.dark .btn-label { color: #ffffff !important; }
+
+    /* ── HOME: Timeline ── */
+    .tl-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase;
+              letter-spacing: 1px; color: var(--text-3); margin-bottom: 12px; }
+    .tl-entry {
+      display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+      background: var(--surface); border-radius: 14px; margin-bottom: 8px;
+      border: 1.5px solid; transition: background 0.3s;
+    }
+    body.dark .tl-entry { border-color: var(--border) !important; }
+    .tl-icon { font-size: 18px; width: 26px; text-align: center; flex-shrink: 0; }
+    .tl-body { flex: 1; }
+    .tl-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .tl-time { font-size: 11px; color: var(--text-3); font-weight: 600; margin-top: 1px; }
+    .tl-del  { background: none; border: none; font-size: 18px; color: var(--text-4); padding: 4px 6px; cursor: pointer; }
+
+    /* ── STATS ── */
+    .cat-pills { display: flex; gap: 7px; margin-bottom: 20px; flex-wrap: wrap; }
+    .cat-pill {
+      border: 2px solid; border-radius: 20px; padding: 5px 13px;
+      font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .stat-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .stat-card {
+      flex: 1; background: var(--surface); border: 1.5px solid var(--border-2);
+      border-radius: 12px; padding: 10px 8px; text-align: center;
+      transition: background 0.3s;
+    }
+    body.dark .stat-card { background: #1e2445; }
+    .stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
+    .stat-lbl { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+
+    /* bar chart */
+    .chart-wrap { background: var(--surface); border: 1.5px solid var(--border-2);
+                  border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+                  transition: background 0.3s; }
+    body.dark .chart-wrap { background: #1e2445; }
+    .chart-title { font-size: 11px; font-weight: 700; color: var(--text-3);
+                   text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+    .chart-grid  { display: grid; grid-template-columns: repeat(12,1fr); gap: 3px; }
+    .chart-col   { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .bar-wrap    { width: 100%; height: 44px; border-radius: 4px; overflow: hidden;
+                   display: flex; align-items: flex-end;
+                   background: rgba(0,0,0,0.05); }
+    body.dark .bar-wrap { background: rgba(255,255,255,0.06); }
+    .bar         { width: 100%; border-radius: 3px 3px 0 0; }
+    .bar-lbl     { font-size: 7px; color: var(--text-3); font-family: sans-serif; }
+
+    /* heatmap */
+    .heatmap-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 8px; }
+    .hm-cell {
+      aspect-ratio: 1; border-radius: 5px; display: flex; align-items: center;
+      justify-content: center; font-size: 9px; font-weight: 700;
+      font-family: sans-serif; color: rgba(255,255,255,0.85);
+    }
+    .hm-day-labels { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }
+    .hm-day { font-size: 8px; color: var(--text-3); text-align: center; font-family: sans-serif; }
+
+    /* hydration vs pee */
+    .hydr-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; }
+    .hydr-col  { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .hydr-bars { display: flex; gap: 2px; align-items: flex-end; height: 48px; }
+    .hydr-bar  { width: 10px; border-radius: 3px 3px 0 0; }
+    .hydr-lbl  { font-size: 7px; color: var(--text-3); font-family: sans-serif; }
+
+    /* ── VET ── */
+    .vet-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 20px; }
+    .vet-btn {
+      border: 1.5px solid var(--border-2); border-radius: 12px; padding: 10px 6px;
+      font-family: inherit; font-size: 11px; font-weight: 700; color: var(--text-2);
+      cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: var(--surface); transition: background 0.3s;
+    }
+    body.dark .vet-btn { background: #1e2445; border-color: var(--border-2); }
+    .vet-icon { font-size: 22px; }
+
+    .vet-entry {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px;
+      background: var(--surface); border-radius: 14px; margin-bottom: 8px;
+      border: 1.5px solid; transition: background 0.3s;
+    }
+    body.dark .vet-entry { border-color: var(--border) !important; }
+    .vet-entry-icon { font-size: 22px; flex-shrink: 0; }
+    .vet-entry-body { flex: 1; }
+    .vet-entry-type { font-size: 13px; font-weight: 700; color: var(--text); }
+    .vet-entry-val  { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .vet-entry-date { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+    .vet-edit { background: none; border: 1px solid var(--border-2); border-radius: 6px;
+                font-size: 11px; padding: 3px 8px; color: var(--text-2); cursor: pointer; }
+
+    /* ── Bottom nav ── */
+    #bottom-nav {
+      display: flex; background: var(--surface);
+      border-top: 1px solid var(--border); padding: 8px 0 10px; flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; cursor: pointer; padding: 4px 0; font-family: inherit;
+    }
+    .nav-icon { font-size: 20px; }
+    .nav-lbl  { font-size: 9px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: 0.6px; color: var(--text-3); }
+    .nav-btn.active .nav-lbl { color: var(--text-2); }
+    .nav-btn:not(.active) { opacity: 0.4; }
+  </style>
+</head>
+<body>
+<div id="card">
+
+  <!-- HEADER -->
+  <div id="header-bar">
+    <div id="header-top">
+      <div>
+        <div id="header-title">Fulki 🐾</div>
+        <div id="header-subtitle">Puppy Tracker</div>
+      </div>
+      <div class="hbtns">
+        <button class="hbtn" id="dark-btn" onclick="toggleDark()">🌙</button>
+        <button class="hbtn" id="a11y-btn">A</button>
+      </div>
+    </div>
+    <div class="date-nav">
+      <button class="nav-arrow">‹</button>
+      <span>Today, 23 Jun 2026</span>
+      <button class="nav-arrow">›</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY STRIP -->
+  <div id="summary-strip">
+    <div class="summary-pill" id="sp-water">💧 3 waters</div>
+    <div class="summary-pill" id="sp-food">🍗 2 meals</div>
+    <div class="summary-pill" id="sp-nap">💤 1h 20m</div>
+    <div class="summary-pill" id="sp-pee">🌱 4 pees</div>
+  </div>
+
+  <!-- ═══ HOME TAB ═══ -->
+  <div class="tab-panel active" id="tab-home">
+
+    <div class="section">
+      <div class="section-label">Next up</div>
+      <div class="pred-row">
+        <div class="pred-card" id="pa" style="background:#FEE2E2;border-color:#FCA5A5">
+          <div class="pred-emoji">🌱</div>
+          <div class="pred-time" id="pa-t" style="color:#B91C1C">2:45 PM</div>
+          <div class="pred-sub"  id="pa-s" style="color:#B91C1C">in 4m</div>
+          <div class="pred-lbl">Pee</div>
+          <div class="conf-wrap">
+            <div class="conf-bg"><div class="conf-fill" id="pa-b" style="width:88%;background:#EF4444"></div></div>
+            <div class="conf-pct" id="pa-p" style="color:#B91C1C">88%</div>
+          </div>
+        </div>
+        <div class="pred-card" id="pb" style="background:#FEF9C3;border-color:#FDE047">
+          <div class="pred-emoji">💩</div>
+          <div class="pred-time" id="pb-t" style="color:#854D0E">4:15 PM</div>
+          <div class="pred-sub"  id="pb-s" style="color:#854D0E">in 1h 34m</div>
+          <div class="pred-lbl">Poop</div>
+          <div class="conf-wrap">
+            <div class="conf-bg"><div class="conf-fill" id="pb-b" style="width:55%;background:#EAB308"></div></div>
+            <div class="conf-pct" id="pb-p" style="color:#854D0E">55%</div>
+          </div>
+        </div>
+        <div class="pred-card" id="pc" style="background:#DCFCE7;border-color:#86EFAC">
+          <div class="pred-emoji">⚡</div>
+          <div class="pred-time" id="pc-t" style="color:#166534">Learning…</div>
+          <div class="pred-lbl">Zoomies</div>
+          <div class="conf-wrap">
+            <div class="conf-bg"><div class="conf-fill" id="pc-b" style="width:20%;background:#22C55E"></div></div>
+            <div class="conf-pct" id="pc-p" style="color:#166534">20%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="padding-bottom:0">
+      <div class="section-label">Log</div>
+      <div id="log-grid">
+        <button class="log-btn" style="background:#E8F5E8;border-color:#A8D8A8"><span class="btn-emoji">🌱</span><span class="btn-label" style="color:#3D8F3D">Pee</span></button>
+        <button class="log-btn" style="background:#FDE8EE;border-color:#F0C0D0"><span class="btn-emoji">💩</span><span class="btn-label" style="color:#B04F6C">Poop</span></button>
+        <button class="log-btn" style="background:#E3F0FC;border-color:#B0D4F5"><span class="btn-emoji">💧</span><span class="btn-label" style="color:#5B9ED6">Water</span></button>
+        <button class="log-btn" style="background:#FEF3E0;border-color:#FDDBA0"><span class="btn-emoji">🥩</span><span class="btn-label" style="color:#C07020">Food</span></button>
+        <button class="log-btn" style="background:#F0E8F8;border-color:#D4B8E8"><span class="btn-emoji">💤</span><span class="btn-label" style="color:#6E3B83">Nap</span></button>
+        <button class="log-btn" style="background:#FDEAEA;border-color:#F5B8BC"><span class="btn-emoji">🏎️</span><span class="btn-label" style="color:#D17078">Zoomies</span></button>
+      </div>
+    </div>
+
+    <div class="section" style="padding-bottom:20px">
+      <div class="tl-lbl">Today's timeline</div>
+      <div class="tl-entry" style="border-color:#A8D8A8"><span class="tl-icon">🌱</span><div class="tl-body"><div class="tl-name">Pee</div><div class="tl-time">1:02 PM</div></div><button class="tl-del">×</button></div>
+      <div class="tl-entry" style="border-color:#FDDBA0"><span class="tl-icon">🥩</span><div class="tl-body"><div class="tl-name">Food</div><div class="tl-time">12:30 PM</div></div><button class="tl-del">×</button></div>
+      <div class="tl-entry" style="border-color:#D4B8E8"><span class="tl-icon">💤</span><div class="tl-body"><div class="tl-name">Nap <span style="font-size:11px;font-weight:600;color:#9B8EC4">54 min</span></div><div class="tl-time">11:10 AM – 12:04 PM</div></div><button class="tl-del">×</button></div>
+      <div class="tl-entry" style="border-color:#B0D4F5"><span class="tl-icon">💧</span><div class="tl-body"><div class="tl-name">Water</div><div class="tl-time">10:48 AM</div></div><button class="tl-del">×</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ STATS TAB ═══ -->
+  <div class="tab-panel" id="tab-stats">
+    <div class="section" style="padding-bottom:20px">
+      <div class="section-label" style="margin-bottom:14px">Category</div>
+      <div class="cat-pills">
+        <button class="cat-pill" style="background:#E8F5E8;border-color:#3D8F3D;color:#3D8F3D">🌱 Pee</button>
+        <button class="cat-pill" style="background:var(--bg);border-color:var(--border-2);color:var(--text-3)">💩 Poop</button>
+        <button class="cat-pill" style="background:var(--bg);border-color:var(--border-2);color:var(--text-3)">💧 Water</button>
+        <button class="cat-pill" style="background:var(--bg);border-color:var(--border-2);color:var(--text-3)">🥩 Food</button>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-val" style="color:#3D8F3D">4</div><div class="stat-lbl">Today</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#3D8F3D">5.2</div><div class="stat-lbl">Daily avg</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#3D8F3D">1:02 PM</div><div class="stat-lbl">Last seen</div></div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Activity by hour</div>
+        <div class="chart-grid">
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:10%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">6a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:30%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">7a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:60%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">8a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:80%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">9a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:45%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">10a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:20%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">11a</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:55%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">12p</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:100%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">1p</div></div>
+          <div class="chart-col"><div class="bar-wrap"></div><div class="bar-lbl">2p</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:25%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">3p</div></div>
+          <div class="chart-col"><div class="bar-wrap"></div><div class="bar-lbl">4p</div></div>
+          <div class="chart-col"><div class="bar-wrap"><div class="bar" style="height:40%;background:linear-gradient(to top,#3D8F3D,#7DC87D)"></div></div><div class="bar-lbl">5p</div></div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Food → Poop lag (14 days)</div>
+        <div class="hm-day-labels">
+          <div class="hm-day">Mon</div><div class="hm-day">Tue</div><div class="hm-day">Wed</div>
+          <div class="hm-day">Thu</div><div class="hm-day">Fri</div><div class="hm-day">Sat</div><div class="hm-day">Sun</div>
+        </div>
+        <div class="heatmap-grid">
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.3"></div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.6">2h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.9">3h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.5">2h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.8">3h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.4">1h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:1.0">4h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.7">2h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.3"></div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.6">2h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.85">3h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.5">2h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.75">3h</div>
+          <div class="hm-cell" style="background:#B04F6C;opacity:0.9">3h</div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Hydration vs Pee (7 days)</div>
+        <div class="hydr-grid">
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:70%;background:#5B9ED6"></div><div class="hydr-bar" style="height:55%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Mon</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:50%;background:#5B9ED6"></div><div class="hydr-bar" style="height:40%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Tue</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:90%;background:#5B9ED6"></div><div class="hydr-bar" style="height:80%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Wed</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:60%;background:#5B9ED6"></div><div class="hydr-bar" style="height:50%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Thu</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:80%;background:#5B9ED6"></div><div class="hydr-bar" style="height:70%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Fri</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:40%;background:#5B9ED6"></div><div class="hydr-bar" style="height:30%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Sat</div>
+          </div>
+          <div class="hydr-col">
+            <div class="hydr-bars"><div class="hydr-bar" style="height:100%;background:#5B9ED6"></div><div class="hydr-bar" style="height:85%;background:#3D8F3D"></div></div>
+            <div class="hydr-lbl">Sun</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:10px;font-size:10px;color:var(--text-3)">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#5B9ED6;border-radius:2px;margin-right:4px"></span>Water</span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:#3D8F3D;border-radius:2px;margin-right:4px"></span>Pees</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ VET TAB ═══ -->
+  <div class="tab-panel" id="tab-vet">
+    <div class="section" style="padding-bottom:20px">
+      <div class="section-label">Add record</div>
+      <div class="vet-grid">
+        <button class="vet-btn"><span class="vet-icon">⚖️</span>Weight</button>
+        <button class="vet-btn"><span class="vet-icon">🪱</span>Flea/Worm</button>
+        <button class="vet-btn"><span class="vet-icon">💉</span>Vaccine</button>
+        <button class="vet-btn"><span class="vet-icon">🏥</span>Vet Visit</button>
+        <button class="vet-btn"><span class="vet-icon">⚠️</span>Concern</button>
+        <button class="vet-btn"><span class="vet-icon">📝</span>Note</button>
+      </div>
+
+      <div class="section-label">History</div>
+      <div class="vet-entry" style="border-color:#9B68C0">
+        <span class="vet-entry-icon">💉</span>
+        <div class="vet-entry-body">
+          <div class="vet-entry-type">Vaccine — DHPPiL4</div>
+          <div class="vet-entry-val">Next due: 15 Sep 2026</div>
+          <div class="vet-entry-date">10 Jun 2026</div>
+        </div>
+        <button class="vet-edit">✏️</button>
+      </div>
+      <div class="vet-entry" style="border-color:#3A9BD5">
+        <span class="vet-entry-icon">⚖️</span>
+        <div class="vet-entry-body">
+          <div class="vet-entry-type">Weight</div>
+          <div class="vet-entry-val">4.2 kg</div>
+          <div class="vet-entry-date">8 Jun 2026</div>
+        </div>
+        <button class="vet-edit">✏️</button>
+      </div>
+      <div class="vet-entry" style="border-color:#E53935">
+        <span class="vet-entry-icon">⚠️</span>
+        <div class="vet-entry-body">
+          <div class="vet-entry-type">Concern</div>
+          <div class="vet-entry-val">Scratching left ear more than usual</div>
+          <div class="vet-entry-date">5 Jun 2026</div>
+        </div>
+        <button class="vet-edit">✏️</button>
+      </div>
+      <div class="vet-entry" style="border-color:#4CAF50">
+        <span class="vet-entry-icon">🪱</span>
+        <div class="vet-entry-body">
+          <div class="vet-entry-type">Flea/Worm treatment</div>
+          <div class="vet-entry-val">Next due: 1 Jul 2026</div>
+          <div class="vet-entry-date">1 Jun 2026</div>
+        </div>
+        <button class="vet-edit">✏️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home',this)"><span class="nav-icon">🏠</span><span class="nav-lbl">Home</span></button>
+    <button class="nav-btn" onclick="switchTab('stats',this)"><span class="nav-icon">📊</span><span class="nav-lbl">Patterns</span></button>
+    <button class="nav-btn" onclick="switchTab('vet',this)"><span class="nav-icon">🏥</span><span class="nav-lbl">Vet</span></button>
+  </div>
+
+</div>
+<script>
+  /* ── Tab switching ── */
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ── Summary pill colours ── */
+  const PILLS_LIGHT = [
+    { bg:'#E3F0FC', color:'#1a5a90', border:'#B0D4F5' }, // water
+    { bg:'#FEF3E0', color:'#8a4a10', border:'#FDDBA0' }, // food
+    { bg:'#F0E8F8', color:'#4a2870', border:'#D4B8E8' }, // nap
+    { bg:'#E8F5E8', color:'#2a6a2a', border:'#A8D8A8' }, // pee
+  ];
+  const PILLS_DARK = [
+    { bg:'rgba(0,92,127,0.25)',  color:'#7eb8d8', border:'#005c7f' },
+    { bg:'rgba(192,112,32,0.2)', color:'#c8a060', border:'#6a4010' },
+    { bg:'rgba(110,59,131,0.2)', color:'#a880d0', border:'#4a2870' },
+    { bg:'rgba(61,143,61,0.2)',  color:'#70c070', border:'#2a5a2a' },
+  ];
+  const pillIds = ['sp-water','sp-food','sp-nap','sp-pee'];
+
+  function applyPills(dark) {
+    const P = dark ? PILLS_DARK : PILLS_LIGHT;
+    pillIds.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.style.background  = P[i].bg;
+      el.style.color       = P[i].color;
+      el.style.borderColor = P[i].border;
+    });
+  }
+
+  /* ── Prediction urgency ── */
+  const PRED_LIGHT = [
+    { t:'#B91C1C', b:'#EF4444' },
+    { t:'#854D0E', b:'#EAB308' },
+    { t:'#166534', b:'#22C55E' },
+  ];
+  const PRED_DARK = [
+    { t:'#e08898', b:'#9058a0' },
+    { t:'#60b0d8', b:'#005c7f' },
+    { t:'#008780', b:'#008780' },
+  ];
+
+  function applyPreds(dark) {
+    ['a','b','c'].forEach((k, i) => {
+      const P = dark ? PRED_DARK[i] : PRED_LIGHT[i];
+      ['t','s','p'].forEach(s => { const e = document.getElementById('p'+k+'-'+s); if(e) e.style.color = P.t; });
+      document.getElementById('p'+k+'-b').style.background = P.b;
+    });
+  }
+
+  /* ── Log button dark borders ── */
+  const LOG_DARK_BORDERS = ['#2a5040','#501830','#182848','#503010','#301850','#501828'];
+
+  function applyLog(dark) {
+    document.querySelectorAll('.log-btn').forEach((btn, i) => {
+      if (!btn.dataset.lb) btn.dataset.lb = btn.style.borderColor;
+      btn.style.borderColor = dark ? LOG_DARK_BORDERS[i] : btn.dataset.lb;
+    });
+  }
+
+  /* ── Toggle ── */
+  function toggleDark() {
+    const on = document.body.classList.toggle('dark');
+    document.getElementById('dark-btn').textContent = on ? '☀️' : '🌙';
+    applyPills(on);
+    applyPreds(on);
+    applyLog(on);
+  }
+
+  /* init */
+  applyPills(false);
+</script>
+</body>
+</html>
