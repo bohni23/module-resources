@@ -1159,6 +1159,23 @@ function updatePlayEnd(id, newDate) {
   }).catch(e => showToast('⚠️ ' + e.message));
 }
 
+function updateSleepEnd(id, newDate) {
+  const log = state.logs.find(l => l.id === id);
+  if (!log) return;
+  const duration = Math.max(0, Math.round((newDate - log.timestamp) / 60000));
+  if (USE_MOCK) {
+    log.sleepEnd = newDate;
+    log.duration = duration;
+    computePredictions();
+    render();
+    return;
+  }
+  db.collection('logs').doc(id).update({
+    sleepEnd: firebase.firestore.Timestamp.fromDate(newDate),
+    duration,
+  }).catch(e => showToast('⚠️ ' + e.message));
+}
+
 function updateLogTime(id, newDate) {
   if (USE_MOCK) {
     const log = state.logs.find(l => l.id === id);
@@ -1845,7 +1862,7 @@ function renderTimeline() {
         <span class="tl-emoji">☀️</span>
         <div class="tl-body">
           <div class="tl-label" style="color:#8A6800">Woke up${log.duration ? ` · <span class="tl-dur">${log.duration}m sleep</span>` : ''}</div>
-          <div class="tl-time"><span class="tl-time-value">${tStr}</span></div>
+          <div class="tl-time"><span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${ts.getTime()}" style="text-decoration:underline dotted;cursor:pointer">${tStr}</span></div>
         </div>
       </div>`;
     }
@@ -1856,7 +1873,7 @@ function renderTimeline() {
         durHtml  = `<span class="tl-dur">${log.duration}m</span>`;
         timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
                  + `<span style="opacity:0.45"> – </span>`
-                 + `<span class="tl-time-value">${endStr}</span>`;
+                 + `<span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${new Date(log.sleepEnd).getTime()}" style="text-decoration:underline dotted;cursor:pointer">${endStr}</span>`;
       } else {
         durHtml = `<span class="tl-dur">In progress…</span>`;
       }
@@ -3055,6 +3072,39 @@ document.addEventListener('click', e => {
     };
     tInp.addEventListener('blur',   savePlay);
     dInp.addEventListener('change', savePlay);
+    tInp.addEventListener('keydown', ev => { if (ev.key==='Enter') tInp.blur(); });
+  }
+
+  if (action === 'edit-sleep-end') {
+    const id   = el.dataset.id;
+    const log  = state.logs.find(l => l.id === id);
+    if (!log) return;
+    const orig = new Date(parseInt(el.dataset.ts));
+    const hh   = String(orig.getHours()).padStart(2,'0');
+    const mm   = String(orig.getMinutes()).padStart(2,'0');
+    const yyyy = orig.getFullYear();
+    const mo   = String(orig.getMonth()+1).padStart(2,'0');
+    const dd   = String(orig.getDate()).padStart(2,'0');
+    const wrap = document.createElement('span');
+    const dInp = Object.assign(document.createElement('input'), {
+      type:'date', className:'tl-time-input', value:`${yyyy}-${mo}-${dd}`,
+      style:'width:108px;margin-bottom:2px',
+    });
+    const tInp = Object.assign(document.createElement('input'), {
+      type:'time', className:'tl-time-input', value:`${hh}:${mm}`,
+    });
+    wrap.append(dInp, document.createElement('br'), tInp);
+    el.replaceWith(wrap);
+    tInp.focus();
+    const saveSleep = () => {
+      if (!tInp.value || !dInp.value) return;
+      const [nh,nm] = tInp.value.split(':').map(Number);
+      const nd = new Date(dInp.value + 'T12:00:00');
+      nd.setHours(nh,nm,0,0);
+      updateSleepEnd(id, nd);
+    };
+    tInp.addEventListener('blur',   saveSleep);
+    dInp.addEventListener('change', saveSleep);
     tInp.addEventListener('keydown', ev => { if (ev.key==='Enter') tInp.blur(); });
   }
 
