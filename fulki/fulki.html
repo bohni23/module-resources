@@ -2412,7 +2412,6 @@ function renderStatsTab() {
         ` ${px(23).toFixed(1)},${baseline}`;
       const pathD = smoothPath(pts);
       linesHtml += `<polygon points="${areaCoords}" fill="url(#lg-${lc.key})"/>`;
-      linesHtml += `<path d="${pathD}" fill="none" stroke="${lc.color}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`;
       linesHtml += `<path d="${pathD}" fill="none" stroke="${lc.color}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
     });
 
