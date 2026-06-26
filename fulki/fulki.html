@@ -2354,7 +2354,7 @@ function renderStatsTab() {
       data[lc.key + '_raw']  = raw.map(v => v / numDays);
     });
 
-    const W = 330, H = 185, padL = 26, padB = 22, padT = 8, padR = 8;
+    const W = 946, H = 185, padL = 26, padB = 22, padT = 8, padR = 8;
     const cW = W - padL - padR, cH = H - padT - padB;
     const px = h => padL + (h / 23) * cW;
     const py = v => padT + (1 - v / 100) * cH;  // fixed 0-100 domain
@@ -2369,8 +2369,8 @@ function renderStatsTab() {
              `<text x="${padL - 3}" y="${(parseFloat(yg) + 2.5).toFixed(1)}" font-size="7.5" text-anchor="end" fill="var(--text-3)" font-family="sans-serif">${frac}</text>`;
     }).join('');
 
-    // X-axis labels every 3h
-    const xLabels = [0,3,6,9,12,15,18,21].map(h =>
+    // X-axis labels every 2h
+    const xLabels = [0,2,4,6,8,10,12,14,16,18,20,22].map(h =>
       `<text x="${px(h).toFixed(1)}" y="${H - 2}" font-size="7" text-anchor="middle" fill="var(--text-3)" font-family="sans-serif">${hrLabel(h)}</text>`
     ).join('');
 
@@ -2429,18 +2429,20 @@ function renderStatsTab() {
     // Raw values as JSON stored on SVG for tooltip handler
     const svgDataVals = JSON.stringify(Object.fromEntries(LINE_CATS.map(lc => [lc.key, data[lc.key + '_raw']])));
 
-    return `<div class="weight-chart-wrap" style="margin-bottom:14px;position:relative">
-      <div class="weight-chart-title">📈 Average activity by hour of day <span style="font-size:9px;color:var(--text-3);font-weight:400">(normalised — hover to compare)</span></div>
-      <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block" data-vals='${svgDataVals}'>
-        ${defsHtml}
-        ${bgRect}
-        ${gridLines}
-        ${xLabels}
-        ${linesHtml}
-        ${vline}
-        ${overlay}
-      </svg>
-      <div id="line-tooltip" style="display:none;position:absolute;background:var(--surface);border:1.5px solid var(--border-2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text);pointer-events:none;z-index:10;font-family:sans-serif;min-width:140px;box-shadow:0 2px 8px rgba(0,0,0,0.15)"></div>
+    return `<div class="weight-chart-wrap" style="margin-bottom:14px">
+      <div class="weight-chart-title">📈 Average activity by hour of day <span style="font-size:9px;color:var(--text-3);font-weight:400">(normalised · scroll ↔ to explore)</span></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px">
+        <svg id="hourly-line-svg" viewBox="0 0 ${W} ${H}" width="${W}" style="display:block" data-vals='${svgDataVals}'>
+          ${defsHtml}
+          ${bgRect}
+          ${gridLines}
+          ${xLabels}
+          ${linesHtml}
+          ${vline}
+          ${overlay}
+        </svg>
+      </div>
+      <div id="line-tooltip" style="display:none;position:fixed;background:var(--surface);border:1.5px solid var(--border-2);border-radius:8px;padding:6px 10px;font-size:11px;color:var(--text);pointer-events:none;z-index:999;font-family:sans-serif;min-width:140px;box-shadow:0 2px 8px rgba(0,0,0,0.15)"></div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${legendHtml}</div>
     </div>`;
   })();
@@ -2481,7 +2483,7 @@ function renderStatsTab() {
     const vline   = document.getElementById('hover-vline');
     const tip     = document.getElementById('line-tooltip');
     if (overlay && svg) {
-      const W = 330, padL = 26, padR = 8, padB = 22, padT = 8;
+      const W = 946, padL = 26, padR = 8, padB = 22, padT = 8;
       const cW = W - padL - padR;
       const vals = JSON.parse(svg.dataset.vals || '{}');
       const handleHover = ev => {
@@ -2503,10 +2505,8 @@ function renderStatsTab() {
             `</div>`;
         }).join('');
         tip.innerHTML = `<div style="font-size:9px;font-weight:700;color:var(--text-3);margin-bottom:3px">${hrLabel(h)}</div>${tipLines}`;
-        const wrapRect = svg.parentElement.getBoundingClientRect();
-        const tipX = relX + 14;
-        tip.style.left = (tipX + 160 > wrapRect.width ? relX - 175 : tipX) + 'px';
-        tip.style.top = '10px';
+        tip.style.left = Math.min(pt.clientX + 14, window.innerWidth - 185) + 'px';
+        tip.style.top  = Math.max(pt.clientY - 80, 10) + 'px';
         tip.style.display = 'block';
       };
       overlay.addEventListener('mousemove', handleHover);
