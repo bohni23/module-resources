@@ -473,12 +473,12 @@
     }
     .chart-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     .chart-bar-wrap {
-      width: 100%; height: 60px; position: relative;
+      width: 100%; height: 54px;
       display: flex; flex-direction: column; justify-content: flex-end;
     }
     .chart-bar-val {
       font-size: 7.5px; text-align: center; color: var(--text-2);
-      position: absolute; top: 0; left: 0; right: 0; font-weight: 800;
+      font-weight: 800; min-height: 10px; line-height: 10px;
     }
     .chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-width: 0; }
     .chart-hr-lbl { font-size: 6.5px; color: var(--text-3); font-family: sans-serif; }
@@ -2076,8 +2076,8 @@ function renderStatsTab() {
     const valHtml = val > 0 ? `<div class="chart-bar-val">${label}</div>` : '';
     const emptyBar = val === 0 ? `<div class="chart-bar" style="height:2px;background:var(--border);opacity:0.4;border-radius:1px"></div>` : '';
     return `<div class="chart-col">
+      <div class="chart-bar-val">${label}</div>
       <div class="chart-bar-wrap">
-        ${valHtml}
         ${val > 0 ? `<div class="chart-bar" style="height:${barH}px;background:${cat.color};box-shadow:0 1px 4px ${cat.color}44"></div>` : emptyBar}
       </div>
       <div class="chart-hr-lbl">${hrLabel(h)}</div>
