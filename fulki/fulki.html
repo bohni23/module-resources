@@ -1817,7 +1817,7 @@ function renderTimeline() {
       .filter(l => l.type === 'sleep' && l.sleepEnd &&
         new Date(l.sleepEnd) >= start && new Date(l.sleepEnd) <= end &&
         l.timestamp < start)
-      .map(l => ({ ...l, _wakeUp: true, timestamp: new Date(l.sleepEnd) }))
+      .map(l => ({ ...l, _wakeUp: true, timestamp: new Date(l.sleepEnd), _sleepStart: l.timestamp }))
   ].sort((a, b) => b.timestamp - a.timestamp);
   const el       = document.getElementById('timeline');
   const isToday  = isSameDay(state.viewDate, new Date());
@@ -1865,12 +1865,19 @@ function renderTimeline() {
     }
 
     if (log._wakeUp) {
+      const sleepStartStr = log._sleepStart
+        ? new Date(log._sleepStart).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' })
+        : '';
       return `<div class="timeline-entry" style="border-color:#F0D060;background:rgba(255,240,160,0.12)">
         <span class="tl-emoji">☀️</span>
         <div class="tl-body">
           <div class="tl-label" style="color:#8A6800">Woke up${log.duration ? ` · <span class="tl-dur">${fmtMinDur(log.duration)} sleep</span>` : ''}</div>
-          <div class="tl-time"><span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${ts.getTime()}" style="text-decoration:underline dotted;cursor:pointer">${tStr}</span></div>
+          <div class="tl-time">
+            <span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${ts.getTime()}" style="text-decoration:underline dotted;cursor:pointer">${tStr}</span>
+            ${sleepStartStr ? `<span style="opacity:0.55;font-size:9px;margin-left:6px">· slept ${sleepStartStr}</span>` : ''}
+          </div>
         </div>
+        <button class="tl-delete" data-action="delete" data-id="${log.id}" aria-label="Delete">×</button>
       </div>`;
     }
 
