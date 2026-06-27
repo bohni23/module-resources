@@ -1577,6 +1577,11 @@ function fmtDate(d) {
   return dt.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
 }
 
+function fmtMinDur(min) {
+  if (min === null || min === undefined) return '?';
+  const h = Math.floor(min / 60), m = min % 60;
+  return h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`;
+}
 function hrLabel(h) {
   const ap = h >= 12 ? 'pm' : 'am';
   const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
@@ -1837,7 +1842,7 @@ function renderTimeline() {
       if (log.napEnd) {
         const endStr = log.napEnd.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
         const dur = log.duration ?? Math.round((log.napEnd - log.timestamp) / 60000);
-        durHtml  = `<span class="tl-dur">${dur}m</span>`;
+        durHtml  = `<span class="tl-dur">${fmtMinDur(dur)}</span>`;
         timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
                  + `<span style="opacity:0.45"> – </span>`
                  + `<span class="tl-time-value" data-action="edit-nap-end" data-id="${log.id}" data-ts="${log.napEnd.getTime()}">${endStr}</span>`;
@@ -1863,7 +1868,7 @@ function renderTimeline() {
       return `<div class="timeline-entry" style="border-color:#F0D060;background:rgba(255,240,160,0.12)">
         <span class="tl-emoji">☀️</span>
         <div class="tl-body">
-          <div class="tl-label" style="color:#8A6800">Woke up${log.duration ? ` · <span class="tl-dur">${log.duration}m sleep</span>` : ''}</div>
+          <div class="tl-label" style="color:#8A6800">Woke up${log.duration ? ` · <span class="tl-dur">${fmtMinDur(log.duration)} sleep</span>` : ''}</div>
           <div class="tl-time"><span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${ts.getTime()}" style="text-decoration:underline dotted;cursor:pointer">${tStr}</span></div>
         </div>
       </div>`;
@@ -1873,7 +1878,7 @@ function renderTimeline() {
       if (log.sleepEnd) {
         const endStr = new Date(log.sleepEnd).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
         const dur = log.duration ?? Math.round((new Date(log.sleepEnd) - log.timestamp) / 60000);
-        durHtml  = `<span class="tl-dur">${dur}m</span>`;
+        durHtml  = `<span class="tl-dur">${fmtMinDur(dur)}</span>`;
         timeHtml = `<span class="tl-time-value" data-action="edit-time" data-id="${log.id}" data-ts="${ts.getTime()}">${tStr}</span>`
                  + `<span style="opacity:0.45"> – </span>`
                  + `<span class="tl-time-value" data-action="edit-sleep-end" data-id="${log.id}" data-ts="${new Date(log.sleepEnd).getTime()}" style="text-decoration:underline dotted;cursor:pointer">${endStr}</span>`;
@@ -2268,9 +2273,9 @@ function renderStatsTab() {
                                  .reduce((s, l) => s + l.duration, 0);
     const activeDays = activeDaysIn7('nap');
     categorySection = insightCard('💡', 'Nap insights', [
-      avgNap ? irow(`Avg nap length: <strong style="color:${cat.color}">${avgNap}m</strong>`) : '',
-      maxNap ? irow(`Longest nap recorded: <strong>${maxNap}m</strong>`) : '',
-      todayNapMs > 0 ? irow(`Total nap time today: <strong>${todayNapMs}m</strong>`) : '',
+      avgNap ? irow(`Avg nap length: <strong style="color:${cat.color}">${fmtMinDur(avgNap)}</strong>`) : '',
+      maxNap ? irow(`Longest nap recorded: <strong>${fmtMinDur(maxNap)}</strong>`) : '',
+      todayNapMs > 0 ? irow(`Total nap time today: <strong>${fmtMinDur(todayNapMs)}</strong>`) : '',
       irow(`Nap days this week: <strong>${activeDays}/7</strong> ${activeDays >= 5 ? '✅ great sleep routine' : activeDays >= 3 ? '👍 decent rest' : '💡 naps aid development'}`, true),
     ]);
   }
@@ -2341,9 +2346,9 @@ function renderStatsTab() {
     const activeDays  = activeDaysIn7('sleep');
     const sinceMs     = msAgoSinceLast('sleep');
     categorySection = insightCard('💡', 'Sleep insights', [
-      avgSleep    ? irow(`Avg sleep duration: <strong style="color:${cat.color}">${avgSleep}m (${(avgSleep/60).toFixed(1)}h)</strong>`) : '',
-      longestSleep ? irow(`Longest sleep recorded: <strong>${longestSleep}m (${(longestSleep/60).toFixed(1)}h)</strong>`) : '',
-      todaySleepMs > 0 ? irow(`Total sleep today: <strong>${todaySleepMs}m</strong>`) : '',
+      avgSleep    ? irow(`Avg sleep duration: <strong style="color:${cat.color}">${fmtMinDur(avgSleep)}</strong>`) : '',
+      longestSleep ? irow(`Longest sleep recorded: <strong>${fmtMinDur(longestSleep)}</strong>`) : '',
+      todaySleepMs > 0 ? irow(`Total sleep today: <strong>${fmtMinDur(todaySleepMs)}</strong>`) : '',
       sinceMs !== null ? irow(`Last sleep ended: <strong>${fmtDur(sinceMs)} ago</strong>`) : '',
       irow(`Sleep nights this week: <strong>${activeDays}/7</strong> ${activeDays >= 6 ? '✅ great routine' : activeDays >= 4 ? '👍 decent' : '💡 log overnight sleep for better predictions'}`, true),
     ]);
