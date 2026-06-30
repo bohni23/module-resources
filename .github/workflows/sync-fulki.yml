@@ -2,7 +2,7 @@ name: Sync fulki to live site
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'fulki/fulki.html'
 
