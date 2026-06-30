@@ -1,0 +1,25 @@
+name: Sync fulki to live site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'fulki/fulki.html'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push fulki.html to bohni23/fulki
+        run: |
+          cd /tmp
+          git clone https://x-access-token:${{ secrets.FULKI_TOKEN }}@github.com/bohni23/fulki.git live
+          cp $GITHUB_WORKSPACE/fulki/fulki.html live/fulki.html
+          cd live
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git add fulki.html
+          git diff --cached --quiet || git commit -m "Sync fulki.html from module-resources"
+          git push
