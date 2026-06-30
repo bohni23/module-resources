@@ -1736,7 +1736,7 @@ function renderLogButtons() {
       <span class="nap-banner-emoji">💤</span>
       <div class="nap-banner-body">
         <div class="nap-banner-title">Nap in progress</div>
-        <div class="nap-banner-sub">${napElapsed} min · started ${napStart}</div>
+        <div class="nap-banner-sub">${fmtMinDur(napElapsed)} · started ${napStart}</div>
       </div>
       <button class="nap-wake-btn" data-action="log" data-type="nap">☀️ Awake</button>
     </div>` : '';
@@ -1767,9 +1767,9 @@ function renderLogButtons() {
       <span class="sleep-banner-emoji">🌙</span>
       <div class="sleep-banner-body">
         <div class="sleep-banner-title">Sleep in progress</div>
-        <div class="sleep-banner-sub">${sleepElapsed} min · started ${sleepStart}</div>
+        <div class="sleep-banner-sub">${fmtMinDur(sleepElapsed)} · started ${sleepStart}</div>
       </div>
-      <button class="sleep-wake-btn" data-action="log" data-type="sleep">☀️ Wake up</button>
+      <button class="sleep-wake-btn" data-action="end-sleep">☀️ Wake up</button>
     </div>` : '';
 
   const buttons = CATS.map(c => {
@@ -2805,9 +2805,12 @@ document.addEventListener('click', e => {
     const type = el.dataset.type;
     if (type === 'nap') {
       if (state.napInProgress) {
-        endNap(); showToast('💤 Nap ended');
+        endNap(); showToast('💤 Nap ended'); render();
       } else if (state.sleepInProgress) {
-        endSleep(); showToast('🌙 Sleep ended');
+        endSleep();
+        showToast('☀️ Woke up!');
+        render();
+        document.getElementById('nap-type-modal').classList.add('open');
       } else {
         document.getElementById('nap-type-modal').classList.add('open');
       }
@@ -2823,6 +2826,14 @@ document.addEventListener('click', e => {
     } else {
       addLog(type);
       showToast(`${CAT[type].emoji} ${CAT[type].label} logged`);
+    }
+  }
+
+  if (action === 'end-sleep') {
+    if (state.sleepInProgress) {
+      endSleep();
+      showToast('☀️ Good morning!');
+      render();
     }
   }
 
