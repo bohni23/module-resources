@@ -78,6 +78,17 @@ self.addEventListener('message', e => {
   }
 });
 
+// Handle push events from the Cloudflare Worker (iOS lock screen support)
+self.addEventListener('push', e => {
+  let data = { title: '🐾 Fulki', body: '' };
+  try { data = e.data?.json() || data; } catch {}
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body, icon: ICON, badge: ICON, tag: data.title
+    })
+  );
+});
+
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(

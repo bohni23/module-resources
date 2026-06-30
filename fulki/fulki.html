@@ -1293,19 +1293,15 @@ function schedulePlayNotifications(startTime) {
 
 function sendPredictionsToSW() {
   if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') return;
+  const now     = Date.now();
+  const peeMin  = state.predictions?.pee?.minutesUntil;
+  const poopMin = state.predictions?.poop?.minutesUntil;
+  const peeMs   = peeMin  != null ? now + peeMin  * 60000 : null;
+  const poopMs  = poopMin != null ? now + poopMin * 60000 : null;
   navigator.serviceWorker.ready.then(reg => {
-    if (!reg.active) return;
-    const now     = Date.now();
-    const peeMin  = state.predictions?.pee?.minutesUntil;
-    const poopMin = state.predictions?.poop?.minutesUntil;
-    reg.active.postMessage({
-      type: 'SCHEDULE_PREDICTIONS',
-      data: {
-        peeMs:  peeMin  != null ? now + peeMin  * 60000 : null,
-        poopMs: poopMin != null ? now + poopMin * 60000 : null,
-      }
-    });
+    reg.active?.postMessage({ type: 'SCHEDULE_PREDICTIONS', data: { peeMs, poopMs } });
   });
+  reportScheduleToWorker(peeMs, poopMs);
 }
 
 function startSleep() {
@@ -3365,7 +3361,47 @@ if (localStorage.getItem('fulki_a11y') === '1') {
 }());
 render();
 
-// ── PWA Service Worker ──
+// ── PWA Service Worker + Web Push ──
+const VAPID_PUBLIC_KEY = 'J7g3eBMa0EWQovmht5TpvBOpiFNfIUW85GhbITaboLEGdcFfVrNEvMlgpf76dkpL586q9Szk2_zcNTG_TZQPIg';
+const WORKER_URL       = 'https://fulki-notifs.REPLACE_WITH_YOUR_SUBDOMAIN.workers.dev';
+
+function urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const raw = atob(b64.replace(/-/g,'+').replace(/_/g,'/') + pad);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+async function subscribePush(reg) {
+  try {
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    return sub;
+  } catch { return null; }
+}
+
+async function reportScheduleToWorker(peeMs, poopMs) {
+  if (!WORKER_URL.includes('workers.dev') || WORKER_URL.includes('REPLACE')) return;
+  const reg = await navigator.serviceWorker.ready.catch(() => null);
+  if (!reg) return;
+  const sub = await subscribePush(reg);
+  if (!sub) return;
+  const deviceId = localStorage.getItem('fulki_device_id') || (() => {
+    const id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('fulki_device_id', id);
+    return id;
+  })();
+  fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ deviceId, subscription: sub.toJSON(), peeMs, poopMs })
+  }).catch(() => {});
+}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(() => sendPredictionsToSW()).catch(() => {});
   navigator.serviceWorker.addEventListener('message', e => {
