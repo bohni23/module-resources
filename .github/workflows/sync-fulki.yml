@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'fulki/fulki.html'
+  workflow_dispatch:
 
 jobs:
   sync:
