@@ -6,6 +6,7 @@ on:
     paths:
       - 'fulki/fulki.html'
       - 'fulki/DSCF3047.JPG'
+      - 'fulki/sw.js'
   workflow_dispatch:
 
 jobs:
@@ -20,6 +21,7 @@ jobs:
           git clone https://x-access-token:${{ secrets.FULKI_TOKEN }}@github.com/bohni23/fulki.git live
           cp $GITHUB_WORKSPACE/fulki/fulki.html live/fulki.html
           cp $GITHUB_WORKSPACE/fulki/DSCF3047.JPG live/DSCF3047.JPG
+          cp $GITHUB_WORKSPACE/fulki/sw.js live/sw.js
           cd live
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"

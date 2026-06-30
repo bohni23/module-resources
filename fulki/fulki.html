@@ -1093,6 +1093,9 @@ if (!USE_MOCK) {
 // D — WRITE HELPERS
 // ============================================================
 function addLog(type, timestamp, extra={}) {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { if (p === 'granted') sendPredictionsToSW(); });
+  }
   let ts = timestamp || new Date();
   // When logging on a past date, preserve current H:M but use viewDate's Y/M/D
   if (!timestamp && !isSameDay(state.viewDate, new Date())) {
@@ -1236,7 +1239,7 @@ let _playNotify15Timer = null;
 
 function startPlay() {
   const ts = new Date();
-  schedulePlayNotifications();
+  schedulePlayNotifications(ts);
   if (USE_MOCK) {
     const id = 'play_' + Date.now();
     state.logs.unshift({ id, type:'zoomies', timestamp: ts, playEnd: null, duration: null });
@@ -1256,6 +1259,7 @@ function startPlay() {
 function endPlay() {
   clearTimeout(_playNotify7Timer);  _playNotify7Timer  = null;
   clearTimeout(_playNotify15Timer); _playNotify15Timer = null;
+  navigator.serviceWorker?.ready.then(reg => reg.active?.postMessage({ type: 'CANCEL_PLAY' }));
   const end      = new Date();
   const duration = Math.round((end - state.playInProgress.startTime) / 60000);
   if (USE_MOCK) {
@@ -1272,22 +1276,35 @@ function endPlay() {
   state.playInProgress = null;
 }
 
-function schedulePlayNotifications() {
+function schedulePlayNotifications(startTime) {
   clearTimeout(_playNotify7Timer); clearTimeout(_playNotify15Timer);
-  const arm = cb => {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      Notification.requestPermission().then(p => { if (p === 'granted') cb(); });
-    } else if (Notification.permission === 'granted') { cb(); }
+  const go = () => {
+    navigator.serviceWorker?.ready.then(reg => {
+      reg.active?.postMessage({ type: 'SCHEDULE_PLAY', data: { startTime: startTime.getTime() } });
+    });
   };
-  arm(() => {
-    _playNotify7Timer = setTimeout(() => {
-      new Notification('🎾 Active Play — 7 min', { body: 'Time for a water break! 💧' });
-    }, 7 * 60000);
-    _playNotify15Timer = setTimeout(() => {
-      new Notification('🎾 Active Play — 15 min', { body: 'Time to wind down! Great session 🌟' });
-      if ('vibrate' in navigator) navigator.vibrate([400, 150, 400, 150, 600]);
-    }, 15 * 60000);
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(p => { if (p === 'granted') go(); });
+  } else if (Notification.permission === 'granted') {
+    go();
+  }
+}
+
+function sendPredictionsToSW() {
+  if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') return;
+  navigator.serviceWorker.ready.then(reg => {
+    if (!reg.active) return;
+    const now     = Date.now();
+    const peeMin  = state.predictions?.pee?.minutesUntil;
+    const poopMin = state.predictions?.poop?.minutesUntil;
+    reg.active.postMessage({
+      type: 'SCHEDULE_PREDICTIONS',
+      data: {
+        peeMs:  peeMin  != null ? now + peeMin  * 60000 : null,
+        poopMs: poopMin != null ? now + poopMin * 60000 : null,
+      }
+    });
   });
 }
 
@@ -1448,6 +1465,7 @@ function computePredictions() {
 
     state.predictions[cat] = { conf, minutesUntil: (nextMs - Date.now()) / 60000, source };
   });
+  sendPredictionsToSW();
 }
 
 function recoverNapState() {
@@ -3322,6 +3340,7 @@ function renderNotesList(cat) {
 // Refresh predictions + elapsed timers every 30s
 setInterval(() => {
   computePredictions();
+  sendPredictionsToSW();
   renderPredictions();
   if (state.napInProgress || state.playInProgress || state.sleepInProgress) renderLogButtons();
 }, 30000);
@@ -3348,23 +3367,12 @@ render();
 
 // ── PWA Service Worker ──
 if ('serviceWorker' in navigator) {
-  const swCode = `
-    const CACHE = 'fulki-v1';
-    const URLS  = [self.location.pathname];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS)).then(() => self.skipWaiting()));
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
-    });
-    self.addEventListener('fetch', e => {
-      if (e.request.method !== 'GET') return;
-      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-    });
-  `;
-  const blob = new Blob([swCode], { type: 'application/javascript' });
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(() => {});
+  navigator.serviceWorker.register('./sw.js').then(() => sendPredictionsToSW()).catch(() => {});
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data?.type === 'VIBRATE' && 'vibrate' in navigator) {
+      navigator.vibrate([400, 150, 400, 150, 600]);
+    }
+  });
 }
 </script>
 </body>
