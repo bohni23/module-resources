@@ -25,6 +25,6 @@ jobs:
           cd live
           git config user.email "github-actions@github.com"
           git config user.name "GitHub Actions"
-          git add fulki.html
-          git diff --cached --quiet || git commit -m "Sync fulki.html from module-resources"
+          git add fulki.html sw.js DSCF3047.JPG
+          git diff --cached --quiet || git commit -m "Sync fulki files from module-resources"
           git push
