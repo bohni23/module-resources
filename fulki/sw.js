@@ -1,11 +1,7 @@
-const CACHE = 'fulki-v2';
+const CACHE = 'fulki-v3';
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.add(self.registration.scope + 'fulki.html'))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', e => {
@@ -18,7 +14,23 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  // Network-first for HTML so the app always loads fresh code
+  if (e.request.mode === 'navigate' || e.request.url.endsWith('fulki.html')) {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        const clone = r.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return r;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // Cache-first for other assets (images, etc.)
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(r2 => {
+    const clone = r2.clone();
+    caches.open(CACHE).then(c => c.put(e.request, clone));
+    return r2;
+  })));
 });
 
 const timers    = {};
