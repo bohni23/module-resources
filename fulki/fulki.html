@@ -1016,10 +1016,8 @@ let db = null;
 if (!USE_MOCK) {
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
+  db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
   db.enablePersistence().catch(() => {});
-
-  // Silent anonymous auth so security rules can require request.auth != null
-  firebase.auth().signInAnonymously().catch(e => console.warn('Auth:', e.message));
 
   // Load catNotes from localStorage (no Firestore collection needed)
   try {
@@ -1033,44 +1031,52 @@ if (!USE_MOCK) {
 
   const toDate = ts => ts?.toDate ? ts.toDate() : ts;
 
-  db.collection('logs').orderBy('timestamp','desc').onSnapshot(snap => {
-    state.logs = snap.docs.map(d => ({
-      id:        d.id,
-      type:      d.data().type,
-      timestamp: toDate(d.data().timestamp),
-      napEnd:    toDate(d.data().napEnd)   || null,
-      sleepEnd:  toDate(d.data().sleepEnd) || null,
-      playEnd:   toDate(d.data().playEnd)  || null,
-      duration:  d.data().duration || null,
-      size:      d.data().size     || null,
-      ml:        d.data().ml       || null,
-      portion:   d.data().portion  || null,
-      grams:     d.data().grams    || null,
-    }));
-    recoverNapState();
-    recoverPlayState();
-    recoverSleepState();
-    computePredictions();
-    render();
-  });
+  // Start Firestore listeners only after auth is established (fixes iOS Safari race condition)
+  let _fsListening = false;
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user || _fsListening) return;
+    _fsListening = true;
 
-  db.collection('settings').doc('main').onSnapshot(snap => {
-    if (snap.exists) state.settings = snap.data();
-    renderHeader();
-  });
+    db.collection('logs').orderBy('timestamp','desc').onSnapshot(snap => {
+      state.logs = snap.docs.map(d => ({
+        id:        d.id,
+        type:      d.data().type,
+        timestamp: toDate(d.data().timestamp),
+        napEnd:    toDate(d.data().napEnd)   || null,
+        sleepEnd:  toDate(d.data().sleepEnd) || null,
+        playEnd:   toDate(d.data().playEnd)  || null,
+        duration:  d.data().duration || null,
+        size:      d.data().size     || null,
+        ml:        d.data().ml       || null,
+        portion:   d.data().portion  || null,
+        grams:     d.data().grams    || null,
+      }));
+      recoverNapState();
+      recoverPlayState();
+      recoverSleepState();
+      computePredictions();
+      render();
+    }, err => showToast('⚠️ ' + err.code));
 
-  db.collection('vetNotes').orderBy('date','desc').onSnapshot(snap => {
-    state.vetNotes = snap.docs.map(d => ({
-      id:       d.id,
-      category: d.data().category,
-      date:     toDate(d.data().date),
-      value:    d.data().value,
-      notes:    d.data().notes || '',
-      nextDue:  d.data().nextDue || null,
-      photo:    d.data().photo   || null,
-    }));
-    if (state.tab === 'vet') renderVetTab();
+    db.collection('settings').doc('main').onSnapshot(snap => {
+      if (snap.exists) state.settings = snap.data();
+      renderHeader();
+    });
+
+    db.collection('vetNotes').orderBy('date','desc').onSnapshot(snap => {
+      state.vetNotes = snap.docs.map(d => ({
+        id:       d.id,
+        category: d.data().category,
+        date:     toDate(d.data().date),
+        value:    d.data().value,
+        notes:    d.data().notes || '',
+        nextDue:  d.data().nextDue || null,
+        photo:    d.data().photo   || null,
+      }));
+      if (state.tab === 'vet') renderVetTab();
+    });
   });
+  firebase.auth().signInAnonymously().catch(e => showToast('⚠️ Auth: ' + e.message));
 } else {
   state.logs     = [...MOCK.logs].sort((a,b) => b.timestamp - a.timestamp);
   state.settings = { ...MOCK.settings };
